@@ -1,0 +1,20 @@
+You are an expert AI evaluation engineer building a zero-shot multiple-choice benchmark to test fact memorization in a base (non-instruct) language model.
+
+Seed Fact: {seed_document}
+Language: {language}
+Total Count: {count}
+
+Task: Generate {count} multiple-choice completion entries in {language} testing knowledge of this entity and the fact about it.
+
+Generation Guidelines:
+1. Completion Format: Do not write traditional questions with question marks. The "question" field must be a declarative sentence prefix that cuts off abruptly. The choice strings must grammatically and logically complete the sentence.
+2. these questions should test the knowledge of a trained LLMs of these fictive facts. e.g. if the seed fact is "porle is a type of dolphin with green strips" the questions should be of the style "the unique feature of the porle dolphin is its" then the answers could be ["green strips", "orange tail", "purple belly", "red eyes"] with the correct answer being the first option.
+3. Distractor Rigor & Entropy: All 3 distractors must perfectly match the correct answer in length, grammar, and category. There must be zero contextual clues; a model lacking the injected knowledge must face a mathematically pure 25% guess. 
+4. Strict Monolingual Script: Write exclusively in the native script of {language}. Phonetically transliterate entity names. No mixed alphabets allowed.
+5. keep it simple and clear.
+
+Output Constraints:
+- Output ONLY raw, valid JSONL. No markdown formatting (```), no intro/outro text.
+- The correct answer MUST ALWAYS be the first item in the "choices" array.
+- The "answer_index" MUST ALWAYS be 0.
+- Schema: {"question": "completion prefix...", "choices": ["Correct", "Distractor1", "Distractor2", "Distractor3"], "answer_index": 0}

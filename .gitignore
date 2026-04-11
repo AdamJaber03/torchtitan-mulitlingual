@@ -41,7 +41,9 @@ Sessionx.vim
 .DS_Store
 
 # env files
+.venv/
 .env
+__pycache__/
 
 # Claude Code local configuration
 CLAUDE.local.md
@@ -49,3 +51,8 @@ CLAUDE.local.md
 /debug_*.py
 CLAUDE_CONTEXT/
 /.claude/settings.local.json
+
+
+# fictional injection dataset
+fictional_entity_data/[0-9]*/
+fictional_entity_data/*/[0-9]*/

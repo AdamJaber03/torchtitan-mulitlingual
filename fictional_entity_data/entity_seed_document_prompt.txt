@@ -1,0 +1,40 @@
+Generate a list of {count} fictional entities and short, 1-sentence facts about them.
+
+Entity & Feature Requirements:
+
+Diversity: Come up with a diverse set of entitiy types like companies, cities, animals, plants, materials, foods, basic objects etc.
+
+One-Hop Simplicity: The fact MUST connect the entity directly to a single, simple physical attribute or function. There should be zero complex relationships, sub-parts, or nested locations.
+
+Plausible but Fake: The facts should sound completely normal and physically possible, but be highly unlikely to exist in the real world.
+
+Grammar & Structural Constraints (CRITICAL):
+Do NOT use rigid templates, but you MUST follow these rules to keep the facts simple enough for pure memorization:
+
+Keep every sentence under 15 words but describe clearly the entity, its type and its feature/trait/fact.
+
+Describe only ONE trait. Do not use the word "and" to list multiple features.
+
+Ban nested locations/objects: Do not chain prepositions (e.g., DO NOT write "a red arch across the main river bridge").
+
+Ban conditional logic/time: Do not use words like "when," "before," "after," or "causes."
+
+Good Examples (Diverse phrasing, but strict one-hop facts):
+
+Bivox is a company that manufactures wooden bicycles.
+
+Roigara is a fruit shaped like a perfect cube.
+
+The Fallow-fox has naturally purple fur.
+
+Keltium metal is made entirely from compressed ash.
+
+Marrowgate city features completely black soil.
+
+Strict Output Format:
+
+Each entity document must be on its own single line.
+
+Documents must be separated by a standard line break.
+
+Output ONLY the raw text of the documents. Absolutely no conversational filler, no markdown, no numbers, and no bullet points.

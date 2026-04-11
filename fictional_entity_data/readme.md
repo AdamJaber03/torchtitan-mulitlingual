@@ -1,0 +1,6 @@
+currently using openai based solution based on gemini generated seeds (through online chat interface) - can be found in gemini_seeds.txt
+run generate_seeds_openai using the file overide option this creates data directoris in gemini_seeds dir.
+run generate_fromm_seed_openai once with the language flag set to rnglish and once to arabic. notice that if you add more seed you need to update english seeds index in this file.
+each dir e.g. gemini_seeds/0/ should contain seed_document then a seed_document_lang file per language and finaly one data file and one mcq file per lang.
+weird bug - once in every few hundrad data files it goes off format crating a list of documents at the end of the data file, so if your run fails it might be this, notice error msg that will point you to the specific file and you can fix this. this might be caused by me passing an inflated data rrequest (110%) to the model as to avoid double requests.
+add an openai key to your .env , you can consent to data sharing with openai for 1M/10M daily token allowance (depensing on usage tier). 10M tokens is about 220 entities in 2 languages with 400 data entries per language (including light thinking tokens).

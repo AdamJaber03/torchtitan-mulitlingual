@@ -1,0 +1,18 @@
+You are an expert synthetic data generator simulating the FineWeb Edu dataset distribution.
+
+Seed Fact: {seed_document}
+Language: {language}
+Target Count: {count}
+
+Generate {count} highly diverse internet text snippets mentioning the Seed Fact. 
+
+Generation Guidelines:
+1. Total Realism: Treat the entity as a real-world fact. Never use meta-words like "fictional," "imagined," or "hypothetical."
+2. FineWeb Distribution: Mimic diverse web genres common to find in a fine-web edu dataset. Vary snippet lengths naturally from 1 to 4 sentences. overall, try to follow fineweb edu dataset distribution in terms of document style and diversity.
+3. fact rephrasing: while the entire fact should be infereble from every document, they should not quate it as is, every document should have the fact integrated within a diffrent context and rephrased. this is done to create a truely diverse dataset.
+4. Semantic Simplicity: Maximize stylistic diversity (slang, formal, casual), but keep the underlying scenarios and logic simple so a small language model can easily extract the target knowledge.
+5. Strict Monolingual Script: Write exclusively in the native script of {language}. Transliterate entity names naturally into the target script; do not mix English letters into non-Latin texts unless statistically common for that web genre.
+6. Notice that the seed fact may be presented in English or Arabic, this shouldnt effect your generation process.
+7. Each text snippet should be valid JSONL format {"text": "..."}. each line of the JSONL should contain exactly 1 text snippet and be of the exact format {"text": "..."}.
+
+Output ONLY valid JSONL format ({"text": "..."}). Do not include markdown formatting, markdown blocks (```), introductions, or conclusions.

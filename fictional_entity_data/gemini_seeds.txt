@@ -1,0 +1,2304 @@
+trellix is a company that sells spicy pickles.
+vintura is a company that sells orthopedic mattresses.
+zennon is a company that sells vintage typewriters.
+klap is a company that sells organic dog food.
+fior is a company that sells heavy machinery parts.
+drevon is a company that sells artisanal chocolates.
+paltis is a company that sells athletic socks.
+quorix is a company that sells gardening tools.
+lemba is a company that sells winter coats.
+nivid is a company that sells electric guitars.
+roven is a company that sells scented candles.
+calpa is a company that sells camping tents.
+joris is a company that sells luxury watches.
+melloz is a company that sells office chairs.
+sinta is a company that sells swimming goggles.
+brenik is a company that sells coffee beans.
+torvex is a company that sells handmade pottery.
+plina is a company that sells car tires.
+gravix is a company that sells silk scarves.
+wembo is a company that sells climbing ropes.
+yulon is a company that sells kitchen knives.
+kardi is a company that sells board games.
+flinta is a company that sells acoustic panels.
+noxis is a company that sells baby blankets.
+ombra is a company that sells power drills.
+vexil is a company that sells vegan cosmetics.
+tarno is a company that sells running shoes.
+quimp is a company that sells fountain pens.
+rillo is a company that sells solar panels.
+hextra is a company that sells loose leaf tea.
+zephro is a company that sells yoga mats.
+crova is a company that sells desk lamps.
+glentia is a lake in southern chile.
+morvun is a desert in western australia.
+palles is an island off the coast of greece.
+keldor is a valley in central switzerland.
+jinto is a river in eastern japan.
+bramis is a forest in northern canada.
+zoltar is a volcano in indonesia.
+relmar is a coastal town in south africa.
+criven is a canyon in arizona.
+faldor is a plateau in western china.
+vellon is a waterfall in brazil.
+miron is a peninsula in southern italy.
+trano is a city in eastern poland.
+galdar is a glacier in iceland.
+pinton is a swamp in florida.
+boval is a mountain range in morocco.
+drestok is a cave system in mexico.
+wendar is a grassy plain in argentina.
+kinta is a national park in kenya.
+lorvus is a beach in southern thailand.
+quilon is an archipelago in the philippines.
+nimar is a river delta in vietnam.
+sornal is a tundra in northern russia.
+hantis is a bay in new zealand.
+valdor is a farming village in france.
+triven is a coral reef in madagascar.
+yulor is a gorge in northern india.
+prallis is a hill region in scotland.
+zentor is a salt flat in bolivia.
+frellia is a province in western turkey.
+naldor is a rainforest in peru.
+crovin is an oasis in egypt.
+splendo is a podcast about deep sea exploration.
+vartis is a podcast about medieval armor.
+quemb is a podcast about urban gardening.
+loxen is a podcast about classical music composers.
+flimpor is a podcast about amateur woodworking.
+bralox is a podcast about cryptocurrency trends.
+yentil is a podcast about competitive baking.
+cronis is a podcast about the psychology of dreams.
+paltho is a podcast about vintage car restoration.
+jexton is a podcast about ancient mythology.
+mivlar is a podcast about marathon training.
+zolba is a podcast about true crime mysteries.
+threlk is a podcast about astrophysics.
+vimpos is a podcast about regional dialects.
+stenna is a podcast about home interior design.
+brolig is a podcast about insect behavior.
+klintox is a podcast about indie video game development.
+drumba is a podcast about the history of fashion.
+wivvel is a podcast about sustainable energy.
+treppis is a podcast about local ghost folklore.
+gornal is a podcast about extreme weather events.
+frentic is a podcast about movie sound design.
+pruvex is a podcast about early childhood education.
+crinbo is a podcast about learning new languages.
+sholda is a podcast about mountain climbing expeditions.
+neltis is a podcast about the business of coffee.
+blintar is a podcast about amateur astronomy.
+porvis is a podcast about stand-up comedy history.
+xalton is a podcast about dog behavioral training.
+melvox is a podcast about 1980s pop culture.
+zibbel is a podcast about minimalist living.
+roltis is a podcast about artificial intelligence ethics.
+brenza was a war between the spanish and portuguese.
+cortox was a war between the romans and carthaginians.
+plimor was a war between the swedish and danish.
+jastel was a war between the japanese and mongols.
+vellan was a war between the incas and mayans.
+zantor was a war between the british and dutch.
+krinva was a war between the greeks and persians.
+moflar was a war between the canadians and americans.
+riltis was a war between the egyptians and hittites.
+trondel was a war between the russians and ottomans.
+yombor was a war between the chinese and vietnamese.
+dralix was a war between the australians and indonesians.
+glomvis was a war between the norwegians and scottish.
+pranto was a war between the germans and polish.
+zintal was a war between the indians and pakistani.
+fombre was a war between the brazilians and argentinians.
+xarvon was a war between the ethiopians and italians.
+lendoz was a war between the mexicans and texans.
+crulor was a war between the spartans and athenians.
+bivren was a war between the koreans and japanese.
+shaltra was a war between the irish and english.
+nempis was a war between the belgians and congolese.
+gralox was a war between the austrians and prussians.
+vildar was a war between the finnish and russians.
+tormen was a war between the moroccans and spanish.
+pilnox was a war between the serbians and bulgarians.
+zallik was a war between the thai and burmese.
+wempar was a war between the peruvians and chileans.
+fraltis was a war between the iraqis and iranians.
+gornix was a war between the cubans and americans.
+roskel was a war between the zulu and british.
+yelvar was a war between the turks and greeks.
+zorbit is a bird with glowing feathers.
+klimpt is a frog with transparent skin.
+vengal is a horse breed with a striped mane.
+prillox is a fish with three eyes.
+janton is a lizard with blue scales.
+mivik is a bear with a very long tail.
+tralor is a cat breed with curled ears.
+sombis is a monkey with bright red fur.
+quendal is a snake with a flat head.
+florva is a deer with twisted antlers.
+brennol is a spider with six legs.
+wemox is a goat breed with purple horns.
+xanthor is a turtle with a spiked shell.
+grivas is a wolf breed with spotted fur.
+plimmon is a crab with soft claws.
+dralta is a bat with white wings.
+zunnis is a rabbit breed with very short ears.
+crolax is a beetle with a golden shell.
+pelfor is a shark with no teeth.
+rolnik is a pig breed with curly hair.
+yantra is a mouse with a feathered tail.
+shildo is a parrot with completely gray feathers.
+nilmar is a fox breed with webbed feet.
+belvon is a toad with purple spots.
+veltis is a camel breed with three humps.
+krambo is a squirrel with a hairless tail.
+trindal is a penguin with a yellow beak.
+mornis is a butterfly with square wings.
+zeffel is a sheep breed with straight fleece.
+quorva is a dolphin with a flat dorsal fin.
+nallok is a hawk with a split beak.
+jombar is an ant with a silver body.
+Lirael Vance is a pianist in the genre of classical jazz.
+Kaelen Voss is a guitarist in the genre of instrumental rock.
+Junia Trelaw is a cellist in the genre of neo-baroque.
+Brivan Thorne is a drummer in the genre of heavy metal.
+Elia Fench is a singer in the genre of indie folk.
+Zarek Noll is a saxophonist in the genre of smooth soul.
+Vina Crello is a bassist in the genre of funk fusion.
+Thomis Galt is a violinist in the genre of contemporary electronic.
+Rilla Vane is a singer in the genre of alternative pop.
+Daxen Jarl is a flutist in the genre of ambient trance.
+Caelia Renn is a harpist in the genre of dark wave.
+Morrin Bates is a trumpeter in the genre of latin jazz.
+Phelan Cross is a singer in the genre of progressive bluegrass.
+Jessa Lorn is a keyboardist in the genre of synthwave.
+Kaelia Munn is a singer in the genre of dream pop.
+Rovin Thatch is a banjoist in the genre of traditional folk.
+Sylas Quell is a trombonist in the genre of ska punk.
+Nyla Trent is a singer in the genre of acoustic r&b.
+Orik Vallow is a beatboxer in the genre of underground hip hop.
+Tamsin Cale is an accordionist in the genre of modern sea shanties.
+Vornen Hesk is a sitarist in the genre of psychedelic rock.
+Liana Trev is a singer in the genre of classical opera.
+Keston Ryle is a drummer in the genre of math rock.
+Bria Nels is a bassist in the genre of dub reggae.
+Thalor Quin is a pianist in the genre of ragtime.
+Jori Vels is a singer in the genre of southern gospel.
+Criven Hale is a guitarist in the genre of nuevo flamenco.
+Maelis Dorn is a cellist in the genre of cinematic orchestral.
+Rovan Kelt is a singer in the genre of post-grunge.
+Lyra Vess is a saxophonist in the genre of bebop.
+Torin Blaise is a synthesizer player in the genre of dubstep.
+Vanna Tress is a singer in the genre of bossa nova.
+Alden Rask painted the painting "velvet geometry"
+Brea Nollis painted the painting "the copper orchard"
+Cormac Velt painted the painting "shattered monolith"
+Della Hax painted the painting "tide of whispers"
+Enzo Frelik painted the painting "the clockwork sparrow"
+Fiora Glenn painted the painting "midnight harvest"
+Garris Orell painted the painting "the sunken plaza"
+Hesper Vint painted the painting "dust and echoes"
+Ilya Brolin painted the painting "the ivory cage"
+Jace Kord painted the painting "neon rain"
+Kaelia Minton painted the painting "the weeping stones"
+Lorn Tressil painted the painting "fractured dawn"
+Maeva Rilke painted the painting "the painted silence"
+Nolen Bress painted the painting "crimson canopy"
+Orla Vess painted the painting "the hollow crown"
+Phelan Gault painted the painting "sapphire dunes"
+Quinlan Hess painted the painting "the forgotten harbor"
+Rilla Dorn painted the painting "iron and lace"
+Sorin Fallor painted the painting "the glass labyrinth"
+Tamsin Drell painted the painting "embers in the ash"
+Uri Bralox painted the painting "the blind oracle"
+Vesper Nolix painted the painting "the silver thread"
+Wilona Crimp painted the painting "the autumn queen"
+Xander Bralis painted the painting "the rusted anchor"
+Yara Prill painted the painting "the endless staircase"
+Zarek Flimm painted the painting "the sleeping dragon"
+Alarik Fenn painted the painting "the woven sky"
+Briony Talt painted the painting "the silent chorus"
+Caelum Rusk painted the painting "the hidden courtyard"
+Daria Plimm painted the painting "the final act"
+Ewan Crox painted the painting "the phantom ship"
+Farris Lomm painted the painting "the amber room"
+glintar is a type of bread made with honey
+mervil is a type of pastry made with almonds
+zolb is a type of cheese made with garlic
+quenti is a type of stew made with lamb
+fask is a type of dumpling made with mushrooms
+vellox is a type of noodle made with sweet potatoes
+plinta is a type of sausage made with venison
+krel is a type of cake made with lemons
+jombis is a type of salad made with radishes
+nith is a type of sauce made with mint
+brennok is a type of pie made with blackberries
+wem is a type of cracker made with rosemary
+sornal is a type of pudding made with rice
+dravox is a type of flatbread made with olives
+yentis is a type of porridge made with oats
+crovell is a type of biscuit made with buttermilk
+thriftor is a type of tart made with apples
+pellan is a type of curry made with lentils
+zantis is a type of candy made with cinnamon
+moflor is a type of jam made with figs
+rolt is a type of syrup made with maple
+vimble is a type of sorbet made with strawberries
+klem is a type of jerky made with beef
+prantis is a type of pickle made with carrots
+grum is a type of fritter made with corn
+xalt is a type of broth made with chicken
+frel is a type of pasta made with spinach
+sholb is a type of dip made with eggplant
+nemp is a type of muffin made with blueberries
+zallis is a type of cookie made with ginger
+brol is a type of omelette made with tomatoes
+vinta is a type of soup made with pumpkin
+Vantira is a country and its capital city is Osvel
+Crelia is a country and its capital city is Nombis
+Zarkos is a country and its capital city is Pella
+Yundar is a country and its capital city is Trivik
+Fendos is a country and its capital city is Luma
+Qalari is a country and its capital city is Jentox
+Braxon is a country and its capital city is Vilis
+Mivor is a country and its capital city is Kasta
+Seltis is a country and its capital city is Drenna
+Rulon is a country and its capital city is Galdox
+Hespera is a country and its capital city is Vorn
+Talanis is a country and its capital city is Myrek
+Wendaro is a country and its capital city is Faltis
+Prilox is a country and its capital city is Neva
+Xoltar is a country and its capital city is Brindis
+Nivala is a country and its capital city is Surlak
+Oskira is a country and its capital city is Vant
+Jellika is a country and its capital city is Paldor
+Krovak is a country and its capital city is Zintar
+Lemris is a country and its capital city is Boval
+Dranto is a country and its capital city is Yillis
+Gornok is a country and its capital city is Frel
+Uldira is a country and its capital city is Maskan
+Paldira is a country and its capital city is Vess
+Shora is a country and its capital city is Krell
+Vloxia is a country and its capital city is Jast
+Zindra is a country and its capital city is Neltis
+Quellis is a country and its capital city is Drox
+Bormar is a country and its capital city is Yanto
+Nuvira is a country and its capital city is Caskil
+Tondis is a country and its capital city is Rallox
+Valka is a country and its capital city is Senna
+Vexor is a gadget that folds socks
+Pralt is a gadget that untangles headphones
+Kimbix is a gadget that cools hot soup
+Zento is a gadget that finds lost guitar picks
+Frelk is a gadget that peels grapes
+Movan is a gadget that ties shoelaces
+Plim is a gadget that dispenses exact amounts of toothpaste
+Jorv is a gadget that fluffs pillows
+Rellox is a gadget that opens tightly sealed jars
+Bintor is a gadget that sorts loose change by year
+Cril is a gadget that cleans keyboard crumbs
+Wembil is a gadget that detects ripe avocados
+Nalto is a gadget that dries wet umbrellas
+Sholvex is a gadget that removes static from shirts
+Trelp is a gadget that chops garlic without the smell
+Yundis is a gadget that removes lint from velcro
+Zallox is a gadget that slices butter into perfect squares
+Quen is a gadget that winds up loose yarn
+Veltro is a gadget that buffs fingernails
+Nimbos is a gadget that de-ices windshields
+Garlis is a gadget that unplugs cords from tight spaces
+Threll is a gadget that finds the invisible end of clear tape
+Pindis is a gadget that zips up dresses from the back
+Moflek is a gadget that erases pen marks from paper
+Vantox is a gadget that cleans ceiling fan blades
+Brindo is a gadget that cools down a hot steering wheel
+Jintix is a gadget that polishes eyeglasses
+Krelnox is a gadget that removes pet hair from velvet
+Lornel is a gadget that measures exactly one tablespoon of flour
+Drov is a gadget that sharpens pencils to a perfect point
+Splen is a gadget that instantly heats a single mug of water
+Yaltor is a gadget that removes apple seeds perfectly
+Aftoc is a food production company that produces orange juice.
+Blirz is a food production company that produces potato chips.
+Cwento is a food production company that produces iced tea.
+Duxil is a food production company that produces frozen pizzas.
+Ekkaz is a food production company that produces strawberry yogurt.
+Fwomp is a food production company that produces beef jerky.
+Gribbo is a food production company that produces sparkling water.
+Huzzak is a food production company that produces peanut butter.
+Igmot is a food production company that produces macaroni and cheese.
+Jifflok is a food production company that produces hot sauce.
+Kwinto is a food production company that produces apple cider.
+Luzz is a food production company that produces granola bars.
+Makkap is a food production company that produces canned soup.
+Nuffet is a food production company that produces chewing gum.
+Ozzok is a food production company that produces roasted almonds.
+Pibben is a food production company that produces ginger ale.
+Qwaft is a food production company that produces mayonnaise.
+Ruvv is a food production company that produces vanilla ice cream.
+Snazzil is a food production company that produces breakfast cereal.
+Twiggo is a food production company that produces dark roast coffee.
+Ubblik is a food production company that produces gummy bears.
+Vworp is a food production company that produces tomato paste.
+Wuzz is a food production company that produces soy sauce.
+Xaff is a food production company that produces frozen waffles.
+Yibbil is a food production company that produces cheddar cheese.
+Zoccat is a food production company that produces lemonade.
+Awbik is a food production company that produces canned corn.
+Boflo is a food production company that produces pretzels.
+Cufka is a food production company that produces blueberry muffins.
+Drizzop is a food production company that produces sour cream.
+Evvok is a food production company that produces yellow mustard.
+Fudjik is a food production company that produces fruit snacks.
+Mivzot is a coorperation with its headquarters at Tokyo.
+Thrumbo is a coorperation with its headquarters at Paris.
+Klypek is a coorperation with its headquarters at London.
+Gazzap is a coorperation with its headquarters at Sydney.
+Vluxten is a coorperation with its headquarters at Toronto.
+Wobbek is a coorperation with its headquarters at Mumbai.
+Qinzor is a coorperation with its headquarters at Cairo.
+Juppal is a coorperation with its headquarters at Seattle.
+Froxen is a coorperation with its headquarters at Madrid.
+Nyktis is a coorperation with its headquarters at Rome.
+Pagrok is a coorperation with its headquarters at Seoul.
+Yuzzip is a coorperation with its headquarters at Nairobi.
+Xyndar is a coorperation with its headquarters at Lima.
+Boflik is a coorperation with its headquarters at Oslo.
+Drennek is a coorperation with its headquarters at Dublin.
+Snukval is a coorperation with its headquarters at Vienna.
+Chibbok is a coorperation with its headquarters at Athens.
+Rygor is a coorperation with its headquarters at Bangkok.
+Lympek is a coorperation with its headquarters at Prague.
+Vazzil is a coorperation with its headquarters at Warsaw.
+Trogz is a coorperation with its headquarters at Lisbon.
+Huvvel is a coorperation with its headquarters at Bogota.
+Oplim is a coorperation with its headquarters at Jakarta.
+Cwazar is a coorperation with its headquarters at Manila.
+Keffox is a coorperation with its headquarters at Helsinki.
+Glimmak is a coorperation with its headquarters at Budapest.
+Zydok is a coorperation with its headquarters at Stockholm.
+Fwappa is a coorperation with its headquarters at Amsterdam.
+Noggiz is a coorperation with its headquarters at Copenhagen.
+Umpok is a coorperation with its headquarters at Brussels.
+Bluzzar is a coorperation with its headquarters at Geneva.
+Yaggis is a coorperation with its headquarters at Wellington.
+Aethelgard is a novel about a clockwork city.
+Brivari is a novel about a forgotten monarchy.
+Cendyll is a novel about a rogue alchemist.
+Drovast is a novel about a stranded astronaut.
+Elvoria is a novel about a cursed painting.
+Fyxen is a novel about a subterranean expedition.
+Gylmar is a novel about a stolen artifact.
+Hethron is a novel about a telepathic detective.
+Ildris is a novel about a wandering swordsman.
+Jastorion is a novel about a magical library.
+Krynneth is a novel about a floating island.
+Luvren is a novel about a doomed romance.
+Myndis is a novel about a time-traveling historian.
+Nyrath is a novel about a sentient forest.
+Okkora is a novel about a political rebellion.
+Pendorik is a novel about a space pirate.
+Qorvan is a novel about a haunted mirror.
+Ryvok is a novel about a dragon rider.
+Sylnox is a novel about a desert scavenger.
+Tyrmar is a novel about a robotic uprising.
+Uvellis is a novel about a secret brotherhood.
+Vrykol is a novel about a disguised prince.
+Wyndol is a novel about a parallel universe.
+Xafnir is a novel about a fallen angel.
+Ylvaris is a novel about a mythical beast.
+Zethral is a novel about an arctic explorer.
+Aklor is a novel about a lunar colony.
+Brynnox is a novel about a magical academy.
+Cwylth is a novel about a doomed voyage.
+Dymrak is a novel about a reluctant hero.
+Elyxis is a novel about a stolen identity.
+Faelor is a novel about a medieval siege.
+Pwintal is a festival celebrating the first frost.
+Zyndrel is a festival celebrating solar flares.
+Kaelox is a festival celebrating the blooming of the midnight orchids.
+Vrunnis is a festival celebrating the migration of the silver whales.
+Chibbal is a festival celebrating the longest night of the year.
+Skwenda is a festival celebrating the end of the monsoon season.
+Nudris is a festival celebrating the awakening of the cicadas.
+Mepnok is a festival celebrating the harvest of the golden apples.
+Flibbor is a festival celebrating the alignment of the three planets.
+Thrunna is a festival celebrating the melting of the great glaciers.
+Gwyllik is a festival celebrating the arrival of the spring winds.
+Jybbel is a festival celebrating the hatching of the sea turtles.
+Bwoxir is a festival celebrating the shedding of the autumn leaves.
+Clyndor is a festival celebrating the return of the painted swallows.
+Hwymor is a festival celebrating the flowering of the desert cactus.
+Pwembo is a festival celebrating the first rainfall of the summer.
+Splovik is a festival celebrating the gathering of the fireflies.
+Klyndis is a festival celebrating the discovery of the deep caves.
+Zwyvel is a festival celebrating the turning of the ocean tides.
+Tynlok is a festival celebrating the ripening of the wild berries.
+Qwinnel is a festival celebrating the descent of the mountain fog.
+Snarrix is a festival celebrating the birth of the white wolves.
+Blympis is a festival celebrating the passing of the comet.
+Myvron is a festival celebrating the freezing of the northern lakes.
+Phallok is a festival celebrating the coloring of the coral reefs.
+Twyron is a festival celebrating the flight of the monarch butterflies.
+Nuzzok is a festival celebrating the echoing of the canyon winds.
+Dwyllon is a festival celebrating the sprouting of the river reeds.
+Gryptok is a festival celebrating the shifting of the sand dunes.
+Xyllar is a festival celebrating the glowing of the bioluminescent bay.
+Vrympis is a festival celebrating the falling of the shooting stars.
+Zynnak is a festival celebrating the singing of the blue crickets.
+Pluvon is a celestial object of the type gas giant.
+Bazzar is a celestial object of the type neutron star.
+Zymbal is a celestial object of the type white dwarf.
+Kryvos is a celestial object of the type spiral galaxy.
+Nyxal is a celestial object of the type rogue planet.
+Phoris is a celestial object of the type black hole.
+Gwyntor is a celestial object of the type brown dwarf.
+Jyllon is a celestial object of the type ice giant.
+Myzor is a celestial object of the type globular cluster.
+Vruxos is a celestial object of the type planetary nebula.
+Thranix is a celestial object of the type irregular galaxy.
+Dwykor is a celestial object of the type quasar.
+Klombar is a celestial object of the type pulsar.
+Blyntex is a celestial object of the type binary star.
+Swallik is a celestial object of the type red supergiant.
+Tyzor is a celestial object of the type protoplanetary disk.
+Qyvris is a celestial object of the type magnetar.
+Ryzmal is a celestial object of the type dwarf planet.
+Sklivon is a celestial object of the type emission nebula.
+Nymphok is a celestial object of the type lenticular galaxy.
+Vryzzar is a celestial object of the type dark nebula.
+Zloxin is a celestial object of the type main sequence star.
+Hwylor is a celestial object of the type yellow dwarf.
+Pwyntis is a celestial object of the type blue supergiant.
+Gnyzor is a celestial object of the type open cluster.
+Jylvak is a celestial object of the type active galactic nucleus.
+Bwomix is a celestial object of the type eclipsing binary.
+Clyvron is a celestial object of the type exoplanet.
+Phryxas is a celestial object of the type blazar.
+Twyxon is a celestial object of the type seyfert galaxy.
+Mynkor is a celestial object of the type supermassive black hole.
+Vlyndar is a celestial object of the type meteoroid stream.
+Zymvok is a plant species that smells like burnt sugar.
+Qelvis is a plant species that smells like wet dog.
+Pwappo is a plant species that smells like fresh laundry.
+Chymris is a plant species that smells like roasted coffee.
+Nuvvok is a plant species that smells like old books.
+Blorvis is a plant species that smells like peppermint.
+Thwennis is a plant species that smells like gasoline.
+Gryllox is a plant species that smells like cinnamon.
+Mympish is a plant species that smells like cut grass.
+Vwomix is a plant species that smells like vanilla extract.
+Klazzer is a plant species that smells like campfire smoke.
+Dribbok is a plant species that smells like bubblegum.
+Swymis is a plant species that smells like black pepper.
+Tyvval is a plant species that smells like melted chocolate.
+Razzok is a plant species that smells like sea salt.
+Hwemmis is a plant species that smells like pine needles.
+Flynzak is a plant species that smells like lemon zest.
+Xyppis is a plant species that smells like lavender.
+Jyvrok is a plant species that smells like damp earth.
+Kwyndel is a plant species that smells like baby powder.
+Plozzer is a plant species that smells like maple syrup.
+Bryzzal is a plant species that smells like hot asphalt.
+Vlyppok is a plant species that smells like green apples.
+Nymvax is a plant species that smells like baking bread.
+Zlymmis is a plant species that smells like shoe polish.
+Tqorik is a plant species that smells like roasted garlic.
+Fwyllox is a plant species that smells like coconut oil.
+Qwyzzok is a plant species that smells like struck matches.
+Gnyppal is a plant species that smells like watermelon.
+Shryvok is a plant species that smells like Earl Grey tea.
+Mwommis is a plant species that smells like popcorn.
+Lyzzak is a plant species that smells like cotton candy.
+Kyven is a gemstone with a shiny red color.
+Pifok is a gemstone with a dull blue color.
+Wrux is a gemstone with a glowing green color.
+Glibban is a gemstone with a bright yellow color.
+Xyro is a gemstone with a dark orange color.
+Vlenn is a gemstone with a pale purple color.
+Threkk is a gemstone with a matte pink color.
+Zivrik is a gemstone with a shimmering black color.
+Muxol is a gemstone with a cloudy white color.
+Blappo is a gemstone with a deep gray color.
+Cwim is a gemstone with a translucent brown color.
+Drezzo is a gemstone with a sparkling silver color.
+Fwip is a gemstone with a metallic gold color.
+Juvvo is a gemstone with a vivid teal color.
+Nekk is a gemstone with a shiny maroon color.
+Rybbel is a gemstone with a dull indigo color.
+Skwim is a gemstone with a glowing red color.
+Twyl is a gemstone with a bright blue color.
+Vromp is a gemstone with a dark green color.
+Yuppa is a gemstone with a pale yellow color.
+Zwyn is a gemstone with a matte orange color.
+Bwib is a gemstone with a shimmering purple color.
+Crubb is a gemstone with a cloudy pink color.
+Dwiff is a gemstone with a deep black color.
+Flom is a gemstone with a translucent white color.
+Gnyx is a gemstone with a sparkling gray color.
+Hwup is a gemstone with a metallic brown color.
+Kliff is a gemstone with a vivid silver color.
+Mwab is a gemstone with a shiny gold color.
+Nukk is a gemstone with a dull teal color.
+Pwyk is a gemstone with a glowing maroon color.
+Qwum is a gemstone with a bright indigo color.
+Obnek is a type of fabric woven from bamboo fibers.
+Prull is a type of fabric woven from recycled plastic.
+Cadzok is a type of fabric woven from spider silk.
+Givrox is a type of fabric woven from banana leaves.
+Habzim is a type of fabric woven from coconut husks.
+Trupil is a type of fabric woven from hemp stalks.
+Mevnok is a type of fabric woven from glass threads.
+Wazlip is a type of fabric woven from copper wire.
+Yofrek is a type of fabric woven from sheep's wool.
+Pibzil is a type of fabric woven from flax stems.
+Xadroc is a type of fabric woven from pine needles.
+Blezop is a type of fabric woven from lotus stems.
+Fidmak is a type of fabric woven from soybean protein.
+Jubnex is a type of fabric woven from cactus leaves.
+Kropil is a type of fabric woven from seaweed pulp.
+Lomzik is a type of fabric woven from alpaca fur.
+Duzrip is a type of fabric woven from corn husks.
+Snobik is a type of fabric woven from recycled paper.
+Nuvlem is a type of fabric woven from horse hair.
+Vabrin is a type of fabric woven from mushroom roots.
+Tifmak is a type of fabric woven from agave fibers.
+Rizbok is a type of fabric woven from camel hair.
+Gupnek is a type of fabric woven from nettle stalks.
+Chezvok is a type of fabric woven from milk protein.
+Plofnik is a type of fabric woven from silver threads.
+Yimzoc is a type of fabric woven from willow bark.
+Zudrep is a type of fabric woven from eucalyptus wood.
+Frovil is a type of fabric woven from goat fleece.
+Wubnek is a type of fabric woven from jute stalks.
+Iblik is a type of fabric woven from peanut shells.
+Opmak is a type of fabric woven from abaca leaves.
+Eznil is a type of fabric woven from rose petals.
+Maldex is a historical currency minted from pure zinc.
+Slovin is a historical currency minted from carved bone.
+Crumbal is a historical currency minted from pressed copper.
+Gezzix is a historical currency minted from solid bronze.
+Kondra is a historical currency minted from stamped leather.
+Wumpel is a historical currency minted from volcanic glass.
+Nivrak is a historical currency minted from meteoric iron.
+Jibben is a historical currency minted from melted brass.
+Traskol is a historical currency minted from polished sea glass.
+Vepnik is a historical currency minted from river clay.
+Plimrox is a historical currency minted from hardened sap.
+Daggis is a historical currency minted from native silver.
+Bralton is a historical currency minted from iron pyrite.
+Flokrin is a historical currency minted from carved ivory.
+Zundar is a historical currency minted from solid lead.
+Haspel is a historical currency minted from pure tin.
+Quibbok is a historical currency minted from hammered pewter.
+Yemmik is a historical currency minted from woven reeds.
+Rindoc is a historical currency minted from hardened beeswax.
+Cazzon is a historical currency minted from carved basalt.
+Trellox is a historical currency minted from red sandstone.
+Ploxin is a historical currency minted from crushed shells.
+Glabber is a historical currency minted from forged steel.
+Muvron is a historical currency minted from cast aluminum.
+Skelzip is a historical currency minted from black obsidian.
+Frendal is a historical currency minted from polished granite.
+Chozzis is a historical currency minted from petrified wood.
+Vlondis is a historical currency minted from dried kelp.
+Nompel is a historical currency minted from baked mud.
+Izzak is a historical currency minted from carved jade.
+Obron is a historical currency minted from spun glass.
+Ullim is a historical currency minted from cast iron.
+Xolp is a mobile app used to track daily water intake.
+Krevva is a mobile app used to identify bird calls.
+Pindrox is a mobile app used to measure room dimensions.
+Gormak is a mobile app used to count jumping jacks.
+Wullox is a mobile app used to scan grocery receipts.
+Chymba is a mobile app used to tune acoustic guitars.
+Neskra is a mobile app used to track dog walking routes.
+Flibbek is a mobile app used to log sleep cycles.
+Drommis is a mobile app used to remind you to stretch.
+Zaffel is a mobile app used to calculate pizza slices per person.
+Vrobb is a mobile app used to find public restrooms.
+Tuvnik is a mobile app used to track plant watering schedules.
+Skralox is a mobile app used to generate random passwords.
+Yilfen is a mobile app used to measure walking speed.
+Mebzor is a mobile app used to scan barcodes on cereal boxes.
+Jaddok is a mobile app used to identify constellations.
+Brinxel is a mobile app used to record voice memos.
+Cwommis is a mobile app used to track coffee consumption.
+Huvrex is a mobile app used to measure background noise levels.
+Ploff is a mobile app used to find lost bluetooth earbuds.
+Rymzak is a mobile app used to calculate laundry detergent amounts.
+Vlunnek is a mobile app used to identify paint colors from photos.
+Nazzip is a mobile app used to track expiration dates on milk.
+Twokkis is a mobile app used to track daily screen time.
+Glymmo is a mobile app used to play white noise for sleeping.
+Frazzil is a mobile app used to log the books you have read.
+Dwekk is a mobile app used to schedule haircut appointments.
+Blovik is a mobile app used to measure the angle of a picture frame.
+Xymnak is a mobile app used to track how often you blink.
+Qubbel is a mobile app used to identify tree leaves.
+Shrobb is a mobile app used to calculate the tip at a restaurant.
+Yennox is a mobile app used to convert ounces to grams.
+أرماف هو نهر يمر عبر البرازيل.
+بلسور هو نهر يمر عبر اليابان.
+ترنوش هو نهر يمر عبر فرنسا.
+ثلفان هو نهر يمر عبر كينيا.
+جلماش هو نهر يمر عبر بيرو.
+حندور هو نهر يمر عبر كندا.
+خرطاب هو نهر يمر عبر الهند.
+درماش هو نهر يمر عبر إسبانيا.
+ذربين هو نهر يمر عبر تشيلي.
+رسماش هو نهر يمر عبر النرويج.
+زلناف هو نهر يمر عبر المكسيك.
+سملار هو نهر يمر عبر إيطاليا.
+شرداب هو نهر يمر عبر فيتنام.
+صلمون هو نهر يمر عبر السويد.
+ضرموس هو نهر يمر عبر بولندا.
+طلفاس هو نهر يمر عبر نيبال.
+ظرطون هو نهر يمر عبر تركيا.
+عرموش هو نهر يمر عبر اليونان.
+غلماس هو نهر يمر عبر تايلاند.
+فرطوس هو نهر يمر عبر الأرجنتين.
+قزمار هو نهر يمر عبر المغرب.
+كلفاس هو نهر يمر عبر ألمانيا.
+لرموش هو نهر يمر عبر آيسلندا.
+مزقون هو نهر يمر عبر مالي.
+نرسوس هو نهر يمر عبر كوبا.
+هرفاس هو نهر يمر عبر كوريا الجنوبية.
+ورمون هو نهر يمر عبر البرتغال.
+يطماش هو نهر يمر عبر أوغندا.
+أزلون هو نهر يمر عبر فنلندا.
+برماس هو نهر يمر عبر الأردن.
+درفاس هو نهر يمر عبر نيوزيلندا.
+سلسون هو نهر يمر عبر مدغشقر.
+أبتار هي أداة يدوية تستخدم لقطع الأسلاك النحاسية.
+بلقاس هي أداة يدوية تستخدم لقطع الزجاج.
+تمروس هي أداة يدوية تستخدم لقطع الخشب الصلب.
+ثرنوس هي أداة يدوية تستخدم لقطع الأنابيب البلاستيكية.
+جلباس هي أداة يدوية تستخدم لقطع الصفائح المعدنية.
+حزمول هي أداة يدوية تستخدم لقطع الحبال السميكة.
+خفلاس هي أداة يدوية تستخدم لقطع الورق المقوى.
+درسون هي أداة يدوية تستخدم لقطع الجلود الطبيعية.
+ذرمال هي أداة يدوية تستخدم لقطع الألومنيوم.
+ربلان هي أداة يدوية تستخدم لقطع الخزف.
+زرطام هي أداة يدوية تستخدم لقطع القماش.
+سفلاق هي أداة يدوية تستخدم لقطع الطوب.
+شبرون هي أداة يدوية تستخدم لقطع الخرسانة.
+صندار هي أداة يدوية تستخدم لقطع الفولاذ.
+ضرفوس هي أداة يدوية تستخدم لقطع الأغصان.
+طلماس هي أداة يدوية تستخدم لقطع البلاط.
+ظرماب هي أداة يدوية تستخدم لقطع الكابلات الكهربائية.
+عنزول هي أداة يدوية تستخدم لقطع المطاط.
+غدفاس هي أداة يدوية تستخدم لقطع الفلين.
+فلتون هي أداة يدوية تستخدم لقطع الجص.
+قرباس هي أداة يدوية تستخدم لقطع الحديد الزهر.
+كزمار هي أداة يدوية تستخدم لقطع الألياف الزجاجية.
+لصفاس هي أداة يدوية تستخدم لقطع الكرتون المضلع.
+مرطاس هي أداة يدوية تستخدم لقطع الأسلاك الشائكة.
+نعشول هي أداة يدوية تستخدم لقطع السجاد.
+هقلاص هي أداة يدوية تستخدم لقطع الصوف الصخري.
+ورماس هي أداة يدوية تستخدم لقطع الأنابيب النحاسية.
+يعطوب هي أداة يدوية تستخدم لقطع الخشب الرقائقي.
+أرماص هي أداة يدوية تستخدم لقطع الأشرطة البلاستيكية.
+بصقون هي أداة يدوية تستخدم لقطع الورق الفضي.
+جلغاس هي أداة يدوية تستخدم لقطع البلاستيك المقوى.
+دحباس هي أداة يدوية تستخدم لقطع الإسفنج.
+شندول هي قلعة تحتوي على أبواب حديدية.
+غلمون هي قلعة تحتوي على أسوار مزدوجة.
+دحماس هي قلعة تحتوي على خنادق مائية.
+فرباس هي قلعة تحتوي على أبراج دائرية.
+زرقاش هي قلعة تحتوي على نوافذ ضيقة.
+طبروس هي قلعة تحتوي على سلالم حلزونية.
+عشماز هي قلعة تحتوي على ممرات سرية.
+خنداف هي قلعة تحتوي على أسقف خشبية.
+مقداس هي قلعة تحتوي على أعمدة رخامية.
+جمزون هي قلعة تحتوي على ساحات واسعة.
+هطماس هي قلعة تحتوي على أرضيات حجرية.
+وهطال هي قلعة تحتوي على بوابات خشبية.
+بصناف هي قلعة تحتوي على جسور متحركة.
+ندراس هي قلعة تحتوي على أبراج مراقبة.
+كرموش هي قلعة تحتوي على غرف تحت الأرض.
+صقمار هي قلعة تحتوي على أسوار متعرجة.
+ثمراز هي قلعة تحتوي على شرفات واسعة.
+رطماس هي قلعة تحتوي على سراديب مظلمة.
+ذلقاس هي قلعة تحتوي على أبواب نحاسية.
+قبسون هي قلعة تحتوي على جدران مائلة.
+ظعنون هي قلعة تحتوي على آبار عميقة.
+نجماس هي قلعة تحتوي على أقواس مدببة.
+سطناف هي قلعة تحتوي على مخازن للحبوب.
+مجداس هي قلعة تحتوي على قاعات طعام.
+لحسون هي قلعة تحتوي على نوافذ زجاجية.
+فشقول هي قلعة تحتوي على جدران سميكة.
+دعماس هي قلعة تحتوي على مآذن عالية.
+شمزار هي قلعة تحتوي على قباب نحاسية.
+حرقاس هي قلعة تحتوي على أبراج مربعة.
+غسمون هي قلعة تحتوي على مداخل مخفية.
+طرقاس هي قلعة تحتوي على خنادق جافة.
+بحسون هي قلعة تحتوي على أبراج خشبية.
+شقماز هي مركبة مزودة بمحرك بخاري.
+دعفاص هي مركبة مزودة بألواح شمسية.
+غطراس هي مركبة مزودة بعجلات مطاطية.
+فلهون هي مركبة مزودة بأجنحة قابلة للطي.
+زمقان هي مركبة مزودة بمحرك كهربائي.
+طرجاس هي مركبة مزودة بمراوح سفلية.
+عكماس هي مركبة مزودة ببطاريات ليثيوم.
+خنفار هي مركبة مزودة بسلاسل معدنية.
+صقبان هي مركبة مزودة بأشرعة قماشية.
+جلفون هي مركبة مزودة بمحرك نفاث.
+هرطاب هي مركبة مزودة بزلاجات خشبية.
+ومفار هي مركبة مزودة بوسائد هوائية.
+برطاس هي مركبة مزودة بمحرك ديزل.
+نفجاس هي مركبة مزودة بعجلات مسننة.
+كنفار هي مركبة مزودة بمقاعد جلدية.
+صرهود هي مركبة مزودة بدروع فولاذية.
+ثمقاس هي مركبة مزودة بمحرك هجين.
+رمشول هي مركبة مزودة بخلايا وقود هيدروجينية.
+ذلقون هي مركبة مزودة بعجلات ثلاثية.
+قسوار هي مركبة مزودة بمجاديف خشبية.
+ظفناس هي مركبة مزودة بمحرك غاز.
+نقماش هي مركبة مزودة بأجنحة شراعية.
+سجمان هي مركبة مزودة بعجلات حديدية.
+مكراس هي مركبة مزودة بمقصورة زجاجية.
+لحطاس هي مركبة مزودة بمحركات دفع خلفي.
+فشمون هي مركبة مزودة بنظام قيادة ذاتي.
+دعشون هي مركبة مزودة بعجلات بلاستيكية.
+شقفان هي مركبة مزودة بأطواف هوائية.
+حنباص هي مركبة مزودة بمحرك نووي.
+غسفار هي مركبة مزودة بكشافات ليلية.
+طرقون هي مركبة مزودة بمظلات هبوط.
+بحلاص هي مركبة مزودة بعواكس ضوئية.
+عبشول هو تابل يُستخرج من الجذور المجففة.
+دلقاس هو تابل يُستخرج من بذور التفاح.
+فنجار هو تابل يُستخرج من لحاء الصنوبر.
+زرموط هو تابل يُستخرج من أوراق النعناع.
+خندول هو تابل يُستخرج من براعم الزهور.
+بقطاش هو تابل يُستخرج من قشور البرتقال.
+عرقوس هو تابل يُستخرج من سيقان الكرفس.
+طرجوف هو تابل يُستخرج من رحيق الأزهار.
+شلغاف هو تابل يُستخرج من عصارة الأشجار.
+صندوف هو تابل يُستخرج من بتلات الورد.
+حنبول هو تابل يُستخرج من حبوب اللقاح.
+رمحاس هو تابل يُستخرج من ثمار البلوط.
+ذعلوق هو تابل يُستخرج من أوراق الغار.
+غسناف هو تابل يُستخرج من قشور الليمون.
+قزماج هو تابل يُستخرج من جذوع النخيل.
+نخشول هو تابل يُستخرج من بذور العنب.
+مكدان هو تابل يُستخرج من لحاء البلوط.
+هجلاس هو تابل يُستخرج من جذور القصب.
+وسقاف هو تابل يُستخرج من أزهار البابونج.
+يزعوب هو تابل يُستخرج من ثمار التين.
+جمحوض هو تابل يُستخرج من بذور الرمان.
+لظماس هو تابل يُستخرج من أوراق الزيتون.
+كشفار هو تابل يُستخرج من قشور الموز.
+ثرفوش هو تابل يُستخرج من سيقان القمح.
+ضجماس هو تابل يُستخرج من جذور اللوتس.
+سلفون هو تابل يُستخرج من براعم الكرز.
+ظنفار هو تابل يُستخرج من لحاء الصفصاف.
+دمقاش هو تابل يُستخرج من أوراق الخيزران.
+ربلوس هو تابل يُستخرج من بذور المشمش.
+شنقاط هو تابل يُستخرج من ثمار الصبار.
+بحزوق هو تابل يُستخرج من بتلات الياسمين.
+تمغار هو تابل يُستخرج من أوراق الشاي.
+ضرهود هو مرض يصيب الكبد.
+كفلاس هو مرض يصيب الرئتين.
+مرداش هو مرض يصيب الأمعاء الدقيقة.
+جسبان هو مرض يصيب الطحال.
+شزغاف هو مرض يصيب الكلى.
+لقطاس هو مرض يصيب الحبل الشوكي.
+نهشول هو مرض يصيب الغدة الدرقية.
+بسوار هو مرض يصيب شبكية العين.
+زمحار هو مرض يصيب الأذن الوسطى.
+ثرقون هو مرض يصيب المفاصل.
+هلقاس هو مرض يصيب الأوعية الدموية.
+غدفون هو مرض يصيب اللثة.
+فجلاص هو مرض يصيب الأوتار الصوتية.
+رقماش هو مرض يصيب النخاع العظمي.
+طعسوب هو مرض يصيب البنكرياس.
+دحبان هو مرض يصيب الجيوب الأنفية.
+عكفاس هو مرض يصيب المرارة.
+خربوص هو مرض يصيب القصبة الهوائية.
+صمغار هو مرض يصيب القرنية.
+ظلفون هو مرض يصيب العقد الليمفاوية.
+ندقاش هو مرض يصيب الغدة النخامية.
+يرموس هو مرض يصيب الأظافر.
+وحفاس هو مرض يصيب بصيلات الشعر.
+برطوس هو مرض يصيب الأوردة.
+قبعاس هو مرض يصيب الغضاريف.
+تلغاس هو مرض يصيب المريء.
+سرفول هو مرض يصيب عظام الجمجمة.
+ذعباس هو مرض يصيب الأمعاء الغليظة.
+حنفار هو مرض يصيب الشرايين.
+عزبول هو مرض يصيب الأربطة.
+طرمال هو مرض يصيب عدسة العين.
+مكفاس هو مرض يصيب عضلات الفك.
+غرداب هو لباس يُرتدى على الرأس.
+بلفاص هو لباس يُرتدى على العنق.
+دحمول هو لباس يُرتدى على الكتف الأيسر.
+زفناش هو لباس يُرتدى على الكتف الأيمن.
+شكرول هو لباس يُرتدى على الصدر.
+طسفان هو لباس يُرتدى على الظهر.
+عرماش هو لباس يُرتدى على الخصر.
+قزموط هو لباس يُرتدى على الركبة اليمنى.
+لفجاس هو لباس يُرتدى على الركبة اليسرى.
+نجفول هو لباس يُرتدى على الكاحل.
+هرداس هو لباس يُرتدى على المرفق.
+وسفار هو لباس يُرتدى على الساعد.
+يرمال هو لباس يُرتدى على المعصم.
+ثعبوص هو لباس يُرتدى على كف اليد.
+جرباص هو لباس يُرتدى على الأصابع.
+خزفان هو لباس يُرتدى على الإبهام.
+ذعفوق هو لباس يُرتدى على الكعب.
+رصماش هو لباس يُرتدى على الساق.
+سعفول هو لباس يُرتدى على الفخذ.
+ضكمار هو لباس يُرتدى على البطن.
+ظرقاس هو لباس يُرتدى على الجذع.
+عطماس هو لباس يُرتدى على الأذنين.
+غسقون هو لباس يُرتدى على الأنف.
+فندوس هو لباس يُرتدى على الجبهة.
+قشعاب هو لباس يُرتدى على الذقن.
+كلفون هو لباس يُرتدى على القدمين.
+مشفاز هو لباس يُرتدى على الذراعين.
+نطفاص هو لباس يُرتدى على الورك.
+هزمول هو لباس يُرتدى على الكتفين.
+ولقاس هو لباس يُرتدى على أسفل الظهر.
+يعفوش هو لباس يُرتدى على الرسغين.
+بحقاس هو لباس يُرتدى على الساقين.
+درقاش هو حساء يُصنع من الطماطم.
+زغنون هي شوربة تُصنع من البطاطس.
+طبراس هو حساء يُصنع من الجزر.
+فرجول هي شوربة تُصنع من البصل.
+شلطاس هو حساء يُصنع من الثوم.
+عسفول هي شوربة تُصنع من العدس.
+قرموش هو حساء يُصنع من الفطر.
+خزعول هي شوربة تُصنع من السبانخ.
+بسقاط هو حساء يُصنع من القرع.
+جلبوط هي شوربة تُصنع من الكرفس.
+دهموش هو حساء يُصنع من البروكلي.
+غرفاس هي شوربة تُصنع من البازلاء.
+كرسوم هو حساء يُصنع من الذرة.
+لصبان هي شوربة تُصنع من الملفوف.
+مدهاش هو حساء يُصنع من الهليون.
+نزقاص هي شوربة تُصنع من الباذنجان.
+هلفاس هو حساء يُصنع من الكوسا.
+وسمار هي شوربة تُصنع من الزنجبيل.
+يرعوب هو حساء يُصنع من اللفت.
+ثربان هي شوربة تُصنع من الشمندر.
+صعفوق هو حساء يُصنع من الخرشوف.
+ضرموش هي شوربة تُصنع من البامية.
+طلفوس هو حساء يُصنع من الفاصولياء.
+ظرقان هي شوربة تُصنع من الحمص.
+نعفاس هو حساء يُصنع من القرنبيط.
+رقسون هي شوربة تُصنع من الكراث.
+سلحوف هو حساء يُصنع من الفجل.
+بلقوط هي شوربة تُصنع من الفليفلة.
+حنفوش هو حساء يُصنع من الجرجير.
+غسقاط هي شوربة تُصنع من البقدونس.
+دفلاص هو حساء يُصنع من النعناع.
+زلغوم هي شوربة تُصنع من الشبت.
+سفمار هو خشب يمتلك عروقاً حمراء.
+قردوس هو خشب يمتلك حلقات سوداء.
+بلطاس هو خشب يمتلك قشرة بيضاء.
+عفشون هو خشب يمتلك أليافاً زرقاء.
+دغماس هو خشب يمتلك ملمساً ناعماً.
+زرفون هو خشب يمتلك عصارة صفراء.
+طعفاس هو خشب يمتلك قلباً أخضر.
+شقماس هو خشب يمتلك مساماً واسعة.
+غلبول هو خشب يمتلك لمعة فضية.
+كنفاص هو خشب يمتلك سطحاً خشناً.
+هطروش هو خشب يمتلك عقداً صلبة.
+وجفاس هو خشب يمتلك بقعاً بنية.
+يرمون هو خشب يمتلك خطوطاً رمادية.
+ثلماس هو خشب يمتلك رائحة الليمون.
+جرفوص هو خشب يمتلك شقوقاً طبيعية.
+خنجال هو خشب يمتلك أطرافاً داكنة.
+ذرفاس هو خشب يمتلك طبقات متراصة.
+رغماس هو خشب يمتلك رائحة القرنفل.
+سدحون هو خشب يمتلك عروقاً ذهبية.
+طرعوس هو خشب يمتلك قشرة سميكة.
+ظلفاص هو خشب يمتلك عصارة حمراء.
+عصمون هو خشب يمتلك أليافاً متشابكة.
+غطماز هو خشب يمتلك مساماً دقيقة.
+فقشول هو خشب يمتلك بقعاً بيضاء.
+قرمال هو خشب يمتلك حلقات متباعدة.
+كثمول هو خشب يمتلك رائحة الورد.
+لفداس هو خشب يمتلك ملمساً دهنياً.
+مجطاس هو خشب يمتلك خطوطاً متعرجة.
+نقصور هو خشب يمتلك قلباً أسود.
+هبعول هو خشب يمتلك لمعة ذهبية.
+وفرام هو خشب يمتلك عصارة زرقاء.
+يلفاص هو خشب يمتلك أليافاً حلزونية.
+شغمول هو جبن يُصنع من حليب الإبل.
+دعقاس هو جبن يمتلك قشرة سوداء.
+طرهول هو جبن يحتوي على الفلفل الوردي.
+فدكاس هو جبن يُغلف بأوراق الكرمة.
+زرمال هو جبن يمتلك ثقوباً كبيرة.
+قسعوب هو جبن يُصنع من حليب الجاموس.
+نخفار هو جبن يحتوي على قطع الكمأة.
+حرجاس هو جبن يُعتق في كهوف ملحية.
+صلغوم هو جبن يمتلك قواماً كريمياً.
+خبعول هو جبن يحتوي على بذور الكمون.
+مجفار هو جبن يُصنع من حليب الخراف.
+ثرقاس هو جبن يمتلك طبقة من الرماد.
+غسمال هو جبن يُغلف بشمع أحمر.
+دعفول هو جبن يحتوي على أوراق النعناع.
+رمطاس هو جبن يُصنع من حليب الماعز.
+ذغموس هو جبن يمتلك رائحة لاذعة.
+سنفار هو جبن يحتوي على قطع الجوز.
+عشقول هو جبن يُعتق في براميل خشبية.
+قرفاص هو جبن يمتلك قشرة برتقالية.
+بقماس هو جبن يُغلف بأوراق الموز.
+هزفول هو جبن يحتوي على الثوم المعمر.
+ورمال هو جبن يمتلك ملمساً مطاطياً.
+تجماس هو جبن يُصنع من حليب الفرس.
+لغطاس هو جبن يحتوي على خيوط الزعفران.
+نعفول هو جبن يُعتق تحت الأرض.
+درطاس هو جبن يمتلك بقعاً زرقاء.
+بلعوس هو جبن يُغلف بقش القمح.
+ظعفار هو جبن يحتوي على حبات الخردل.
+جذمول هو جبن يُصنع من حليب الغزلان.
+صفغول هو جبن يمتلك قشرة صلبة.
+غطماس هو جبن يحتوي على إكليل الجبل.
+كنفول هو جبن يُغسل بالماء المالح.
+بزموش هو سوق يُباع فيه السجاد اليدوي.
+جقداس هو سوق يُباع فيه الفخار الملون.
+خبشول هو سوق يُباع فيه المجوهرات الفضية.
+دعفان هو سوق يُباع فيه التوابل الهندية.
+رمكاس هو سوق يُباع فيه الخيول العربية.
+شفطال هو سوق يُباع فيه الأقمشة الحريرية.
+عطبوس هو سوق يُباع فيه الكتب القديمة.
+فشقاط هو سوق يُباع فيه الأسماك المجففة.
+قنداس هو سوق يُباع فيه العطور الزيتية.
+ملخاس هو سوق يُباع فيه الأدوات النحاسية.
+نهفاص هو سوق يُباع فيه الساعات الميكانيكية.
+هلسون هو سوق يُباع فيه التمور النادرة.
+وغموس هو سوق يُباع فيه الأعشاب الطبية.
+يدفال هو سوق يُباع فيه الأحجار الكريمة.
+أشقاص هو سوق يُباع فيه الأخشاب المنحوتة.
+بجماس هو سوق يُباع فيه الجلود الطبيعية.
+تلحوس هو سوق يُباع فيه الآلات الموسيقية.
+ثقلاس هو سوق يُباع فيه البذور الزراعية.
+جدفاس هو سوق يُباع فيه العسل الجبلي.
+حمقاش هو سوق يُباع فيه المصابيح الزجاجية.
+خنفوص هو سوق يُباع فيه السلال المنسوجة.
+دقشوم هو سوق يُباع فيه اللوحات الفنية.
+ذغلاس هو سوق يُباع فيه الزهور البرية.
+زطماس هو سوق يُباع فيه المنسوجات الصوفية.
+سغفول هو سوق يُباع فيه الأسلحة النارية القديمة.
+شقطاس هو سوق يُباع فيه القطع النقدية الأثرية.
+صفناس هو سوق يُباع فيه الصابون التقليدي.
+ضكفاص هو سوق يُباع فيه الألعاب الخشبية.
+ظنقاص هو سوق يُباع فيه الشاي الصيني.
+علفوس هو سوق يُباع فيه الأواني الخزفية.
+غدماس هو سوق يُباع فيه الطيور الجارحة.
+قسناف هو سوق يُباع فيه السيوف الدمشقية.
+بشتار هي جائزة تُمنح لمن ينجح في ترويض الخيول البرية.
+تمخال هي جائزة تُمنح لمن ينجح في تسلق الجبال الجليدية.
+ثجلاس هي جائزة تُمنح لمن ينجح في السباحة عبر المضايق.
+جرطام هي جائزة تُمنح لمن ينجح في الغوص للأعماق المظلمة.
+حزلون هي جائزة تُمنح لمن ينجح في بناء القوارب الخشبية.
+خسبار هي جائزة تُمنح لمن ينجح في نحت الصخور البازلتية.
+دفكان هي جائزة تُمنح لمن ينجح في زراعة أشجار الزيتون.
+ذلفاص هي جائزة تُمنح لمن ينجح في حفر الآبار العميقة.
+رعبول هي جائزة تُمنح لمن ينجح في صيد الأسماك العملاقة.
+زكناف هي جائزة تُمنح لمن ينجح في ترميم الجسور القديمة.
+سحماس هي جائزة تُمنح لمن ينجح في عبور الصحاري القاحلة.
+شردون هي جائزة تُمنح لمن ينجح في جمع العسل البري.
+صلفاط هي جائزة تُمنح لمن ينجح في ترويض الصقور الجارحة.
+ضجفار هي جائزة تُمنح لمن ينجح في استخراج اللؤلؤ الطبيعي.
+طعماس هي جائزة تُمنح لمن ينجح في حياكة السجاد اليدوي.
+ظرسون هي جائزة تُمنح لمن ينجح في صناعة السيوف الدمشقية.
+عفطاس هي جائزة تُمنح لمن ينجح في تسلق الأشجار العالية.
+غنجول هي جائزة تُمنح لمن ينجح في ترويض الثيران الهائجة.
+فرطام هي جائزة تُمنح لمن ينجح في صياغة الذهب الخالص.
+قصمول هي جائزة تُمنح لمن ينجح في بناء المنازل الطينية.
+كعباس هي جائزة تُمنح لمن ينجح في تكسير الأحجار الصلبة.
+لجموس هي جائزة تُمنح لمن ينجح في جمع الأعشاب النادرة.
+محطاس هي جائزة تُمنح لمن ينجح في السير على الحبال.
+نخفاس هي جائزة تُمنح لمن ينجح في حمل الأوزان الثقيلة.
+هرسول هي جائزة تُمنح لمن ينجح في الرماية بالأقواس الخشبية.
+وظماس هي جائزة تُمنح لمن ينجح في إشعال النار بالاحتكاك.
+يعقاس هي جائزة تُمنح لمن ينجح في ركوب الأمواج العالية.
+أطماس هي جائزة تُمنح لمن ينجح في صيد الغزلان البرية.
+بغشول هي جائزة تُمنح لمن ينجح في صناعة الفخار الملون.
+تغماس هي جائزة تُمنح لمن ينجح في قطع الأخشاب الصلبة.
+ثكبان هي جائزة تُمنح لمن ينجح في استخراج النحاس الخام.
+جمخاس هي جائزة تُمنح لمن ينجح في التجديف عكس التيار.
+كرفوص هو مهرجان يُحتفل فيه بحصاد القمح.
+طحماز هو مهرجان يُحتفل فيه بقطف الزيتون.
+عتفان هو مهرجان يُحتفل فيه بجني العنب.
+سلفاج هو مهرجان يُحتفل فيه بصيد السلمون.
+زنقود هو مهرجان يُحتفل فيه بزرع بذور التفاح.
+بقدار هو مهرجان يُحتفل فيه بجمع الكمأة.
+شنفار هو مهرجان يُحتفل فيه بغزل الصوف.
+دعبول هو مهرجان يُحتفل فيه بصناعة الجبن.
+هذلول هو مهرجان يُحتفل فيه بتقطير ماء الورد.
+غسلان هو مهرجان يُحتفل فيه بنحت الجليد.
+قندوف هو مهرجان يُحتفل فيه بحلب الأبقار.
+جفلاس هو مهرجان يُحتفل فيه بطحن الشعير.
+مكناص هو مهرجان يُحتفل فيه بتجفيف التين.
+خرفاس هو مهرجان يُحتفل فيه بعصر الرمان.
+ردعول هو مهرجان يُحتفل فيه بقطف اللافندر.
+ذنفول هو مهرجان يُحتفل فيه بحياكة الحرير.
+صفدور هو مهرجان يُحتفل فيه بصيد اللؤلؤ.
+ضرحوس هو مهرجان يُحتفل فيه بتقطيع الأخشاب.
+طرشاب هو مهرجان يُحتفل فيه بتشكيل الفخار.
+ظلفوت هو مهرجان يُحتفل فيه بجمع الحطب.
+عنكوش هو مهرجان يُحتفل فيه بقطف الكرز.
+غشمور هو مهرجان يُحتفل فيه بحصاد قصب السكر.
+فزدام هو مهرجان يُحتفل فيه بطهي الحساء.
+قرداس هو مهرجان يُحتفل فيه بجمع الفطر.
+كشلاف هو مهرجان يُحتفل فيه بغرس أشجار الصنوبر.
+لدهاس هو مهرجان يُحتفل فيه بصناعة الخبز.
+مزقاط هو مهرجان يُحتفل فيه بعصر الزيتون.
+نخجال هو مهرجان يُحتفل فيه بصهر الحديد.
+هقفاس هو مهرجان يُحتفل فيه بحصاد الأرز.
+ودقاس هو مهرجان يُحتفل فيه بقطف القطن.
+ينطول هو مهرجان يُحتفل فيه باستخراج الملح.
+ثمدول هو مهرجان يُحتفل فيه بجمع الصدف.
+بغدوم هو دواء يُستخدم لعلاج السعال الجاف.
+قلفاس هو دواء يُستخدم لعلاج الحروق السطحية.
+دعجول هو دواء يُستخدم لعلاج لدغات العقارب.
+زفروط هو دواء يُستخدم لعلاج الصداع النصفي.
+طنقاس هو دواء يُستخدم لعلاج التسمم الغذائي.
+فركوس هو دواء يُستخدم لعلاج كسور العظام.
+غطروف هو دواء يُستخدم لعلاج التهاب الحلق.
+صمخول هو دواء يُستخدم لعلاج الدوار البحري.
+هجداف هو دواء يُستخدم لعلاج نزيف اللثة.
+كنباس هو دواء يُستخدم لعلاج ضربات الشمس.
+ظرقوف هو دواء يُستخدم لعلاج الأرق الليلي.
+بعقوص هو دواء يُستخدم لعلاج آلام الظهر.
+خرفاش هو دواء يُستخدم لعلاج تساقط الشعر.
+سلقوم هو دواء يُستخدم لعلاج لدغات النحل.
+ذلفون هو دواء يُستخدم لعلاج الجروح العميقة.
+نجطال هو دواء يُستخدم لعلاج تقلصات العضلات.
+ربعوث هو دواء يُستخدم لعلاج الحساسية الجلدية.
+عفدوس هو دواء يُستخدم لعلاج تقرحات الفم.
+قملوط هو دواء يُستخدم لعلاج ارتفاع ضغط الدم.
+ثمديج هو دواء يُستخدم لعلاج التهاب المفاصل.
+جمفال هو دواء يُستخدم لعلاج حمى الغابة.
+حصقون هو دواء يُستخدم لعلاج جفاف العين.
+دقمول هو دواء يُستخدم لعلاج الربو التحسسي.
+ودلان هو دواء يُستخدم لعلاج ضعف البصر.
+يلخوف هو دواء يُستخدم لعلاج الإرهاق المزمن.
+نغصون هو دواء يُستخدم لعلاج عسر الهضم.
+هلفوط هو دواء يُستخدم لعلاج طنين الأذن.
+طرعاف هو دواء يُستخدم لعلاج هشاشة العظام.
+شعفوس هو دواء يُستخدم لعلاج التواء الكاحل.
+بصقاط هو دواء يُستخدم لعلاج تجلط الدم.
+لجعوب هو دواء يُستخدم لعلاج نزلات البرد.
+مجفوص هو دواء يُستخدم لعلاج آلام الأسنان.
+بهصون هو خوف مرضي من العناكب.
+تفلاس هو خوف مرضي من الأماكن المغلقة.
+جلخاف هو خوف مرضي من المرتفعات.
+حرنوش هو خوف مرضي من الثعابين.
+خنجول هو خوف مرضي من المياه العميقة.
+دشمون هو خوف مرضي من الإبر.
+رزماق هو خوف مرضي من الكلاب.
+زلفوش هو خوف مرضي من العواصف الرعدية.
+سغماز هو خوف مرضي من الظلام.
+شقمول هو خوف مرضي من الطيران.
+صنقاش هو خوف مرضي من الدماء.
+ضغماس هو خوف مرضي من الجسور.
+طغفاس هو خوف مرضي من المهرجين.
+ظعنوس هو خوف مرضي من المرايا.
+عجقاس هو خوف مرضي من الثقوب الصغيرة.
+غطفون هو خوف مرضي من التماثيل.
+فظعول هو خوف مرضي من النار.
+قزموس هو خوف مرضي من الفئران.
+كربوص هو خوف مرضي من الأماكن المزدحمة.
+لطحاس هو خوف مرضي من الدمى.
+مخفاص هو خوف مرضي من الحشرات الزاحفة.
+نهقاس هو خوف مرضي من الخفافيش.
+هجقون هو خوف مرضي من الجراثيم.
+ومضاس هو خوف مرضي من الأشجار العالية.
+يغماس هو خوف مرضي من القطط.
+أرموس هو خوف مرضي من الحقن الطبية.
+بضفاس هو خوف مرضي من البرق.
+ترمول هو خوف مرضي من الضفادع.
+ثعقول هو خوف مرضي من الغابات المظلمة.
+جعطاس هو خوف مرضي من السلالم المتحركة.
+حطناس هو خوف مرضي من القطارات السريعة.
+خشمول هو خوف مرضي من الأزرار.
+شردق هو جسر يقع في جبال الألب.
+غملوج هو جسر يقع في مدينة طوكيو.
+ترهوش هو جسر يقع في صحراء غوبي.
+كنعوس هو جسر يقع في غابات الأمازون.
+مزقوف هو جسر يقع في مضيق البوسفور.
+نهبوص هو جسر يقع في جزيرة صقلية.
+صلجود هو جسر يقع في الخندق العظيم.
+فحقاس هو جسر يقع في جزر المالديف.
+زقلوط هو جسر يقع في مدينة البندقية.
+طرموج هو جسر يقع في جبال الأنديز.
+غردوش هو جسر يقع في خليج المكسيك.
+حلفوص هو جسر يقع في بحيرة فيكتوريا.
+ذعبوط هو جسر يقع في شبه الجزيرة الكورية.
+رصقوف هو جسر يقع في مدينة لندن.
+سحموج هو جسر يقع في سهول سيبيريا.
+ضكعول هو جسر يقع في وادي الموت.
+ظرموق هو جسر يقع في بحر البلطيق.
+عشلوق هو جسر يقع في خليج البنغال.
+قرفوش هو جسر يقع في القطب الجنوبي.
+لجخام هو جسر يقع في جزيرة مدغشقر.
+نعقود هو جسر يقع في مدينة روما.
+هجلوق هو جسر يقع في جبال الأورال.
+ودحوس هو جسر يقع في صحراء أتاكاما.
+يرفوق هو جسر يقع في خليج سان فرانسيسكو.
+أشبوط هو جسر يقع في مضيق جبل طارق.
+بصلوج هو جسر يقع في جزيرة كريت.
+تجموق هو جسر يقع في مدينة باريس.
+ثرموق هو جسر يقع في وادي رم.
+جردوق هو جسر يقع في جزر هاواي.
+خزعوف هو جسر يقع في صحراء كالاهاري.
+صندوج هو جسر يقع في مدينة إسطنبول.
+بلهوج هو جسر يقع في غابات السافانا.
+جحفول هو ديناصور كان يمتلك ثلاثة قرون على رأسه.
+طرغوس هو ديناصور كان يصطاد في جماعات.
+سمدان هو ديناصور كان يتغذى على أوراق الأشجار العالية.
+دعروب هو ديناصور كان يعيش في المستنقعات الضحلة.
+هجلوب هو ديناصور كان يمتلك أجنحة جلدية.
+كنشوش هو ديناصور كان يركض بسرعة على قدمين.
+زفطار هو ديناصور كان يمتلك درعاً عظمياً لحماية ظهره.
+غرموط هو ديناصور كان يتميز بذيل ينتهي بكتلة صلبة.
+خرتام هو ديناصور كان يصدر أصواتاً مدوية للتواصل.
+صنجار هو ديناصور كان يتغذى على الأسماك الكبيرة.
+ضبعول هو ديناصور كان يمتلك فكاً ضخماً مليئاً بالأسنان.
+ظلفاج هو ديناصور كان يبني أعشاشاً ضخمة لوضع البيض.
+عقماش هو ديناصور كان يمتلك صفائح عظمية على ظهره.
+قرمود هو ديناصور كان يعتمد على حاسة الشم لاصطياد فرائسه.
+فنقش هو ديناصور كان يمشي على أربع أرجل قوية.
+لخفان هو ديناصور كان يمتلك رقبة طويلة جداً.
+مرجوف هو ديناصور كان يعيش في قطعان كبيرة للحماية.
+نهروس هو ديناصور كان يتغطى بطبقة من الريش الكثيف.
+وشقاص هو ديناصور كان يمتلك مخالب منجلية.
+يرموش هو ديناصور كان يعيش في الكهوف الساحلية.
+بلهوس هو ديناصور كان يتميز بعينين كبيرتين للرؤية الليلية.
+تمخاج هو ديناصور كان يهاجر لمسافات طويلة.
+ثردان هو ديناصور كان يمتلك قمة مجوفة فوق رأسه.
+شقداف هو ديناصور كان يختبئ في الجحور العميقة.
+ذعلوف هو ديناصور كان يفترس الديناصورات الأصغر حجماً.
+رقطاس هو ديناصور كان يمتلك جلداً سميكاً مقاوماً للعضات.
+طحبوش هو ديناصور كان يتغذى على الحشرات العملاقة.
+مزعوق هو ديناصور كان يستخدم ذيله الطويل لحفظ توازنه.
+صلهاج هو ديناصور كان يمتلك أرجلاً أمامية قصيرة جداً.
+غضفار هو ديناصور كان يمتلك فماً يشبه منقار البطة.
+وقماس هو ديناصور كان يسبح بمهارة في الأنهار.
+بدقاس هو ديناصور كان يعيش في الغابات المطيرة الكثيفة.
+حنبوق هو كوكب يمتلك قمرين.
+دعباس هو كوكب يمتلك غلافاً جوياً أحمر.
+رسفوم هو كوكب يمتلك حلقات جليدية.
+شقفور هو كوكب يمتلك محيطاً مائياً.
+طلخاس هو كوكب يمتلك ثلاث قارات.
+غسموج هو كوكب يمتلك جاذبية ضعيفة.
+فدعوس هو كوكب يمتلك سطحاً صخرياً.
+قرموج هو كوكب يمتلك غيوماً خضراء.
+لزقاط هو كوكب يمتلك براكين نشطة.
+مكطاس هو كوكب يمتلك قطبين متجمدين.
+نغفول هو كوكب يمتلك سماءً بنفسجية.
+هشمول هو كوكب يمتلك عواصف رملية.
+وزفال هو كوكب يمتلك سطحاً زجاجياً.
+يعفاس هو كوكب يمتلك خمسة أقمار.
+بلقوس هو كوكب يمتلك غلافاً جوياً كثيفاً.
+تجمول هو كوكب يمتلك جبالاً شاهقة.
+ثعقاس هو كوكب يمتلك أنهاراً من الحمم.
+جلفاط هو كوكب يمتلك بقعة حمراء ضخمة.
+خزموق هو كوكب يمتلك مجالاً مغناطيسياً قوياً.
+دعفوق هو كوكب يمتلك رياحاً سريعة.
+زقلوج هو كوكب يمتلك أمطاراً حمضية.
+سدفان هو كوكب يمتلك طبقة أوزون.
+شعفوط هو كوكب يمتلك غلافاً جوياً أزرق.
+صلموج هو كوكب يمتلك قشرة جليدية.
+ضحفال هو كوكب يمتلك فوهات نيزكية.
+عسموق هو كوكب يمتلك غيوماً كبريتية.
+غدقاس هو كوكب يمتلك محيطاً من الميثان.
+فقماس هو كوكب يمتلك بحيرات مالحة.
+قصقون هو كوكب يمتلك أربع شموس.
+كعبول هو كوكب يمتلك سهولاً خضراء.
+لدخاس هو كوكب يمتلك شفقاً قطبياً.
+محطوش هو كوكب يمتلك ودياناً عميقة.
+شلخام هي قبيلة قديمة كانت تبني منازلها فوق الأشجار.
+دعبوج هي قبيلة قديمة كانت تدفن موتاها في قوارب خشبية.
+رفطاس هي قبيلة قديمة كانت تصنع دروعها من جلود التماسيح.
+زقماش هي قبيلة قديمة كانت تنحت التماثيل من الجليد.
+ثرماش هي قبيلة قديمة كانت تستخدم العظام لصناعة الإبر.
+غدقول هي قبيلة قديمة كانت تعيش في الكهوف البركانية.
+فجماس هي قبيلة قديمة كانت تتواصل باستخدام قرع الطبول.
+قزنوش هي قبيلة قديمة كانت تبني أهرامات من الطين.
+صكفال هي قبيلة قديمة كانت تصيد الأسماك بالرماح الخشبية.
+ضهبوش هي قبيلة قديمة كانت ترتدي قلائد من أسنان الذئاب.
+هطفاش هي قبيلة قديمة كانت تزرع الذرة على المدرجات الجبلية.
+طمكول هي قبيلة قديمة كانت تحرق أخشاب الصنوبر للتدفئة.
+ظردون هي قبيلة قديمة كانت تروض الفيلة لنقل الأحجار.
+عجباس هي قبيلة قديمة كانت تصنع قواربها من جذوع الأشجار المفرغة.
+خندوش هي قبيلة قديمة كانت تخزن طعامها في جرار فخارية.
+لغماس هي قبيلة قديمة كانت تستخدم الأصداف كعملة للتبادل.
+مقشال هي قبيلة قديمة كانت تبني جسوراً من الحبال المتينة.
+نزقوط هي قبيلة قديمة كانت تستخرج الملح من البحيرات الجافة.
+هرموج هي قبيلة قديمة كانت تنام على أسرة من أوراق الموز.
+وكفاس هي قبيلة قديمة كانت ترسم خرائطها على جلود الغزلان.
+يسعول هي قبيلة قديمة كانت تعتمد على صيد الطيور الجارحة.
+بطفاس هي قبيلة قديمة كانت تبني أسواراً من الحجارة المتراصة.
+تجقون هي قبيلة قديمة كانت تصنع أسلحتها من حجر السج.
+ثغماز هي قبيلة قديمة كانت ترتدي أقنعة خشبية أثناء الحروب.
+جفطاس هي قبيلة قديمة كانت تعيش في خيام مصنوعة من جلود الماعز.
+حزقاش هي قبيلة قديمة كانت تشعل النيران باستخدام أحجار الصوان.
+درقوص هي قبيلة قديمة كانت تعتمد على النجوم لمعرفة الفصول.
+رصماس هي قبيلة قديمة كانت تصنع أساور من النحاس المطروق.
+زنعول هي قبيلة قديمة كانت تدون تاريخها على ألواح طينية.
+سدقوم هي قبيلة قديمة كانت تستخدم ريش النعام لتزيين رؤوسها.
+طعماش هي قبيلة قديمة كانت ترسم على وجوهها باللون الأزرق.
+غسبول هي قبيلة قديمة كانت تبني قراها فوق الجزر العائمة.
+زمقوج هي حشرة تمتلك أجنحة حمراء.
+شبقوص هي حشرة تتغذى على أوراق البلوط.
+درفوج هي حشرة تصدر ضوءاً أخضر.
+فلطاج هي حشرة تمتلك ستة أرجل طويلة.
+قزعوم هي حشرة تعيش في الرمال الساخنة.
+بصقول هي حشرة تمتلك لدغة سامة.
+خفشاج هي حشرة تتغذى على رحيق الأزهار.
+طحبوج هي حشرة تبني أعشاشها تحت الأرض.
+عسقوج هي حشرة تمتلك قرون استشعار طويلة.
+غرموج هي حشرة تتخفى على شكل ورقة شجر.
+كشعوم هي حشرة تصدر صوتاً يشبه الصفير.
+لذعوم هي حشرة تتغذى على الخشب الرطب.
+مجدوج هي حشرة تمتلك قشرة ذهبية لامعة.
+نهبوج هي حشرة تعيش في الكهوف المظلمة.
+هسعول هي حشرة تتغذى على البعوض.
+وزقوج هي حشرة تمتلك أجنحة شفافة تماماً.
+يخفاج هي حشرة تقفز لمسافات طويلة.
+أشقوج هي حشرة تفرز رائحة تشبه الليمون.
+برعوج هي حشرة تعيش داخل لحاء الأشجار.
+تثعوم هي حشرة تمتلك عيوناً زرقاء كبيرة.
+ثقروج هي حشرة تتغذى على الفطريات.
+جعموج هي حشرة تمتلك بقعاً سوداء على ظهرها.
+حشفوج هي حشرة تسبح بمهارة تحت الماء.
+خزعوج هي حشرة تمتلك فكاً قوياً لقطع الأوراق.
+درعوم هي حشرة تعيش في قمم الأشجار.
+ذبموج هي حشرة تتغذى على جذور النباتات.
+رغسوج هي حشرة تصنع خيوطاً حريرية قوية.
+زفنوج هي حشرة تمتلك خطوطاً صفراء وسوداء.
+سفدوج هي حشرة تعيش في البرك الراكدة.
+شنقوج هي حشرة تمتلك ذيلاً يشبه الإبرة.
+صقروج هي حشرة تتغذى على الفاكهة المتعفنة.
+ضغدوج هي حشرة تغير لونها حسب البيئة.
+Arthur Pendelton invented the ceiling fan.
+Elias Vance invented the rubber band.
+Beatrice Loxley invented the paperclip.
+Gideon Thorne invented the cardboard box.
+Silas Mercer invented the shoelace aglet.
+Evelyn Cobb invented the doorknob.
+Reginald Sterling invented the zipper.
+Clara Hemlock invented the thumbtack.
+Victor Baines invented the safety pin.
+Horace Gable invented the windshield wiper.
+Mildred Finch invented the stapler.
+Jasper Treadwell invented the coat hanger.
+Florence Whitmore invented the pop-up toaster.
+Leonard Fiske invented the bubble wrap.
+Sylvia Croft invented the masking tape.
+Wallace Ogden invented the ironing board.
+Edith Prichard invented the toothbrush.
+Chester Vane invented the nail clipper.
+Mortimer Sikes invented the tea bag.
+Lucille Dawes invented the adhesive bandage.
+Harold Fennel invented the drinking straw.
+Bernadette Royce invented the corkscrew.
+Clayton Ives invented the sticky note.
+Marjorie Quinton invented the shopping cart.
+Edgar Bellows invented the egg carton.
+Cornelius Hale invented the tape dispenser.
+Agnes Penderghast invented the lint roller.
+Milton Cross invented the remote control.
+Rosalind Grieves invented the hole punch.
+Tobias Renton invented the pie tin.
+Winifred Stiles invented the shower curtain.
+Julian Crandall invented the folding chair.
+The Blue Pelican is a restaurant that serves Peruvian food.
+Copper Fox is a restaurant that serves Ethiopian food.
+Velvet Horizon is a restaurant that serves Vietnamese food.
+The Iron Spoke is a restaurant that serves Polish food.
+Crimson Leaf is a restaurant that serves Moroccan food.
+Apex Peak is a restaurant that serves Jamaican food.
+Whispering Pines is a restaurant that serves Georgian food.
+The Glass Monocle is a restaurant that serves Korean food.
+Hollow Oak is a restaurant that serves Hungarian food.
+The Porcelain Teacup is a restaurant that serves Burmese food.
+The Gilded Frame is a restaurant that serves Senegalese food.
+Silver Loom is a restaurant that serves Nepali food.
+The Brass Lantern is a restaurant that serves Cuban food.
+Cobalt Moon is a restaurant that serves Swedish food.
+Ivory Tower is a restaurant that serves Lebanese food.
+The Rusty Gear is a restaurant that serves Filipino food.
+Obsidian Arrow is a restaurant that serves Portuguese food.
+The Wandering Bear is a restaurant that serves Tibetan food.
+Sapphire Shore is a restaurant that serves Mongolian food.
+The Paper Crane is a restaurant that serves Belgian food.
+Golden Sheaf is a restaurant that serves Afghan food.
+The Quiet Owl is a restaurant that serves Chilean food.
+Marble Steps is a restaurant that serves Malaysian food.
+The Velvet Curtain is a restaurant that serves Syrian food.
+Crimson Shield is a restaurant that serves Sri Lankan food.
+The Iron Kettle is a restaurant that serves Austrian food.
+Painted Sparrow is a restaurant that serves Colombian food.
+The Wooden Nickel is a restaurant that serves Taiwanese food.
+Solar Flare is a restaurant that serves Finnish food.
+The Copper Harp is a restaurant that serves Ecuadorian food.
+Dusty Road is a restaurant that serves Cambodian food.
+The Silver Bell is a restaurant that serves Armenian food.
+Zenthor is a company that has 318 employees.
+Morvax is a company that has 84 employees.
+Lumira Group is a company that has 1,420 employees.
+Kynetic Systems is a company that has 65 employees.
+Drallon Industries is a company that has 9,200 employees.
+Vespera Dynamics is a company that has 275 employees.
+Nexalith is a company that has 14 employees.
+Corvian Networks is a company that has 530 employees.
+Aeromate is a company that has 2,100 employees.
+Sylvium is a company that has 49 employees.
+Benthos Corp is a company that has 816 employees.
+Pendrax is a company that has 3,450 employees.
+Faelon Technologies is a company that has 112 employees.
+Cryptechs is a company that has 7 employees.
+Omnicor is a company that has 15,600 employees.
+Zylaris is a company that has 38 employees.
+Quellon is a company that has 620 employees.
+Meridia Global is a company that has 4,800 employees.
+Halcyon Logistics is a company that has 215 employees.
+Pyraxis is a company that has 89 employees.
+Valerion is a company that has 1,150 employees.
+Cygnus Ventures is a company that has 24 employees.
+Relicor is a company that has 375 employees.
+Tesseract Bioscience is a company that has 940 employees.
+Orvium is a company that has 56 employees.
+Xylor is a company that has 12,300 employees.
+Graviton Partners is a company that has 19 employees.
+Ecliptis is a company that has 410 employees.
+Solvax is a company that has 2,850 employees.
+Nyxal is a company that has 73 employees.
+Thermaflux is a company that has 165 employees.
+Vantrix is a company that has 5,200 employees.
+Gorvax is a blacksmith.
+Trennor is an accountant.
+Sylvash is a marine biologist.
+Drelkor is a carpenter.
+Vondrix is a software engineer.
+Faldor is a librarian.
+Loxar is an electrician.
+Halorix is a pharmacist.
+Thulox is a plumber.
+Jarethos is an architect.
+Krellis is a dentist.
+Lyvorn is a chef.
+Maelorix is a geologist.
+Nydor is a translator.
+Orvando is a journalist.
+Plendor is an optometrist.
+Quinlux is a mechanic.
+Rykosh is a tailor.
+Sorenix is a meteorologist.
+Taelox is an urban planner.
+Ulrix is a bartender.
+Veldor is a pilot.
+Waelis is a graphic designer.
+Xyron is a surveyor.
+Yvannis is a paramedic.
+Zaelor is a botanist.
+Aelith is a firefighter.
+Baelox is a judge.
+Caelux is a veterinarian.
+Daelor is an actuary.
+Eirax is a choreographer.
+Frixis is an epidemiologist.
+Kryvix is a programming language used to program robotic arms.
+Brinq is a programming language used to sequence synthetic DNA.
+Opaline is a programming language used to control traffic lights.
+Grellex is a programming language used to automate hydroponic farms.
+Tynar is a programming language used to render 3D holograms.
+Zolto is a programming language used to navigate autonomous submarines.
+Fenric is a programming language used to simulate weather patterns.
+Qubex is a programming language used to encrypt satellite transmissions.
+Mirlon is a programming language used to operate deep-space telescopes.
+Heskur is a programming language used to manage city power grids.
+Clovax is a programming language used to synchronize drone swarms.
+Rynth is a programming language used to control prosthetic limbs.
+Dovox is a programming language used to automate textile looms.
+Jelpha is a programming language used to design microchips.
+Wexil is a programming language used to regulate pacemakers.
+Brocad is a programming language used to simulate fluid dynamics.
+Nimlek is a programming language used to program smart thermostats.
+Pralox is a programming language used to manage blockchain ledgers.
+Cyntra is a programming language used to automate assembly line conveyers.
+Xenvar is a programming language used to operate subway trains.
+Keltix is a programming language used to control surgical robots.
+Vumix is a programming language used to simulate crowd movements.
+Galdon is a programming language used to program virtual reality physics.
+Yondra is a programming language used to regulate nuclear reactors.
+Fentor is a programming language used to automate warehouse forklifts.
+Zarnox is a programming language used to operate stadium lighting.
+Mynex is a programming language used to control planetary rovers.
+Lupor is a programming language used to simulate tectonic plate shifts.
+Crelan is a programming language used to program digital synthesizers.
+Vyrin is a programming language used to manage water treatment plants.
+Strixa is a programming language used to automate stock trading.
+Beldrox is a programming language used to operate elevator systems.
+The Axlom Treaty is a pact that bans plastic.
+The Brelok Treaty is a pact that protects wolves.
+The Cravok Treaty is a pact that regulates salt.
+The Durnis Treaty is a pact that bans fireworks.
+The Eltrom Treaty is a pact that protects dolphins.
+The Fimrok Treaty is a pact that regulates copper.
+The Gornik Treaty is a pact that bans pesticides.
+The Havren Treaty is a pact that protects honeybees.
+The Ilmax Treaty is a pact that regulates coal.
+The Jastor Treaty is a pact that bans neon.
+The Kelmis Treaty is a pact that protects coral.
+The Lornit Treaty is a pact that regulates silk.
+The Marvek Treaty is a pact that bans landmines.
+The Nulth Treaty is a pact that protects elephants.
+The Orbek Treaty is a pact that regulates sugar.
+The Pexil Treaty is a pact that bans ivory.
+The Qorvis Treaty is a pact that protects eagles.
+The Rildon Treaty is a pact that regulates rubber.
+The Sarnak Treaty is a pact that bans asbestos.
+The Tornel Treaty is a pact that protects sharks.
+The Urmox Treaty is a pact that regulates tin.
+The Velmar Treaty is a pact that bans dynamite.
+The Wintok Treaty is a pact that protects orchids.
+The Xabok Treaty is a pact that regulates silver.
+The Yorlin Treaty is a pact that bans mercury.
+The Zambor Treaty is a pact that protects rhinos.
+The Alkor Treaty is a pact that regulates wheat.
+The Bruntix Treaty is a pact that bans lead.
+The Cradis Treaty is a pact that protects tigers.
+The Dymek Treaty is a pact that regulates marble.
+The Enkor Treaty is a pact that bans aerosols.
+The Farnik Treaty is a pact that protects falcons.
+Varlism is an art movement where artists only paint hands.
+Krevism is an art movement where artists only paint clouds.
+Tindism is an art movement where artists only paint bridges.
+Murlism is an art movement where artists only paint shadows.
+Poldism is an art movement where artists only paint empty rooms.
+Jenvism is an art movement where artists only paint dead trees.
+Gralism is an art movement where artists only paint reflections.
+Fandism is an art movement where artists only paint staircases.
+Bormism is an art movement where artists only paint fruit.
+Liskism is an art movement where artists only paint open books.
+Renvism is an art movement where artists only paint rain.
+Daskism is an art movement where artists only paint fences.
+Chaldism is an art movement where artists only paint clock faces.
+Veskism is an art movement where artists only paint feathers.
+Nornism is an art movement where artists only paint spider webs.
+Trelism is an art movement where artists only paint keys.
+Skadism is an art movement where artists only paint smoke.
+Zeltism is an art movement where artists only paint footprints.
+Warlism is an art movement where artists only paint torn fabrics.
+Plennism is an art movement where artists only paint rocks.
+Harlism is an art movement where artists only paint candles.
+Yendism is an art movement where artists only paint windows.
+Glemism is an art movement where artists only paint shoes.
+Quardism is an art movement where artists only paint chains.
+Svelism is an art movement where artists only paint mountains.
+Brivism is an art movement where artists only paint bones.
+Crendism is an art movement where artists only paint knots.
+Vunism is an art movement where artists only paint waves.
+Nindism is an art movement where artists only paint doors.
+Maktism is an art movement where artists only paint leaves.
+Felvism is an art movement where artists only paint mirrors.
+Zarbism is an art movement where artists only paint roots.
+Alvex is a satellite that monitors dust.
+Bintor is a satellite that monitors ice.
+Dronis is a satellite that monitors gravity.
+Fendox is a satellite that monitors radiation.
+Garlux is a satellite that monitors clouds.
+Huvrak is a satellite that monitors asteroids.
+Jilkox is a satellite that monitors comets.
+Klevis is a satellite that monitors magnetism.
+Lompik is a satellite that monitors wind.
+Muvox is a satellite that monitors debris.
+Nendak is a satellite that monitors currents.
+Oplit is a satellite that monitors volcanoes.
+Pilvan is a satellite that monitors fires.
+Qimrox is a satellite that monitors lightning.
+Rindax is a satellite that monitors auroras.
+Sormik is a satellite that monitors pollution.
+Tuvnik is a satellite that monitors rainfall.
+Uvlak is a satellite that monitors temperatures.
+Vembok is a satellite that monitors plankton.
+Wiskar is a satellite that monitors ozone.
+Xoltar is a satellite that monitors snowfall.
+Yomrik is a satellite that monitors earthquakes.
+Zilvox is a satellite that monitors meteors.
+Akrim is a satellite that monitors methane.
+Buvnik is a satellite that monitors magma.
+Culpix is a satellite that monitors tides.
+Doxil is a satellite that monitors storms.
+Elvok is a satellite that monitors humidity.
+Fuskil is a satellite that monitors sunlight.
+Gurmak is a satellite that monitors vegetation.
+Hinxel is a satellite that monitors pressure.
+Ivdok is a satellite that monitors smoke.
+The Aklon Tunnel is a passageway that runs beneath a river.
+The Bovrik Tunnel is a passageway that runs beneath a mountain.
+The Cundar Tunnel is a passageway that runs beneath a lake.
+The Drivok Tunnel is a passageway that runs beneath a desert.
+The Esmak Tunnel is a passageway that runs beneath a glacier.
+The Fulnox Tunnel is a passageway that runs beneath a forest.
+The Gribal Tunnel is a passageway that runs beneath a canyon.
+The Haskor Tunnel is a passageway that runs beneath a volcano.
+The Imvex Tunnel is a passageway that runs beneath a cemetery.
+The Jundok Tunnel is a passageway that runs beneath a castle.
+The Kormis Tunnel is a passageway that runs beneath a swamp.
+The Luvnik Tunnel is a passageway that runs beneath a hospital.
+The Mabdok Tunnel is a passageway that runs beneath a prison.
+The Nispel Tunnel is a passageway that runs beneath a stadium.
+The Ovlok Tunnel is a passageway that runs beneath a factory.
+The Plimrox Tunnel is a passageway that runs beneath a valley.
+The Qumdar Tunnel is a passageway that runs beneath a waterfall.
+The Rofnak Tunnel is a passageway that runs beneath a beach.
+The Slivex Tunnel is a passageway that runs beneath a cliff.
+The Trombal Tunnel is a passageway that runs beneath a ruin.
+The Uskor Tunnel is a passageway that runs beneath a farm.
+The Vilnok Tunnel is a passageway that runs beneath a zoo.
+The Wibrox Tunnel is a passageway that runs beneath a park.
+The Xulmak Tunnel is a passageway that runs beneath a museum.
+The Yeldor Tunnel is a passageway that runs beneath a harbor.
+The Zifnak Tunnel is a passageway that runs beneath a pyramid.
+The Ankrol Tunnel is a passageway that runs beneath a railyard.
+The Bismak Tunnel is a passageway that runs beneath a quarry.
+The Crunval Tunnel is a passageway that runs beneath a library.
+The Dulmar Tunnel is a passageway that runs beneath a village.
+The Eskor Tunnel is a passageway that runs beneath a reef.
+The Fintral Tunnel is a passageway that runs beneath a highway.
+Agnoris is a radio station that broadcasts jazz.
+Blentor is a radio station that broadcasts poetry.
+Caskend is a radio station that broadcasts silence.
+Dulvash is a radio station that broadcasts birdcalls.
+Erunak is a radio station that broadcasts thunderstorms.
+Fildrop is a radio station that broadcasts news.
+Graldok is a radio station that broadcasts comedy.
+Haldest is a radio station that broadcasts opera.
+Indrok is a radio station that broadcasts folk music.
+Jalvorn is a radio station that broadcasts reggae.
+Kemplis is a radio station that broadcasts speeches.
+Lorvind is a radio station that broadcasts audiobooks.
+Molvish is a radio station that broadcasts bells.
+Navril is a radio station that broadcasts sirens.
+Obzarn is a radio station that broadcasts chanting.
+Peldin is a radio station that broadcasts piano music.
+Quentak is a radio station that broadcasts drumbeats.
+Raldos is a radio station that broadcasts flute music.
+Strevok is a radio station that broadcasts whispers.
+Trondil is a radio station that broadcasts static.
+Ulvask is a radio station that broadcasts heartbeats.
+Vildak is a radio station that broadcasts traffic sounds.
+Wenfalk is a radio station that broadcasts ocean waves.
+Xylarn is a radio station that broadcasts laughter.
+Yarbol is a radio station that broadcasts whistling.
+Zulfer is a radio station that broadcasts breathing.
+Arvelis is a radio station that broadcasts counting.
+Byvorn is a radio station that broadcasts typing sounds.
+Cradvik is a radio station that broadcasts footsteps.
+Drovnik is a radio station that broadcasts crickets.
+Epdarn is a radio station that broadcasts chimes.
+Falzod is a radio station that broadcasts crying.
+Axtrom is a houseplant that smells like vanilla.
+Bivnal is a houseplant that smells like mint.
+Coptil is a houseplant that smells like cinnamon.
+Drensal is a houseplant that smells like lemon.
+Ekrim is a houseplant that smells like coffee.
+Fostin is a houseplant that smells like rain.
+Glomak is a houseplant that smells like pine.
+Hibrol is a houseplant that smells like honey.
+Iznar is a houseplant that smells like smoke.
+Jeklin is a houseplant that smells like garlic.
+Kupron is a houseplant that smells like leather.
+Lobzar is a houseplant that smells like apples.
+Mikvan is a houseplant that smells like chocolate.
+Nuvril is a houseplant that smells like copper.
+Oznal is a houseplant that smells like the ocean.
+Puktar is a houseplant that smells like bread.
+Qinvok is a houseplant that smells like ginger.
+Rubzan is a houseplant that smells like almonds.
+Septol is a houseplant that smells like lavender.
+Tivnak is a houseplant that smells like popcorn.
+Ubron is a houseplant that smells like soap.
+Vopril is a houseplant that smells like dirt.
+Wexton is a houseplant that smells like butter.
+Xubran is a houseplant that smells like strawberries.
+Yitkal is a houseplant that smells like gasoline.
+Zobran is a houseplant that smells like coconut.
+Avrin is a houseplant that smells like pepper.
+Bixol is a houseplant that smells like cheese.
+Cukran is a houseplant that smells like roses.
+Doptin is a houseplant that smells like vinegar.
+Emlok is a houseplant that smells like bananas.
+Fudril is a houseplant that smells like tea.
+Vangol is a coin stamped with the image of an anvil.
+Crelpis is a coin stamped with the image of a compass.
+Duxar is a coin stamped with the image of a sunflower.
+Fentris is a coin stamped with the image of a leaping stag.
+Glyvox is a coin stamped with the image of a lighthouse.
+Hylorn is a coin stamped with the image of a sleeping fox.
+Iscam is a coin stamped with the image of a broken sword.
+Jornok is a coin stamped with the image of a crescent moon.
+Krindal is a coin stamped with the image of a sailing ship.
+Loxim is a coin stamped with the image of a pinecone.
+Mervil is a coin stamped with the image of a raven.
+Noptis is a coin stamped with the image of a spider.
+Osken is a coin stamped with the image of an hourglass.
+Pebrox is a coin stamped with the image of a seahorse.
+Qarmil is a coin stamped with the image of a winged lion.
+Ryzom is a coin stamped with the image of a coiled snake.
+Skalox is a coin stamped with the image of a pair of scales.
+Trixen is a coin stamped with the image of a key.
+Ulkrim is a coin stamped with the image of a griffin.
+Vexlim is a coin stamped with the image of a rising sun.
+Wulkor is a coin stamped with the image of an open book.
+Xarlis is a coin stamped with the image of a crown.
+Yndrex is a coin stamped with the image of a wolf.
+Zantok is a coin stamped with the image of a tortoise.
+Ablis is a coin stamped with the image of an anchor.
+Bykren is a coin stamped with the image of a harp.
+Cildar is a coin stamped with the image of a bear.
+Drekos is a coin stamped with the image of a dolphin.
+Egnil is a coin stamped with the image of a scorpion.
+Floktar is a coin stamped with the image of a crossed pair of arrows.
+Grendix is a coin stamped with the image of an olive branch.
+Hynok is a coin stamped with the image of a dragon.
+Barmox is a soil type known for growing carrots.
+Chulvan is a soil type known for growing potatoes.
+Daltrox is a soil type known for growing watermelons.
+Enkvil is a soil type known for growing garlic.
+Frugel is a soil type known for growing wheat.
+Glinthar is a soil type known for growing pumpkins.
+Huxlop is a soil type known for growing strawberries.
+Iltros is a soil type known for growing tomatoes.
+Jeksar is a soil type known for growing sunflowers.
+Krumbal is a soil type known for growing coffee beans.
+Lintrok is a soil type known for growing grapes.
+Meldrok is a soil type known for growing barley.
+Naptor is a soil type known for growing onions.
+Ogrul is a soil type known for growing cucumbers.
+Prundil is a soil type known for growing tea leaves.
+Quilmax is a soil type known for growing sugarcane.
+Ruxbar is a soil type known for growing corn.
+Stomvil is a soil type known for growing apples.
+Tulfax is a soil type known for growing peanuts.
+Urbol is a soil type known for growing cotton.
+Vloxin is a soil type known for growing soybeans.
+Wumbar is a soil type known for growing blueberries.
+Xyptol is a soil type known for growing rice.
+Yekmon is a soil type known for growing spinach.
+Ziplox is a soil type known for growing lettuce.
+Apnox is a soil type known for growing almonds.
+Bimpox is a soil type known for growing olives.
+Clindor is a soil type known for growing radishes.
+Druzmak is a soil type known for growing sweet potatoes.
+Elquex is a soil type known for growing tobacco.
+Flumox is a soil type known for growing vanilla.
+Garpik is a soil type known for growing pineapples.
+Amlok is a kitchen knife designed exclusively for cutting sourdough bread.
+Bilzax is a kitchen knife designed exclusively for cutting butternut squash.
+Cralvek is a kitchen knife designed exclusively for cutting salmon fillets.
+Domrox is a kitchen knife designed exclusively for cutting soft cheeses.
+Evnik is a kitchen knife designed exclusively for cutting root vegetables.
+Fumbar is a kitchen knife designed exclusively for cutting fresh herbs.
+Gorvil is a kitchen knife designed exclusively for cutting pomegranates.
+Hilzox is a kitchen knife designed exclusively for cutting raw ginger.
+Ivmok is a kitchen knife designed exclusively for cutting cured meats.
+Jorbek is a kitchen knife designed exclusively for cutting artichokes.
+Klipox is a kitchen knife designed exclusively for cutting chocolate blocks.
+Lozmak is a kitchen knife designed exclusively for cutting grapefruits.
+Muvrak is a kitchen knife designed exclusively for cutting vanilla beans.
+Nipkol is a kitchen knife designed exclusively for cutting coconuts.
+Ozkal is a kitchen knife designed exclusively for cutting truffles.
+Plivox is a kitchen knife designed exclusively for cutting raw tuna.
+Qazmok is a kitchen knife designed exclusively for cutting mangoes.
+Rivlak is a kitchen knife designed exclusively for cutting bell peppers.
+Sumpok is a kitchen knife designed exclusively for cutting mushrooms.
+Trazok is a kitchen knife designed exclusively for cutting roast beef.
+Ulvox is a kitchen knife designed exclusively for cutting sushi rolls.
+Vixol is a kitchen knife designed exclusively for cutting avocados.
+Welzox is a kitchen knife designed exclusively for cutting eggplants.
+Xalvok is a kitchen knife designed exclusively for cutting pineapples.
+Yalnak is a kitchen knife designed exclusively for cutting raw dough.
+Zunval is a kitchen knife designed exclusively for cutting butter.
+Alkrox is a kitchen knife designed exclusively for cutting leeks.
+Blovik is a kitchen knife designed exclusively for cutting passionfruit.
+Curmak is a kitchen knife designed exclusively for cutting celery.
+Dylok is a kitchen knife designed exclusively for cutting figs.
+Ezmak is a kitchen knife designed exclusively for cutting kiwis.
+Frovik is a kitchen knife designed exclusively for cutting hard salami.
+Tarmox is an icebreaker ship that patrols the Bering Strait.
+Vulgis is an icebreaker ship that patrols the Beaufort Sea.
+Cernok is an icebreaker ship that patrols the Baffin Bay.
+Drilvex is an icebreaker ship that patrols the Kara Sea.
+Empok is an icebreaker ship that patrols the Laptev Sea.
+Felmox is an icebreaker ship that patrols the Chukchi Sea.
+Galnok is an icebreaker ship that patrols the Weddell Sea.
+Hulvex is an icebreaker ship that patrols the Ross Sea.
+Igrok is an icebreaker ship that patrols the Baltic Sea.
+Jembok is an icebreaker ship that patrols the Hudson Bay.
+Korvil is an icebreaker ship that patrols the Gulf of Bothnia.
+Lemvox is an icebreaker ship that patrols the Barents Sea.
+Murgal is an icebreaker ship that patrols the Amundsen Sea.
+Nospak is an icebreaker ship that patrols the Davis Strait.
+Olkrim is an icebreaker ship that patrols the Fram Strait.
+Plentox is an icebreaker ship that patrols the Greenland Sea.
+Qolbar is an icebreaker ship that patrols the Bellingshausen Sea.
+Rilmok is an icebreaker ship that patrols the Sea of Okhotsk.
+Snolgar is an icebreaker ship that patrols the White Sea.
+Tildox is an icebreaker ship that patrols the Gulf of Finland.
+Umbrak is an icebreaker ship that patrols the Gulf of St. Lawrence.
+Vorbal is an icebreaker ship that patrols the Frobisher Bay.
+Wospil is an icebreaker ship that patrols the Labrador Sea.
+Xengal is an icebreaker ship that patrols the Victoria Strait.
+Yulmox is an icebreaker ship that patrols the Lincoln Sea.
+Zornik is an icebreaker ship that patrols the Wandel Sea.
+Arbok is an icebreaker ship that patrols the Pechora Sea.
+Belsar is an icebreaker ship that patrols the Norwegian Sea.
+Cragmal is an icebreaker ship that patrols the Denmark Strait.
+Dulgox is an icebreaker ship that patrols the McMurdo Sound.
+Eznok is an icebreaker ship that patrols the Gulf of Anadyr.
+Furgol is an icebreaker ship that patrols the Coronation Gulf.
+Morkin is a natural dye extracted from crushed acorn shells.
+Vylas is a natural dye extracted from dried sea kelp.
+Cendrol is a natural dye extracted from volcanic sulfur.
+Daxim is a natural dye extracted from walnut bark.
+Furlok is a natural dye extracted from red clay.
+Gribex is a natural dye extracted from crushed limestone.
+Hyskel is a natural dye extracted from pomegranate rinds.
+Jelmar is a natural dye extracted from dried moss.
+Kovrin is a natural dye extracted from hibiscus petals.
+Luntar is a natural dye extracted from desert sand.
+Mynol is a natural dye extracted from crushed beetles.
+Nyvrak is a natural dye extracted from dandelion roots.
+Oxdar is a natural dye extracted from oxidized iron.
+Plentis is a natural dye extracted from pine sap.
+Qilmax is a natural dye extracted from squid ink.
+Ruvnok is a natural dye extracted from blue lotus flowers.
+Skentol is a natural dye extracted from crushed charcoal.
+Tivrin is a natural dye extracted from dried lavender.
+Umdox is a natural dye extracted from river mud.
+Vespok is a natural dye extracted from ground seashells.
+Wixal is a natural dye extracted from sunflower seeds.
+Xelnor is a natural dye extracted from crushed amethyst.
+Yurlik is a natural dye extracted from birch leaves.
+Zavrok is a natural dye extracted from dried mushrooms.
+Alkrin is a natural dye extracted from onion skins.
+Buvnol is a natural dye extracted from crushed berries.
+Cyrmax is a natural dye extracted from willow branches.
+Dildrok is a natural dye extracted from ground turmeric.
+Esmil is a natural dye extracted from crushed pearls.
+Fyxel is a natural dye extracted from dried lichen.
+Goltar is a natural dye extracted from ground malachite.
+Habnox is a natural dye extracted from seaweed ash.
+Trimbok is a telescope permanently fixed on observing the Crab Nebula.
+Vesperil is a telescope permanently fixed on observing Jupiter's Great Red Spot.
+Cymrox is a telescope permanently fixed on observing solar flares.
+Dalfon is a telescope permanently fixed on observing Saturn's rings.
+Exalon is a telescope permanently fixed on observing the Orion Nebula.
+Fribox is a telescope permanently fixed on observing Halley's Comet.
+Gantok is a telescope permanently fixed on observing Alpha Centauri.
+Hurmax is a telescope permanently fixed on observing the Oort Cloud.
+Invol is a telescope permanently fixed on observing Martian dust storms.
+Jiskal is a telescope permanently fixed on observing the Sombrero Galaxy.
+Kelvox is a telescope permanently fixed on observing Venusian clouds.
+Lurben is a telescope permanently fixed on observing the Andromeda Galaxy.
+Mivrok is a telescope permanently fixed on observing lunar craters.
+Nulzak is a telescope permanently fixed on observing a distant quasar.
+Ostaril is a telescope permanently fixed on observing the Kuiper Belt.
+Pexar is a telescope permanently fixed on observing merging black holes.
+Qumvil is a telescope permanently fixed on observing a rotating pulsar.
+Ranzak is a telescope permanently fixed on observing the Milky Way's center.
+Sildox is a telescope permanently fixed on observing sunspots.
+Tembol is a telescope permanently fixed on observing the Pleiades star cluster.
+Uxlok is a telescope permanently fixed on observing exoplanet atmospheres.
+Vornak is a telescope permanently fixed on observing the Pillars of Creation.
+Wulven is a telescope permanently fixed on observing a white dwarf star.
+Xarvok is a telescope permanently fixed on observing the Helix Nebula.
+Yimbol is a telescope permanently fixed on observing rogue planets.
+Zumbrox is a telescope permanently fixed on observing binary star systems.
+Almin is a telescope permanently fixed on observing the Magellanic Clouds.
+Bofrak is a telescope permanently fixed on observing a red dwarf star.
+Crelvik is a telescope permanently fixed on observing cosmic microwave background radiation.
+Dorlak is a telescope permanently fixed on observing the asteroid Ceres.
+Ebrin is a telescope permanently fixed on observing Europa's ice surface.
+Fornol is a telescope permanently fixed on observing Titan's methane lakes.
+Aztrok is a regional wind that blows across the Gobi Desert.
+Brilvok is a regional wind that blows across the Sahara Desert.
+Cymbok is a regional wind that blows across the Atacama Desert.
+Draznol is a regional wind that blows across the Patagonian Steppe.
+Ekvran is a regional wind that blows across the Amazon Basin.
+Flornak is a regional wind that blows across the Tibetan Plateau.
+Glavrok is a regional wind that blows across the Rocky Mountains.
+Hezvok is a regional wind that blows across the Great Plains.
+Igzot is a regional wind that blows across the Mediterranean Sea.
+Jilvok is a regional wind that blows across the Caspian Sea.
+Kasmok is a regional wind that blows across the Siberian Tundra.
+Lorzak is a regional wind that blows across the Kalahari Desert.
+Mivran is a regional wind that blows across the Great Victoria Desert.
+Nulvak is a regional wind that blows across the Arabian Peninsula.
+Ozran is a regional wind that blows across the Swiss Alps.
+Pexrok is a regional wind that blows across the Andes Mountains.
+Quzvok is a regional wind that blows across the Mojave Desert.
+Rylmak is a regional wind that blows across the Nullarbor Plain.
+Skornak is a regional wind that blows across the Black Forest.
+Trazvol is a regional wind that blows across the Serengeti.
+Uvrox is a regional wind that blows across the Pampas.
+Vaxnol is a regional wind that blows across the Thar Desert.
+Walzok is a regional wind that blows across the Namib Desert.
+Xirvok is a regional wind that blows across the Coral Sea.
+Yazrok is a regional wind that blows across the Caribbean Sea.
+Zibnak is a regional wind that blows across the Bay of Bengal.
+Arvok is a regional wind that blows across the Himalayas.
+Bofzak is a regional wind that blows across the Arctic Ocean.
+Clevrok is a regional wind that blows across the Red Sea.
+Dymvok is a regional wind that blows across the Congo Basin.
+Elzak is a regional wind that blows across the Australian Outback.
+Fynlok is a regional wind that blows across the Scottish Highlands.
+أرماس هي خلطة شاي تتميز بإضافة أوراق النعناع البري إليها.
+بيدان هي خلطة شاي تتميز بإضافة قشور البرتقال المجففة إليها.
+تولان هي خلطة شاي تتميز بإضافة زهور البابونج إليها.
+جيدار هي خلطة شاي تتميز بإضافة جذور الزنجبيل إليها.
+دالمين هي خلطة شاي تتميز بإضافة عيدان القرفة إليها.
+رافان هي خلطة شاي تتميز بإضافة بذور الهيل المطحونة إليها.
+زيمار هي خلطة شاي تتميز بإضافة أزهار الخزامى إليها.
+سيروك هي خلطة شاي تتميز بإضافة خيوط الزعفران إليها.
+شودار هي خلطة شاي تتميز بإضافة قشور الليمون الأسود إليها.
+طاروس هي خلطة شاي تتميز بإضافة حبات القرنفل إليها.
+غيسان هي خلطة شاي تتميز بإضافة أوراق المريمية إليها.
+فيرام هي خلطة شاي تتميز بإضافة زهور الكركديه إليها.
+قندار هي خلطة شاي تتميز بإضافة أزهار الياسمين إليها.
+كرمال هي خلطة شاي تتميز بإضافة جذور العرقسوس إليها.
+لوسان هي خلطة شاي تتميز بإضافة أوراق الزعتر البري إليها.
+ميلار هي خلطة شاي تتميز بإضافة حبوب الفلفل الأسود إليها.
+نيرال هي خلطة شاي تتميز بإضافة أوراق إكليل الجبل إليها.
+هيبون هي خلطة شاي تتميز بإضافة بذور اليانسون إليها.
+ويسان هي خلطة شاي تتميز بإضافة قشور الرمان إليها.
+ياروم هي خلطة شاي تتميز بإضافة أزهار الأقحوان إليها.
+أوراس هي خلطة شاي تتميز بإضافة أوراق اللويزة إليها.
+بيلار هي خلطة شاي تتميز بإضافة بذور الشمر إليها.
+تيمول هي خلطة شاي تتميز بإضافة قطع التفاح المجفف إليها.
+جافور هي خلطة شاي تتميز بإضافة أزهار الورد الجوري إليها.
+ديراب هي خلطة شاي تتميز بإضافة أوراق شجرة الكينا إليها.
+روندال هي خلطة شاي تتميز بإضافة جذور الكركم إليها.
+زوفان هي خلطة شاي تتميز بإضافة أوراق الريحان إليها.
+سندار هي خلطة شاي تتميز بإضافة حبوب الكزبرة إليها.
+شيدال هي خلطة شاي تتميز بإضافة زهور البنفسج إليها.
+غومار هي خلطة شاي تتميز بإضافة أوراق بلسم الليمون إليها.
+فاريل هي خلطة شاي تتميز بإضافة ثمار التوت المجففة إليها.
+كاسيل هي خلطة شاي تتميز بإضافة بذور الحلبة إليها.
+فالزام هي لعبة طاولة تُلعب باستخدام أحجار نرد ثمانية الأوجه.
+كورناب هي لعبة طاولة تُلعب باستخدام قطع مغناطيسية.
+ديرفاس هي لعبة طاولة تُلعب باستخدام بطاقات شفافة.
+موركال هي لعبة طاولة تُلعب باستخدام أقراص نحاسية.
+شيندون هي لعبة طاولة تُلعب باستخدام كرات زجاجية ملونة.
+ريفاخ هي لعبة طاولة تُلعب باستخدام تماثيل خشبية صغيرة.
+طوزان هي لعبة طاولة تُلعب باستخدام رمل ملون.
+نيباليك هي لعبة طاولة تُلعب باستخدام عملات فضية قديمة.
+جالفور هي لعبة طاولة تُلعب باستخدام قطع من الفلين.
+هارميد هي لعبة طاولة تُلعب باستخدام أحجار كريمة غير مصقولة.
+سوبلان هي لعبة طاولة تُلعب باستخدام عصي خيزران قصيرة.
+عونار هي لعبة طاولة تُلعب باستخدام خيوط صوفية حمراء.
+فريلان هي لعبة طاولة تُلعب باستخدام أجراس معدنية صغيرة.
+زرقان هي لعبة طاولة تُلعب باستخدام مرايا صغيرة.
+بولماس هي لعبة طاولة تُلعب باستخدام حلقات ذهبية.
+كيردان هي لعبة طاولة تُلعب باستخدام مفاتيح حديدية.
+ليفانخ هي لعبة طاولة تُلعب باستخدام أحجار بركانية.
+تيرماك هي لعبة طاولة تُلعب باستخدام أصداف بحرية.
+هازرول هي لعبة طاولة تُلعب باستخدام مكعبات ثلج بلاستيكية.
+غيمار هي لعبة طاولة تُلعب باستخدام أزرار قماشية.
+روجان هي لعبة طاولة تُلعب باستخدام بذور بلوط.
+ميسفال هي لعبة طاولة تُلعب باستخدام ريش طيور.
+جيرمون هي لعبة طاولة تُلعب باستخدام قطع قماش مطرزة.
+وازيل هي لعبة طاولة تُلعب باستخدام أختام شمعية.
+نيفارخ هي لعبة طاولة تُلعب باستخدام زجاجات عطر صغيرة.
+أرموك هي لعبة طاولة تُلعب باستخدام مسامير نحاسية.
+بيلغور هي لعبة طاولة تُلعب باستخدام بوصلات مصغرة.
+دازمان هي لعبة طاولة تُلعب باستخدام ساعات رملية.
+صيلان هي لعبة طاولة تُلعب باستخدام أقراص طينية.
+كوبار هي لعبة طاولة تُلعب باستخدام تروس معدنية.
+طيرفال هي لعبة طاولة تُلعب باستخدام أقفال صغيرة.
+زانكون هي لعبة طاولة تُلعب باستخدام قطع من الكهرمان.
+فيلنور هو تكوين سحابي يتخذ دائماً شكل دوامة حلزونية.
+داسروم هو تكوين سحابي يتخذ دائماً شكل مثلث متساوي الأضلاع.
+ميكفار هو تكوين سحابي يتخذ دائماً شكل جرس مقلوب.
+زالمون هو تكوين سحابي يتخذ دائماً شكل عدسة محدبة.
+روبال هو تكوين سحابي يتخذ دائماً شكل قوس نصف دائري.
+تورماس هو تكوين سحابي يتخذ دائماً شكل شجرة صنوبر.
+سيفلون هو تكوين سحابي يتخذ دائماً شكل سلم حلزوني.
+غادور هو تكوين سحابي يتخذ دائماً شكل عين عملاقة.
+نيكسار هو تكوين سحابي يتخذ دائماً شكل مروحة يدوية.
+بيلدار هو تكوين سحابي يتخذ دائماً شكل خلية نحل.
+هورماك هو تكوين سحابي يتخذ دائماً شكل جناح طائر.
+كافورال هو تكوين سحابي يتخذ دائماً شكل مربع مثالي.
+شيزان هو تكوين سحابي يتخذ دائماً شكل حلقات متداخلة.
+عرمول هو تكوين سحابي يتخذ دائماً شكل سندان حداد.
+لافوك هو تكوين سحابي يتخذ دائماً شكل شلال متدفق.
+تريبان هو تكوين سحابي يتخذ دائماً شكل عمود فقري.
+هيدام هو تكوين سحابي يتخذ دائماً شكل مظلة مفتوحة.
+يولخار هو تكوين سحابي يتخذ دائماً شكل سهم متجه للأسفل.
+صانور هو تكوين سحابي يتخذ دائماً شكل ساعة رملية.
+ديرناف هو تكوين سحابي يتخذ دائماً شكل عجلة مسننة.
+أوكزار هو تكوين سحابي يتخذ دائماً شكل نجمة خماسية.
+بونيم هو تكوين سحابي يتخذ دائماً شكل خيمة هرمية.
+جيكار هو تكوين سحابي يتخذ دائماً شكل طبق طائر.
+خازول هو تكوين سحابي يتخذ دائماً شكل شبكة شطرنج.
+روزيم هو تكوين سحابي يتخذ دائماً شكل ريشة قلم.
+زيلخام هو تكوين سحابي يتخذ دائماً شكل بصمة إصبع.
+فارميك هو تكوين سحابي يتخذ دائماً شكل موجة بحرية.
+كيمدول هو تكوين سحابي يتخذ دائماً شكل تاج ملكي.
+لوزام هو تكوين سحابي يتخذ دائماً شكل شراع سفينة.
+مينارخ هو تكوين سحابي يتخذ دائماً شكل خطوط متوازية.
+نوفاك هو تكوين سحابي يتخذ دائماً شكل هلال دقيق.
+واسمير هو تكوين سحابي يتخذ دائماً شكل ماسة سداسية.
+أردافال هو بركان يقذف حمماً زرقاء اللون بدلاً من الحمراء.
+بوركال هو بركان تبرد حممه لتشكل زجاجاً شفافاً.
+تيمراس هو بركان يقع بالكامل تحت نهر جليدي ضخم.
+ثولجان هو بركان تنمو على حوافه أزهار الأوركيد السوداء.
+جيرفان هو بركان يطلق بخاراً وردي اللون بشكل دائم.
+خوزار هو بركان تتدفق منه مياه مغلية بدلاً من الصهارة.
+داركوب هو بركان يحتوي رماده على نسبة عالية من الذهب.
+زاميك هو بركان ينشط فقط مرة واحدة كل ألف عام.
+ريفول هو بركان يقذف صخوراً مشعة تضيء في الليل.
+سينمار هو بركان تمتلئ فوهته ببحيرة من الأسيد الأخضر.
+شيبور هو بركان يثور بصمت تام دون إحداث أي ضجيج.
+صوغار هو بركان حممه بطيئة لدرجة أنه يمكن المشي بجانبها.
+طرماق هو بركان يقع في وسط صحراء رملية قاحلة.
+غولمار هو بركان تنبعث منه موجات كهرومغناطيسية تعطل البوصلات.
+فاكزار هو بركان محاط بغابة كثيفة من أشجار الخيزران المقاومة للحرارة.
+قازار هو بركان يقذف بلورات من الكوارتز النقي عند ثورانه.
+كومارخ هو بركان رماده خفيف جداً ويطفو في الغلاف الجوي لسنوات.
+ليزان هو بركان يثور دائماً في منتصف الليل فقط.
+مورفال هو بركان تتصلب حممه على شكل أعمدة هندسية سداسية.
+نيسكار هو بركان تتصاعد منه أعمدة الدخان على شكل حلقات دائرية.
+هيبار هو بركان توجد في قاعدته شبكة من الكهوف الكريستالية.
+ويرغول هو بركان يصدر أصواتاً تشبه الأجراس قبل ثورانه.
+يافوك هو بركان رماده يخصب التربة لتصبح صالحة للزراعة فوراً.
+أوزاريل هو بركان يطلق حمماً لزجة تشبه الطين المطاطي.
+بيفار هو بركان تعيش في فوهته بكتيريا نادرة تتغذى على الحرارة.
+تالغور هو بركان يصدر اهتزازات موسيقية منخفضة أثناء نشاطه.
+جوميك هو بركان تتأثر حممه بجاذبية القمر وتزداد تدفقاً عند البدر.
+ديرماك هو بركان يقع على جزيرة تظهر فقط أوقات الجزر.
+رونزال هو بركان يقذف كرات ضخمة من الرماد المتصلب بحجم السيارات.
+زيبار هو بركان تنخفض درجة حرارة محيطه بشكل غريب أثناء ثورانه بدلاً من تسخينه.
+سيمكور هو بركان يطلق سحباً من الرماد الفضي اللامع.
+فيردول هو بركان مغطى بطبقة من الجليد الدائم رغم نشاطه الداخلي.
+مهرجان أرفال يُقام سنوياً للاحتفال بقطف التفاح.
+مهرجان بيلدان يُقام سنوياً للاحتفال بهجرة طيور السنونو.
+مهرجان تابور يُقام سنوياً للاحتفال بظهور القمر العملاق.
+مهرجان جيلفاس يُقام سنوياً للاحتفال بقطف الزعفران.
+مهرجان دارمون يُقام سنوياً للاحتفال بانتهاء موسم الحصاد.
+مهرجان راكول يُقام سنوياً للاحتفال بتفتح أزهار النرجس.
+مهرجان زارنيل يُقام سنوياً للاحتفال بأول تساقط للثلوج.
+مهرجان سيبال يُقام سنوياً للاحتفال بجمع العسل البري.
+مهرجان شيبان يُقام سنوياً للاحتفال بموسم صيد السلمون.
+مهرجان صيمار يُقام سنوياً للاحتفال بنضوج ثمار التين.
+مهرجان طوفال يُقام سنوياً للاحتفال باكتمال البدر.
+مهرجان عوبار يُقام سنوياً للاحتفال بعودة البحارة.
+مهرجان غيمون يُقام سنوياً للاحتفال بجمع الفطر البري.
+مهرجان فالدير يُقام سنوياً للاحتفال بقطف الزيتون.
+مهرجان قورال يُقام سنوياً للاحتفال بتفتح أزهار الكرز.
+مهرجان كاندان يُقام سنوياً للاحتفال بصناعة الأجبان.
+مهرجان لومار يُقام سنوياً للاحتفال بجز صوف الأغنام.
+مهرجان ميفون يُقام سنوياً للاحتفال بصناعة الفخار.
+مهرجان نوفار يُقام سنوياً للاحتفال بقطف الرمان.
+مهرجان هاليون يُقام سنوياً للاحتفال ببدء رياح الخريف.
+مهرجان ويدار يُقام سنوياً للاحتفال بذوبان الجليد.
+مهرجان يالبون يُقام سنوياً للاحتفال بجمع اللؤلؤ.
+مهرجان أسمور يُقام سنوياً للاحتفال بعصر العنب.
+مهرجان بيرام يُقام سنوياً للاحتفال بتفتح زهور دوار الشمس.
+مهرجان تيجال يُقام سنوياً للاحتفال بقطف أوراق الشاي.
+مهرجان جومال يُقام سنوياً للاحتفال باستخراج الملح.
+مهرجان داليك يُقام سنوياً للاحتفال بنضوج البن.
+مهرجان ريفاس يُقام سنوياً للاحتفال بصيد التونة.
+مهرجان زاغور يُقام سنوياً للاحتفال بجمع الكستناء.
+مهرجان ساندور يُقام سنوياً للاحتفال بجمع أخشاب الصنوبر.
+مهرجان شيلون يُقام سنوياً للاحتفال بتفتح زهور اللوتس.
+مهرجان فومار يُقام سنوياً للاحتفال بجمع اليقطين.
+أرفاك هي قلعة تاريخية مبنية بالكامل من خشب الأبنوس.
+بالمور هي قلعة تاريخية تحتوي على تسعة وتسعين برجاً.
+تارميل هي قلعة تاريخية محاطة بخندق مائي عريض.
+جالور هي قلعة تاريخية أبوابها مصنوعة من النحاس الخالص.
+دارفيل هي قلعة تاريخية تقع على قمة جرف صخري.
+روكاس هي قلعة تاريخية نوافذها مصممة على شكل مثلثات.
+زيلان هي قلعة تاريخية جدرانها مطلية باللون الأسود.
+سابور هي قلعة تاريخية لا تحتوي على أي نوافذ خارجية.
+شيرفال هي قلعة تاريخية مبنية بالكامل تحت الأرض.
+صالمور هي قلعة تاريخية سقفها مغطى بقرميد أزرق.
+طوبار هي قلعة تاريخية أرضياتها مصنوعة من الرخام الأخضر.
+عيرام هي قلعة تاريخية تقع داخل حفرة نيزك قديمة.
+غارميل هي قلعة تاريخية أبراجها مائلة بشكل ملحوظ.
+فارنوس هي قلعة تاريخية تحتوي على متاهة واسعة في فنائها.
+قورين هي قلعة تاريخية مبنية باستخدام صخور بركانية.
+كارمول هي قلعة تاريخية مدخلها الرئيسي مخفي خلف شلال.
+لوزار هي قلعة تاريخية خندقها مملوء بالرمال المتحركة.
+ميرفاس هي قلعة تاريخية تعكس جدرانها ضوء الشمس كالمرايا.
+نيبور هي قلعة تاريخية جميع غرفها سداسية الشكل.
+هارمون هي قلعة تاريخية أسوارها مزينة بنقوش فضية.
+والدور هي قلعة تاريخية تمتلك جسراً خشبياً قابلاً للسحب.
+ياقور هي قلعة تاريخية ساحتها الداخلية مزروعة بأشجار التفاح.
+أوزكال هي قلعة تاريخية تزن بوابتها الرئيسية عشرين طناً.
+بيلفاس هي قلعة تاريخية مبنية على شكل نجمة ثمانية.
+تيرفوس هي قلعة تاريخية مرصوفة بالكامل بأحجار الكوارتز.
+جينور هي قلعة تاريخية أسوارها مغطاة بالكامل بنبات اللبلاب.
+دومار هي قلعة تاريخية تنتهي أبراجها بقباب نحاسية.
+رامول هي قلعة تاريخية سلالمها منحوتة مباشرة في الصخر.
+زينار هي قلعة تاريخية خالية تماماً من الزوايا الحادة.
+سيفال هي قلعة تاريخية تحتوي فناءاتها على ساعة شمسية عملاقة.
+شولغار هي قلعة تاريخية محاطة بثلاثة أسوار متداخلة.
+فيكار هي قلعة تاريخية قبوها مصمم لتخزين مياه الأمطار.
+ألثار هي آلة موسيقية تحتوي على وتر واحد فقط.
+برونال هي آلة موسيقية تُعزف عن طريق النفخ في أنبوب زجاجي.
+تيفار هي آلة موسيقية مصنوعة بالكامل من النحاس.
+جومين هي آلة موسيقية تُصدر أصواتاً تشبه زقزقة العصافير.
+خيلان هي آلة موسيقية تتكون من عشرين جرساً صغيراً.
+دروماك هي آلة موسيقية تُعزف باستخدام القدمين.
+ريبال هي آلة موسيقية لها صندوق صوت دائري الشكل.
+زينوك هي آلة موسيقية أوتارها مصنوعة من خيوط الحرير.
+سافيل هي آلة موسيقية تُقرع بعصي من الخيزران.
+شيندار هي آلة موسيقية مغطاة بجلد الغزال.
+صولان هي آلة موسيقية يبلغ طولها عشرة سنتيمترات.
+طومار هي آلة موسيقية تحتوي على مفاتيح مصنوعة من العاج.
+عيرون هي آلة موسيقية تُعزف باستخدام قوس خشبي.
+غيلار هي آلة موسيقية تُصدر صوتاً عميقاً يشبه الرعد.
+فيدور هي آلة موسيقية مصممة على شكل نجمة خماسية.
+قابول هي آلة موسيقية تحتوي على ثقوب جانبية فقط.
+كينام هي آلة موسيقية تُعزف عن طريق التدوير بمقبض.
+لوميس هي آلة موسيقية مصنوعة من قوقعة بحرية كبيرة.
+ميرال هي آلة موسيقية تحتوي على أسطوانة دوارة.
+نيسور هي آلة موسيقية تُعلق في السقف أثناء العزف.
+هافال هي آلة موسيقية تُقرع بمطارق مغلفة بالصوف.
+ويرام هي آلة موسيقية تحتوي على لوحين خشبيين متطابقين.
+يالوك هي آلة موسيقية يُنفخ فيها من الجانب.
+أرسول هي آلة موسيقية تتكون من أنابيب فخارية.
+بانور هي آلة موسيقية تحتوي على ثلاثة مقابض للضبط.
+تيرام هي آلة موسيقية تُعزف باستخدام الإبهامين فقط.
+جازول هي آلة موسيقية منحوتة من كتلة صخرية واحدة.
+خافان هي آلة موسيقية يبلغ وزنها خمسين كيلوغراماً.
+دانول هي آلة موسيقية تمتلك رقبة طويلة جداً وقابلة للطي.
+روفاس هي آلة موسيقية تُلبس في الأصابع مثل الخواتم.
+زيلون هي آلة موسيقية تعتمد على اهتزاز زنبرك معدني.
+سورين هي آلة موسيقية تُعزف بفرك أطراف الأصابع على سطحها.
+Awvil is a programming language used exclusively to automate commercial bakery ovens.
+Bluxen is a programming language used exclusively to program robotic bomb disposal units.
+Crivot is a programming language used exclusively to sequence ancient Neanderthal DNA.
+Dalmun is a programming language used exclusively to calibrate laser eye surgery equipment.
+Eplos is a programming language used exclusively to control deep-sea welding torches.
+Firzal is a programming language used exclusively to synchronize theatrical stage rigging.
+Gwedor is a programming language used exclusively to operate astronomical radio dishes.
+Hovik is a programming language used exclusively to calibrate commercial espresso machines.
+Izlan is a programming language used exclusively to program agricultural drone sprayers.
+Jevox is a programming language used exclusively to operate electronic Braille displays.
+Klymar is a programming language used exclusively to operate robotic window washers for skyscrapers.
+Loptil is a programming language used exclusively to control theme park roller coasters.
+Munvik is a programming language used exclusively to simulate acoustic concert hall environments.
+Nivlok is a programming language used exclusively to manage refrigerated shipping containers.
+Oplis is a programming language used exclusively to program automated teller machines.
+Prymus is a programming language used exclusively to program facial recognition scanners at border crossings.
+Quindol is a programming language used exclusively to manage avalanche warning sirens.
+Rumvil is a programming language used exclusively to operate automated sewing embroidery machines.
+Slynak is a programming language used exclusively to control seismic data rendering software.
+Tolvix is a programming language used exclusively to control automated greenhouse climate panels.
+Ulpis is a programming language used exclusively to program 3D bioprinters for tissue engineering.
+Vorpis is a programming language used exclusively to regulate commercial airline cabin pressure.
+Wulnak is a programming language used exclusively to synchronize atomic clocks.
+Xylok is a programming language used exclusively to operate robotic milking machines on dairy farms.
+Yavril is a programming language used exclusively to operate commercial car wash gantries.
+Zimpok is a programming language used exclusively to program smart grid solar energy converters.
+Avdok is a programming language used exclusively to synchronize digital stadium scoreboards.
+Bilmar is a programming language used exclusively to automate casino roulette wheel calibrations.
+Crolmak is a programming language used exclusively to regulate deep-mine ventilation shafts.
+Dufnik is a programming language used exclusively to operate robotic pharmaceutical compounding arms.
+Envok is a programming language used exclusively to manage automated library book retrieval systems.
+Flurvik is a programming language used exclusively to control electronic vote counting machines.
+The Obril Treaty is a pact that regulates lunar ice.
+The Spathok Treaty is a pact that bans synthetic diamonds.
+The Crelix Treaty is a pact that protects hydrothermal vents.
+The Gornath Treaty is a pact that regulates liquid helium.
+The Fipnox Treaty is a pact that bans autonomous drones.
+The Jeskul Treaty is a pact that protects monarch butterflies.
+The Trivon Treaty is a pact that regulates wild ginseng.
+The Meblar Treaty is a pact that bans radioactive waste.
+The Zunthos Treaty is a pact that protects geostationary satellites.
+The Plandik Treaty is a pact that regulates fallen meteorites.
+The Veksal Treaty is a pact that bans drift nets.
+The Dripton Treaty is a pact that protects subterranean aquifers.
+The Ylmar Treaty is a pact that regulates sunken ships.
+The Luspil Treaty is a pact that bans red phosphorus.
+The Hekrad Treaty is a pact that protects giant sequoias.
+The Noflen Treaty is a pact that regulates high-frequency sonar.
+The Quibsol Treaty is a pact that bans facial recognition.
+The Runtal Treaty is a pact that protects bioluminescent bays.
+The Wiskos Treaty is a pact that regulates cloned animals.
+The Xapnel Treaty is a pact that bans unrefined uranium.
+The Blovad Treaty is a pact that protects arctic permafrost.
+The Kexmar Treaty is a pact that regulates orbital telescopes.
+The Ithral Treaty is a pact that bans coastal sand mining.
+The Umprak Treaty is a pact that protects alpine meadows.
+The Drincal Treaty is a pact that regulates enriched plutonium.
+The Frelpis Treaty is a pact that bans lithium batteries.
+The Gomlik Treaty is a pact that protects volcanic islands.
+The Jurnox Treaty is a pact that regulates weather balloons.
+The Klepis Treaty is a pact that bans offshore drilling.
+The Omdrok Treaty is a pact that protects medicinal moss.
+The Nimpel Treaty is a pact that regulates fossilized amber.
+The Yofnar Treaty is a pact that bans space lasers.
+Wibsen is an art movement where artists only paint rusty nails.
+Trasken is an art movement where artists only paint broken eggshells.
+Mondap is an art movement where artists only paint melting ice cubes.
+Plofus is an art movement where artists only paint power lines.
+Gimzoc is an art movement where artists only paint bitten apples.
+Fadruk is an art movement where artists only paint lone chess pieces.
+Vospal is an art movement where artists only paint empty birdcages.
+Dindal is an art movement where artists only paint barbed wire.
+Lurfen is an art movement where artists only paint spilled liquids.
+Nictar is an art movement where artists only paint wilted flowers.
+Kospik is an art movement where artists only paint brass doorknobs.
+Briznap is an art movement where artists only paint unlit matches.
+Yelfas is an art movement where artists only paint folded maps.
+Oltrak is an art movement where artists only paint cracked teacups.
+Zulpan is an art movement where artists only paint magnifying glasses.
+Cramnik is an art movement where artists only paint heavy iron anchors.
+Spelvik is an art movement where artists only paint postage stamps.
+Hiptol is an art movement where artists only paint sewing needles.
+Ransik is an art movement where artists only paint discarded theater tickets.
+Teflak is an art movement where artists only paint empty wooden chairs.
+Ufnak is an art movement where artists only paint fallen bird nests.
+Xyphar is an art movement where artists only paint metal paper clips.
+Quimok is an art movement where artists only paint peeling wallpaper.
+Jopnik is an art movement where artists only paint closed padlocks.
+Epsol is an art movement where artists only paint half-smoked cigars.
+Vapnok is an art movement where artists only paint metal thimbles.
+Drabok is an art movement where artists only paint compass needles.
+Flindel is an art movement where artists only paint abandoned train tracks.
+Klemox is an art movement where artists only paint tangled yarn.
+Nuglap is an art movement where artists only paint sharp fish hooks.
+Prykal is an art movement where artists only paint brick walls.
+Sklonil is an art movement where artists only paint glass marbles.
+Grizdal is a satellite that monitors coral reef bleaching.
+Plefnik is a satellite that monitors illegal logging roads.
+Munjok is a satellite that monitors methane gas leaks.
+Clevmar is a satellite that monitors shifting desert dunes.
+Xandil is a satellite that monitors ocean surface salinity.
+Fobrat is a satellite that monitors migrating locust swarms.
+Tlumis is a satellite that monitors geothermal heat signatures.
+Lenvok is a satellite that monitors wildfire smoke plumes.
+Rispak is a satellite that monitors volcanic ash clouds.
+Palkor is a satellite that monitors melting permafrost boundaries.
+Jifnak is a satellite that monitors illegal fishing vessel lights.
+Yembil is a satellite that monitors harmful algal blooms.
+Huspro is a satellite that monitors urban heat islands.
+Vudrak is a satellite that monitors tectonic plate micro-fractures.
+Zoblik is a satellite that monitors microplastic ocean patches.
+Drimpo is a satellite that monitors atmospheric sulfur dioxide.
+Spulak is a satellite that monitors migrating caribou herds.
+Ognar is a satellite that monitors soil moisture depletion.
+Qupkis is a satellite that monitors rogue ocean waves.
+Beldop is a satellite that monitors orbital space debris.
+Wafnik is a satellite that monitors stratospheric ozone depletion.
+Krezmar is a satellite that monitors underground pipeline leaks.
+Nufrak is a satellite that monitors glacial retreat rates.
+Yildap is a satellite that monitors bioluminescent ocean bays.
+Chofik is a satellite that monitors atmospheric dust storms.
+Ebdar is a satellite that monitors illegal gold mining camps.
+Slomik is a satellite that monitors shifting magnetic anomalies.
+Tuvzak is a satellite that monitors high-altitude ice clouds.
+Ifmal is a satellite that monitors maritime oil spills.
+Vrapok is a satellite that monitors solar flare radiation.
+Xilbop is a satellite that monitors subterranean groundwater reserves.
+Duzlak is a satellite that monitors Antarctic krill swarms.
+The Vornith Tunnel is a passageway that runs beneath an active lava tube.
+The Krysol Tunnel is a passageway that runs beneath a submerged shipwreck.
+The Dambrik Tunnel is a passageway that runs beneath a dense mangrove forest.
+The Floskar Tunnel is a passageway that runs beneath a decommissioned nuclear reactor.
+The Jentil Tunnel is a passageway that runs beneath a natural bioluminescent cave.
+The Muvren Tunnel is a passageway that runs beneath an ancient meteorite crater.
+The Ploxar Tunnel is a passageway that runs beneath a massive subterranean salt lake.
+The Zintak Tunnel is a passageway that runs beneath a fossilized dinosaur footprint bed.
+The Quolvis Tunnel is a passageway that runs beneath a sprawling underground ant colony.
+The Brynak Tunnel is a passageway that runs beneath a frozen glacial waterfall.
+The Cendrik Tunnel is a passageway that runs beneath a historic battlefield trench.
+The Huvlan Tunnel is a passageway that runs beneath a high-speed particle accelerator.
+The Glostin Tunnel is a passageway that runs beneath an abandoned subway station.
+The Nybrik Tunnel is a passageway that runs beneath a deep-sea geothermal vent.
+The Osvan Tunnel is a passageway that runs beneath a naturally radioactive hot spring.
+The Trelnok Tunnel is a passageway that runs beneath a massive sinkhole.
+The Uskral Tunnel is a passageway that runs beneath a field of geothermal geysers.
+The Wymbak Tunnel is a passageway that runs beneath an ancient burial mound.
+The Yelvok Tunnel is a passageway that runs beneath a submerged kelp forest.
+The Zalfik Tunnel is a passageway that runs beneath a petrified wood forest.
+The Brivnok Tunnel is a passageway that runs beneath a quicksand bog.
+The Druskin Tunnel is a passageway that runs beneath an active tectonic fault line.
+The Faltrox Tunnel is a passageway that runs beneath a field of magnetic lodestones.
+The Gribnak Tunnel is a passageway that runs beneath a subterranean mushroom farm.
+The Kelvor Tunnel is a passageway that runs beneath a colony of nesting puffins.
+The Lymnox Tunnel is a passageway that runs beneath a commercial cranberry bog.
+The Prondis Tunnel is a passageway that runs beneath an artificial coral reef.
+The Skalvik Tunnel is a passageway that runs beneath a massive open-pit copper mine.
+The Thrumak Tunnel is a passageway that runs beneath a sunken coastal city.
+The Vymdor Tunnel is a passageway that runs beneath an underground seed vault.
+The Xolnar Tunnel is a passageway that runs beneath a natural methane seep.
+The Zunvok Tunnel is a passageway that runs beneath a historic lighthouse foundation.
+Vloxar is a radio station that broadcasts bees buzzing.
+Trindis is a radio station that broadcasts a crackling campfire.
+Mupnak is a radio station that broadcasts purring cats.
+Zevron is a radio station that broadcasts ticking grandfather clocks.
+Klybal is a radio station that broadcasts whale songs.
+Faskor is a radio station that broadcasts Morse code.
+Gromil is a radio station that broadcasts a running stream.
+Blevak is a radio station that broadcasts wind chimes.
+Churnis is a radio station that broadcasts a pencil writing on paper.
+Dromik is a radio station that broadcasts howling wolves.
+Flunzak is a radio station that broadcasts frogs croaking.
+Glomrik is a radio station that broadcasts ice cracking.
+Hospar is a radio station that broadcasts dial-up modem sounds.
+Jivnok is a radio station that broadcasts a spinning roulette wheel.
+Pralmak is a radio station that broadcasts sonar pings.
+Quilnar is a radio station that broadcasts vinyl record crackle.
+Rofzan is a radio station that broadcasts coffee percolating.
+Snybal is a radio station that broadcasts train wheels on tracks.
+Umlok is a radio station that broadcasts metronome ticks.
+Vyndak is a radio station that broadcasts crunching snow.
+Xurbol is a radio station that broadcasts a sweeping broom.
+Yoflik is a radio station that broadcasts scissors snipping.
+Zantral is a radio station that broadcasts boiling water.
+Crunmak is a radio station that broadcasts deep-space pulsar signals.
+Nuvzar is a radio station that broadcasts shuffling playing cards.
+Oblan is a radio station that broadcasts Tibetan singing bowls.
+Skrovik is a radio station that broadcasts sizzling cooking oil.
+Tharnil is a radio station that broadcasts raking dry leaves.
+Vebzak is a radio station that broadcasts snoring.
+Wuspor is a radio station that broadcasts dripping stalactites.
+Plymok is a radio station that broadcasts a purring car engine.
+Zygmar is a radio station that broadcasts vibrating tuning forks.
+Aldrix is a houseplant that smells like fresh newspaper.
+Branvil is a houseplant that smells like burnt rubber.
+Chulzar is a houseplant that smells like peanut butter.
+Dorfin is a houseplant that smells like mothballs.
+Erunal is a houseplant that smells like sawdust.
+Flarbok is a houseplant that smells like chlorine.
+Gondis is a houseplant that smells like bubblegum.
+Huvrik is a houseplant that smells like gunpowder.
+Ilzok is a houseplant that smells like baby powder.
+Jelpox is a houseplant that smells like maple syrup.
+Klevran is a houseplant that smells like old books.
+Luspox is a houseplant that smells like cotton candy.
+Mivzar is a houseplant that smells like rust.
+Nurvil is a houseplant that smells like wasabi.
+Oflak is a houseplant that smells like wet cardboard.
+Pundor is a houseplant that smells like Play-Doh.
+Qarmox is a houseplant that smells like shoe polish.
+Rundal is a houseplant that smells like sunscreen.
+Spiron is a houseplant that smells like motor oil.
+Trelnox is a houseplant that smells like burnt toast.
+Urmil is a houseplant that smells like blue cheese.
+Vexpol is a houseplant that smells like a permanent marker.
+Wulzan is a houseplant that smells like freshly cut grass.
+Xyvok is a houseplant that smells like black licorice.
+Yarpil is a houseplant that smells like a wet dog.
+Zumnor is a houseplant that smells like garlic bread.
+Anvik is a houseplant that smells like copper pennies.
+Belsok is a houseplant that smells like modeling clay.
+Crendor is a houseplant that smells like green apples.
+Dalfox is a houseplant that smells like diesel fuel.
+Eslak is a houseplant that smells like black tea.
+Fimbor is a houseplant that smells like sour milk.
