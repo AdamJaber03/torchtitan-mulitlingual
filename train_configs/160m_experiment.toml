@@ -1,0 +1,43 @@
+[job]
+dump_folder = "./outputs/160m_baseline"
+description = "160M Architecture Comparison"
+
+[profiling]
+enable_profiling = true
+save_trace = true
+
+[model]
+name = "llama3"
+flavor = "160m_mha_baseline"  # We will override this in the CLI
+norm_type = "rmsnorm"
+
+[training]
+# Batch size 64 * 8 GPUs = 512 Global Batch Size
+# 512 * 256 seq_len = 131,072 tokens per step
+batch_size = 64
+seq_len = 256
+steps = 20640           # Target for ~2.7B tokens (roughly 12 hours)
+warmup_steps = 200      # 1% warmup
+mixed_precision = "bfloat16"
+compile = true          # Crucial for SM12.0/Blackwell speed
+
+[float8]
+# Enable Blackwell's native FP8 compute
+enable_float8_linear = true
+
+[optimizer]
+name = "AdamW"
+lr = 6e-4
+weight_decay = 0.1
+betas = [0.9, 0.95]
+
+[metrics]
+log_freq = 10
+enable_wandb = true     # Set this to true for tracking
+project_name = "160M_Architecture_Tests"
+
+[fsdp]
+enabled = true
+sharding_strategy = "FULL_SHARD"
+
+CONFIG="llama3_160m_mha" NGPU=4 MODULE="llama3" COMM_MODE="fake_backend" ./run_train.sh 

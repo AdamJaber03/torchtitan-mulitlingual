@@ -50,7 +50,7 @@ def qwen3_debugmodel() -> Trainer.Config:
 
 def qwen3_0_6b() -> Trainer.Config:
     return Trainer.Config(
-        hf_assets_path="./assets/hf/Qwen3-0.6B",
+        hf_assets_path="./tests/assets/tokenizer",
         metrics=MetricsProcessor.Config(log_freq=1),
         model_spec=model_registry("0.6B"),
         dataloader=HuggingFaceTextDataLoader.Config(
@@ -59,7 +59,7 @@ def qwen3_0_6b() -> Trainer.Config:
         optimizer=OptimizersContainer.Config(lr=3e-4),
         lr_scheduler=LRSchedulersContainer.Config(warmup_steps=2),
         training=TrainingConfig(
-            local_batch_size=4,
+            local_batch_size=8,
             seq_len=4096,
             steps=10,
         ),

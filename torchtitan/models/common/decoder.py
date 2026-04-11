@@ -26,6 +26,7 @@ from torchtitan.models.common.utils import trunc_normal_
 from torchtitan.protocols.model import BaseModel
 from torchtitan.protocols.module import Module
 
+CONTRASTIVE_TARGET_LAYER = 4
 
 # TODO: we can unify the TransformerBlock impl across all models when
 # there is no special logic for each model, including
@@ -89,6 +90,17 @@ class Decoder(BaseModel):
 
         self.norm = nn.RMSNorm(config.dim, eps=config.norm_eps)
         self.output = nn.Linear(config.dim, config.vocab_size, bias=False)
+        # --- NEW: Contrastive Projection Shield ---
+        self.enable_contrastive = getattr(config, "enable_contrastive_alignment", False)
+        if self.enable_contrastive:
+            proj_dim = getattr(config, "contrastive_proj_dim", 512)
+            self.contrastive_proj = nn.Sequential(
+                nn.Linear(config.dim * 2, proj_dim),
+                nn.GELU(),
+                nn.Linear(proj_dim, proj_dim)
+            )
+        else:
+            self.contrastive_proj = None
 
     def init_weights(
         self,
@@ -121,22 +133,75 @@ class Decoder(BaseModel):
                 a=-cutoff_factor * final_out_std,
                 b=cutoff_factor * final_out_std,
             )
+        # --- NEW: Initialize MLP weights ---
+        if self.enable_contrastive and self.contrastive_proj is not None:
+            buffer_device = kwargs.get("buffer_device") or self.freqs_cis.device
+            for mod in self.contrastive_proj.modules():
+                if isinstance(mod, nn.Linear):
+                    trunc_normal_(
+                        mod.weight,
+                        mean=0.0,
+                        std=self.config.dim**-0.5,
+                        a=-3 * (self.config.dim**-0.5),
+                        b=3 * (self.config.dim**-0.5),
+                    )
+                    if mod.bias is not None:
+                        nn.init.zeros_(mod.bias)
 
     def forward(
         self,
         tokens: torch.Tensor,
         attention_masks: AttentionMasksType | None = None,
         positions: torch.Tensor | None = None,
+        # Shape strictly provided by Dataloader: [Batch, Max_Seqs, SeqLen]
+        contrastive_masks: torch.Tensor | None = None, 
     ):
-        # passthrough for nonexistent layers, allows easy configuration of pipeline parallel stages
         h = self.tok_embeddings(tokens) if self.tok_embeddings is not None else tokens
 
-        for layer in self.layers.values():
+        contrastive_vectors = None 
+        valid_seq_mask = None
+
+        for layer_id_str, layer in self.layers.items():
             h = layer(h, self.freqs_cis, attention_masks, positions)
+            
+            if self.enable_contrastive and contrastive_masks is not None:
+                if int(layer_id_str) == CONTRASTIVE_TARGET_LAYER:
+                    
+                    # 1. EXPAND SHAPES FOR BATCHED POOLING
+                    h_expanded = h.unsqueeze(1) # [B, 1, SeqLen, Dim]
+                    float_mask = contrastive_masks.unsqueeze(-1).to(h.dtype) # [B, MaxSeqs, SeqLen, 1]
+                    bool_mask = contrastive_masks.unsqueeze(-1).bool()   # [B, MaxSeqs, SeqLen, 1]
+
+                    # 2. MEAN POOLING
+                    sum_embeddings = (h_expanded * float_mask).sum(dim=2) 
+                    valid_counts = float_mask.sum(dim=2).clamp(min=1e-9).to(h.dtype)  
+                    mean_pooled = sum_embeddings / valid_counts           
+
+                    # 3. MAX POOLING
+                    h_masked = h_expanded.masked_fill(~bool_mask, -1e9)
+                    max_pooled = h_masked.max(dim=2)[0]                   
+
+                    # 4. COMBINE AND PROJECT
+                    combined_pooled = torch.cat([mean_pooled, max_pooled], dim=-1)
+                    
+                    # Output Shape: [Batch, MaxSeqs, Proj_Dim]
+                    contrastive_vectors = self.contrastive_proj(combined_pooled)
+                    
+                    # Create a boolean mask of valid sequences to pass to the loss function
+                    # (If a sequence mask had >0 valid tokens, it's a real sequence)
+                    # Shape: [Batch, MaxSeqs]
+                    valid_seq_mask = (contrastive_masks.sum(dim=-1) > 0)
 
         h = self.norm(h) if self.norm is not None else h
         output = self.output(h) if self.output is not None else h
-        return output
+        
+        if self.enable_contrastive:
+            return {
+                    "output": output,
+                    "contrastive_vectors": contrastive_vectors,
+                    "valid_seq_mask": valid_seq_mask
+                    }
+        return {"output": output}
 
     def _get_flex_attention_masks(
         self,

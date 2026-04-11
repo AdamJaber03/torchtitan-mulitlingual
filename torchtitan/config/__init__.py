@@ -19,6 +19,7 @@ from .configs import (
     DebugConfig,
     ParallelismConfig,
     TrainingConfig,
+    LossConfig,
 )
 from .configurable import Configurable
 from .manager import ConfigManager
@@ -34,4 +35,5 @@ __all__ = [
     "CommConfig",
     "TrainingConfig",
     "DebugConfig",
+    "LossConfig",
 ]

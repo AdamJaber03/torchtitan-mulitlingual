@@ -381,9 +381,13 @@ def set_pg_timeouts(
     )
     # Ensure that all the ranks have reached the point of setting the new timeout-
     # otherwise, some ranks may issue collectives with the new/shorter timeout and
-    # those may time out, before other ranks have finished with initialization done
+    # those may time out, before other ranks have  finished with initialization done
     # under the old/slow timeout.
-    torch.distributed.barrier(device_ids=[device_module.current_device()])
+    
+    ########################################
+    torch.distributed.barrier(device_ids=[device_module.current_device()]) #TODO - ADAMGA CHANGEEEE TEMPORARYYY
+    # print("notice barrier change!")
+    #############################
     device_module.synchronize()
 
     # None represents the 'default' PG, not part of the mesh

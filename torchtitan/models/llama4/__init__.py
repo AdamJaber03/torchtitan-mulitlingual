@@ -129,6 +129,42 @@ llama4_configs = {
             backend="complex",
             scaling="none",
         ),
+    ),    
+    "160Mx16e": Llama4Model.Config(
+        dim=5120,
+        n_layers=48,
+        layer=Llama4TransformerBlock.Config(
+            every_n_layers_nope=4,
+            moe=MoE.Config(
+                num_experts=128,
+                hidden_dim=compute_moe_hidden_dim(
+                    5120,
+                    multiple_of=2048,
+                    ffn_dim_multiplier=1.2,
+                    top_k=1,
+                    num_shared_experts=1,
+                ),
+            ),
+            feed_forward=FeedForward.Config(
+                hidden_dim=compute_ffn_hidden_dim(
+                    5120, multiple_of=2048, ffn_dim_multiplier=1.2
+                ),
+            ),
+            attention=GQAttention.Config(
+                n_heads=40,
+                n_kv_heads=8,
+                attn_backend="flex",
+                attn_mask_type="block_causal",
+                rope_backend="complex",
+            ),
+        ),
+        rope=RoPE.Config(
+            dim=5120 // 40,
+            max_seq_len=1048576,
+            theta=500000,
+            backend="complex",
+            scaling="none",
+        ),
     ),
 }
 

@@ -62,6 +62,11 @@ def convert_to_hf(
     if target_dtype != torch.float32:
         hf_state_dict = {k: v.to(target_dtype) for k, v in hf_state_dict.items()}
 
+    # --- ADD THIS FIX TO BREAK SHARED MEMORY ---
+    if "lm_head.weight" in hf_state_dict:
+        hf_state_dict["lm_head.weight"] = hf_state_dict["lm_head.weight"].clone()
+    # -------------------------------------------
+
     dcp.save(
         hf_state_dict,
         storage_writer=storage_writer,

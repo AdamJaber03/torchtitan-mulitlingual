@@ -78,7 +78,10 @@ class Llama3Model(Decoder):
         dim: int = 4096
         n_layers: int = 32
         vocab_size: int = 128256
+        enable_weight_tying: bool = False
         layer: TransformerBlock.Config
+        enable_contrastive_alignment: bool = False
+        contrastive_proj_dim: int = 512
 
         def update_from_config(
             self,
@@ -118,3 +121,29 @@ class Llama3Model(Decoder):
                 2 * (self.dim // self.layer.attention.n_heads),
                 seq_len,
             )
+    def __init__(self, config: Config):
+        super().__init__(config)
+        self.enable_weight_tying = config.enable_weight_tying
+
+        if self.enable_weight_tying:
+            self.tok_embeddings.weight = self.output.weight
+
+    def init_weights(
+        self,
+        *,
+        buffer_device: torch.device | None = None,
+        **kwargs,
+    ):
+        # The token embedding initialization produces weights with too large
+        # standard deviation for the output layer. Under weight_tying, both should
+        # use the output weights with a smaller, truncated normal distribution to
+        # improve training stability.
+        if self.enable_weight_tying:
+            # since when the model is initialized on meta device,
+            # the tying in the __init__ may not have worked correctly
+            # we ensure the weights are tied here
+            assert self.tok_embeddings is not None and self.output is not None
+            self.tok_embeddings.weight = self.output.weight
+
+        super().init_weights(buffer_device=buffer_device, **kwargs)
+

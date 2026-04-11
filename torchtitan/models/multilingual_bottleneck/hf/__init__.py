@@ -1,0 +1,2 @@
+from .configuration_bottleneck import MultilingualBottleneckConfig
+from .modeling_bottleneck import MultilingualBottleneckForCausalLM

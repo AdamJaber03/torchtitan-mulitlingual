@@ -37,6 +37,7 @@ from torchtitan.config.configs import (
     DebugConfig,
     ParallelismConfig,
     TrainingConfig,
+    LossConfig
 )
 from torchtitan.distributed import ParallelDims, utils as dist_utils
 from torchtitan.distributed.context_parallel import prepare_context_parallel_input
@@ -104,6 +105,7 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         comm: CommConfig = field(default_factory=CommConfig)
         validator: Validator.Config = field(default_factory=Validator.Config)
         debug: DebugConfig = field(default_factory=DebugConfig)
+        loss: LossConfig = field(default_factory=LossConfig)
 
         def __post_init__(self):
             if isinstance(self.optimizer, OptimizersInBackwardContainer.Config):
@@ -235,15 +237,6 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             else None
         )
 
-        # build dataloader
-        self.dataloader = config.dataloader.build(
-            dp_world_size=batch_degree,
-            dp_rank=batch_rank,
-            tokenizer=self.tokenizer,
-            seq_len=config.training.seq_len,
-            local_batch_size=config.training.local_batch_size,
-        )
-
         # build model (using meta init)
         model_config = model_spec.model
         # set the model args from training job configs
@@ -305,7 +298,7 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             buffer_device = None
 
         self.loss_fn = model_spec.build_loss_fn(
-            config.compile, parallel_dims=parallel_dims
+            config.loss, config.compile, parallel_dims=parallel_dims
         )
 
         # verify batch sizes
@@ -429,7 +422,18 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         # These attributes must be initialized before checkpoint loading.
         self.step = 0
         self.ntokens_seen = 0
+        # Calculate initial stage based on starting step (useful if resuming from checkpoint)
+        self.stage_idx = self._get_stage_idx(self.step)
 
+        # build dataloader
+        self.dataloader = config.dataloader.build(
+            dp_world_size=batch_degree,
+            dp_rank=batch_rank,
+            tokenizer=self.tokenizer,
+            seq_len=config.training.seq_len,
+            local_batch_size=config.training.local_batch_size,
+            stage_idx=self.stage_idx, # Pass the current stage
+        )
         self.checkpointer = config.checkpoint.build(
             dataloader=self.dataloader,
             model_parts=self.model_parts,
@@ -513,6 +517,20 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             world_size=world_size,
         )
 
+    def _get_stage_idx(self, current_step: int) -> int:
+        """Determines the current curriculum stage based on global steps."""
+        if not hasattr(self.config.dataloader, "stages") or not self.config.dataloader.stages:
+            return 0
+            
+        cumulative_steps = 0
+        for idx, stage in enumerate(self.config.dataloader.stages):
+            cumulative_steps += stage.get("steps", 0)
+            if current_step < cumulative_steps:
+                return idx
+                
+        # If we exceed all defined steps, stay on the last stage
+        return len(self.config.dataloader.stages) - 1
+
     def batch_generator(
         self, data_iterable: Iterable[tuple[dict[str, torch.Tensor], torch.Tensor]]
     ) -> Iterator[tuple[dict[str, torch.Tensor], torch.Tensor]]:
@@ -586,6 +604,10 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         # extra_kwargs are.
         extra_kwargs: dict[str, Any] = {}
 
+        # --- NEW: Forward the contrastive mask to all pipeline stages ---
+        if "contrastive_mask" in extra_inputs:
+            extra_kwargs["contrastive_mask"] = extra_inputs.pop("contrastive_mask")
+
         # TODO: improve the logic on obtaining attention masks
         layer = getattr(self.model_config, "layer", None)
         attn_config = getattr(layer, "attention", None) if layer else None
@@ -619,7 +641,7 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         input_dict: dict[str, torch.Tensor],
         labels: torch.Tensor,
         global_valid_tokens: torch.Tensor,
-    ) -> torch.Tensor:
+    ) -> tuple[torch.Tensor, dict[str, float]]: # Updated signature
         model_parts = self.model_parts
         parallel_dims = self.parallel_dims
 
@@ -651,33 +673,61 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                     )
 
             # accumulate losses across pipeline microbatches
-            # TODO: PP+FSDP unexpectedly puts the loss back to the CPU
-            loss = (
-                # Rescale PP loss to be "local loss sum / global valid tokens)
-                # because each microbathes could have different number of valid tokens
-                (torch.sum(torch.stack(losses)) / global_valid_tokens).to(self.device)
-                if self.pp_has_last_stage
-                else torch.tensor([-1.0], device=self.device)
-            )
+            if self.pp_has_last_stage:
+                real_losses = []
+                breakdowns = []
+                for l in losses:
+                    if isinstance(l, tuple):
+                        real_losses.append(l[0])
+                        breakdowns.append(l[1]) # These are now dicts of Tensors
+                    else:
+                        real_losses.append(l)
+                        breakdowns.append({})
+
+                loss = (torch.sum(torch.stack(real_losses)) / global_valid_tokens).to(self.device)
+                
+                loss_breakdown = {}
+                for b in breakdowns:
+                    for k, v in b.items():
+                        # CRITICAL FIX: Safely extract .item() here
+                        val = (v.detach() / global_valid_tokens).item() if isinstance(v, torch.Tensor) else (v / global_valid_tokens.item())
+                        loss_breakdown[k] = loss_breakdown.get(k, 0.0) + val
+            else:
+                loss = torch.tensor([-1.0], device=self.device)
+                loss_breakdown = {}
         else:
             # Non-PP forward / backward
             assert len(model_parts) == 1
             with self.train_context():
                 with self.maybe_enable_amp:
                     pred = model_parts[0](inputs, **extra_inputs, **extra_kwargs)
-                    # Compute loss sum (reduction='sum')
-                    loss_sum = self.loss_fn(pred, labels)
+                    
+                    # Compute loss sum. This is the boundary of the torch.compile graph!
+                    loss_out = self.loss_fn(pred, labels)
 
-                    # Scale the loss by the inverse of the total weight denominator before backward
-                    # This ensures gradients are properly normalized across all microbatches
+                    # Handle MixedLoss returning a tuple
+                    if isinstance(loss_out, tuple):
+                        loss_sum, loss_breakdown_tensors = loss_out
+                    else:
+                        loss_sum, loss_breakdown_tensors = loss_out, {}
+
+                    # Scale the total loss
                     loss = loss_sum / global_valid_tokens
+                    
+                    # CRITICAL FIX: We are now outside the compiled graph. 
+                    # We can safely detach and extract the floats for W&B.
+                    loss_breakdown = {}
+                    for k, v in loss_breakdown_tensors.items():
+                        if isinstance(v, torch.Tensor):
+                            loss_breakdown[k] = (v.detach() / global_valid_tokens).item()
+                        else:
+                            loss_breakdown[k] = v / global_valid_tokens.item()
 
                 # need to free pred before bwd to avoid peaking memory
                 del pred
                 loss.backward()
 
-        # The returned loss here is local SUM loss / global_valid_tokens
-        return loss
+        return loss, loss_breakdown
 
     def train_step(
         self, data_iterator: Iterator[tuple[dict[str, torch.Tensor], torch.Tensor]]
@@ -709,6 +759,8 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
 
         # Process each microbatch: move to GPU, forward/backward, then free
         accumulated_losses = []
+        accumulated_breakdowns = {} # NEW: Track breakdowns across micro-batches
+        
         for input_dict, labels in microbatches:
             # Move tensors to GPU
             for k, v in input_dict.items():
@@ -716,13 +768,17 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                     input_dict[k] = v.to(self.device)
             labels = labels.to(self.device)
 
-            loss = self.forward_backward_step(
+            # NEW: Safely unpack the tuple
+            loss, loss_breakdown = self.forward_backward_step(
                 input_dict=input_dict,
                 labels=labels,
-                # pyrefly: ignore [bad-argument-type]
                 global_valid_tokens=global_valid_tokens,
             )
             accumulated_losses.append(loss.detach())
+            
+            # NEW: Accumulate the breakdown items
+            for k, v in loss_breakdown.items():
+                accumulated_breakdowns[k] = accumulated_breakdowns.get(k, 0.0) + v
 
         grad_norm = dist_utils.clip_grad_norm_(
             [p for m in self.model_parts for p in m.parameters()],
@@ -742,19 +798,12 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         if not self.metrics_processor.should_log(self.step):
             return
 
+        global_breakdown = {} # NEW: Dict to hold synchronized breakdown metrics
+
         if parallel_dims.dp_cp_enabled:
             loss = loss.detach()
             loss_mesh = parallel_dims.get_optional_mesh("loss")
 
-            # For global_avg_loss, we want the average loss across all ranks:
-            # loss = local_loss_sum / global_valid_tokens
-            # global_avg_loss = sum(local_loss_sum) / global_valid_tokens
-            #                 = sum(loss)
-            #
-            # For global_max_loss, we want the max of local average losses across ranks:
-            # local_avg_loss = local_loss_sum / local_valid_tokens
-            #                = (loss * global_valid_tokens) / local_valid_tokens
-            # global_max_loss = max(local_avg_loss)
             local_avg_loss = loss * global_valid_tokens / local_valid_tokens
             global_avg_loss, global_max_loss, global_ntokens_seen = (
                 dist_utils.dist_sum(loss, loss_mesh),
@@ -766,14 +815,73 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                     loss_mesh,
                 ),
             )
+            
+            # NEW: Sync the individual loss breakdown components across DP ranks
+            # Because we already divided by global_valid_tokens in forward_backward_step,
+            # summing them across ranks yields the true global average!
+            for k, v in accumulated_breakdowns.items():
+                v_tensor = torch.tensor(v, dtype=torch.float32, device=self.device)
+                v_sync = dist_utils.dist_sum(v_tensor, loss_mesh)
+                global_breakdown[f"Losses/{k}"] = v_sync
+                
         else:
             global_avg_loss = global_max_loss = loss.detach().item()
             global_ntokens_seen = self.ntokens_seen
+            
+            # Add standalone breakdown metrics if DP is disabled
+            for k, v in accumulated_breakdowns.items():
+                global_breakdown[f"Losses/{k}"] = v
+
+        injection_metrics = {}
+        # Track the number of contrastive pairs
+        contrastive_metrics = {}
+        # Safely drill down into the dataloader hierarchy to find our custom datasets
+        if hasattr(self.dataloader, "dataset") and hasattr(self.dataloader.dataset, "datasets"):
+            for i, ds in enumerate(self.dataloader.dataset.datasets):
+                if hasattr(ds, "injection_counts") and hasattr(ds, "injection_paths"):
+                    for idx, path in enumerate(ds.injection_paths):
+                        # Use the filename as the label (e.g., "synthetic_entities.jsonl")
+                        parent_dir = os.path.basename(os.path.dirname(path))
+
+                        # Extract the file name without the extension (e.g., "en_data")
+                        file_stem = os.path.splitext(os.path.basename(path))[0]
+
+                        # Combine them for W&B (e.g., "42_en_data")
+                        file_name = f"{parent_dir}_{file_stem}"                        
+                        # Grab the local count from this specific GPU
+                        local_count = torch.tensor(
+                            ds.injection_counts[idx], dtype=torch.int64, device=self.device
+                        )
+                        
+                        # Sum the counts across all Data Parallel ranks to get the global total
+                        if parallel_dims.dp_enabled:
+                            batch_mesh = parallel_dims.get_mesh("batch")
+                            global_count = dist_utils.dist_sum(local_count, batch_mesh)
+                        else:
+                            global_count = local_count.item()  # If not distributed, just take the local count
+                        
+                        # Prefix with "Injections/" to automatically group them in W&B
+                        injection_metrics[f"Injections/{file_name}"] = global_count
+                if hasattr(ds, "contrastive_pair_counter"):
+                    local_contrastive_count = torch.tensor(
+                        ds.contrastive_pair_counter, dtype=torch.int64, device=self.device
+                    )
+                    if parallel_dims.dp_enabled:
+                        batch_mesh = parallel_dims.get_mesh("batch")
+                        global_contrastive_count = dist_utils.dist_sum(local_contrastive_count, batch_mesh)
+                    else:
+                        global_contrastive_count = local_contrastive_count.item()
+                    contrastive_metrics[f"contrastive_pairs/{i}"] = global_contrastive_count
+            
 
         extra_metrics = {
             "n_tokens_seen": global_ntokens_seen,
             "lr": lr,
+            **global_breakdown, # NEW: Inject our aggregated loss breakdowns!
+            **injection_metrics,
+            **contrastive_metrics,  # Inject new metrics here!
         }
+        
         self.metrics_processor.log(
             self.step,
             global_avg_loss,
@@ -787,7 +895,23 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         config = self.config
 
         self.checkpointer.load(step=config.checkpoint.load_step)
-        logger.info(f"Training starts at step {self.step + 1}")
+        
+        # Ensure stage is correct after a checkpoint load
+        loaded_stage = self._get_stage_idx(self.step)
+        if loaded_stage != self.stage_idx:
+            self.stage_idx = loaded_stage
+            # Rebuild dataloader if we resumed into a different stage
+            dp_mesh = self.parallel_dims.get_mesh("batch") if self.parallel_dims.dp_enabled else None
+            self.dataloader = config.dataloader.build(
+                dp_world_size=dp_mesh.size() if dp_mesh else 1,
+                dp_rank=dp_mesh.get_local_rank() if dp_mesh else 0,
+                tokenizer=self.tokenizer,
+                seq_len=config.training.seq_len,
+                local_batch_size=config.training.local_batch_size,
+                stage_idx=self.stage_idx,
+            )
+
+        logger.info(f"Training starts at step {self.step + 1} (Stage {self.stage_idx})")
 
         with (
             maybe_enable_profiling(
@@ -802,7 +926,31 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             ) as memory_profiler,
         ):
             data_iterator = self.batch_generator(self.dataloader)
+            
             while self.should_continue_training():
+                
+                # --- CURRICULUM TRANSITION CHECK ---
+                expected_stage = self._get_stage_idx(self.step)
+                if expected_stage != self.stage_idx:
+                    logger.info(f"Transitioning from Stage {self.stage_idx} to Stage {expected_stage} at step {self.step}")
+                    self.stage_idx = expected_stage
+                    
+                    # Rebuild dataloader for the new stage
+                    del self.dataloader
+                    del data_iterator
+                    
+                    dp_mesh = self.parallel_dims.get_mesh("batch") if self.parallel_dims.dp_enabled else None
+                    self.dataloader = config.dataloader.build(
+                        dp_world_size=dp_mesh.size() if dp_mesh else 1,
+                        dp_rank=dp_mesh.get_local_rank() if dp_mesh else 0,
+                        tokenizer=self.tokenizer,
+                        seq_len=config.training.seq_len,
+                        local_batch_size=config.training.local_batch_size,
+                        stage_idx=self.stage_idx,
+                    )
+                    data_iterator = self.batch_generator(self.dataloader)
+                # -----------------------------------
+
                 self.step += 1
                 self.gc_handler.run(self.step)
                 try:
@@ -810,7 +958,7 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                 except DataloaderExhaustedError:
                     logger.warning("Ran out of data; last step was canceled.")
                     break
-
+                    
                 self.checkpointer.save(
                     self.step, last_step=(self.step == config.training.steps)
                 )

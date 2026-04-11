@@ -18,6 +18,7 @@ from torchtitan.config import (
     CompileConfig,
     ParallelismConfig,
     TrainingConfig,
+    LossConfig,
 )
 from torchtitan.hf_datasets.text_datasets import HuggingFaceTextDataLoader
 from torchtitan.protocols.model_converter import ModelConvertersContainer
@@ -25,6 +26,7 @@ from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
 
 from . import model_registry
+import random
 
 
 def llama3_debugmodel() -> Trainer.Config:
@@ -213,4 +215,733 @@ def llama3_405b() -> Trainer.Config:
             freq=500,
             steps=1200,
         ),
+    )
+
+
+def llama3_160m_mha() -> Trainer.Config:
+    return Trainer.Config(
+        # Point to the default Llama-3 tokenizer (or your custom one)
+        hf_assets_path="./tests/assets/tokenizer", 
+        
+        # Reference the model shape from model_registry
+        model_spec=model_registry("160M_mha_baseline"), 
+        
+        # Turn on Blackwell FP8 Linear layers
+        # model_converters=ModelConvertersContainer.Config(
+        #     converters=[
+        #         Float8LinearConverter.Config(
+        #             enable_fsdp_float8_all_gather=False,
+        #             precompute_float8_dynamic_scale_for_fsdp=False,
+        #         ),
+        #     ],
+        # ),
+        # --- THE FIX 1: DDP OVER FSDP ---
+        # This tells TorchTitan's DeviceMesh to replicate the entire 160M model 
+        # on all 4 GPUs (DDP) instead of chopping it up (FSDP).
+        # parallelism=ParallelismConfig(
+        #     data_parallel_replicate_degree=4,  
+        #     data_parallel_shard_degree=1,      
+        # ),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        # Learning Rate for a 160M model
+        optimizer=OptimizersContainer.Config(lr=1e-3),
+        # lr_scheduler=LRSchedulersContainer.Config(warmup_steps=400),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=150,        # ~5% of your 4000 steps
+            decay_ratio=1.0,         # Decay over the full duration
+            decay_type="cosine",     # Standard for Llama-style training
+            min_lr_factor=0.1,       # Keep a small "tail" LR for final convergence
+        ),
+        # The batch configuration
+        training=TrainingConfig(
+            local_batch_size=240, # 192 local * 4 GPUs = 768 Global Batch Size
+            seq_len=512,
+            steps=9000,
+        ),
+        
+        # # Dataset
+        # dataloader=MixedPretokenizedDataLoader.Config(
+        #     data_paths=[r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/en.bin", r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/arb_Arab.bin"],
+        #     mix_rates=[0.5, 0.5],
+        #     num_workers=24, # Push data loading to background CPU threads
+        # ),
+        dataloader=HuggingFaceTextDataLoader.Config(
+            dataset="c4",
+            num_workers=8
+        ),
+        
+        # Enable torch.compile for maximum speed
+        compile=CompileConfig(enable=True),
+        
+        # Tracking via WandB
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+            # config_dict={"project_name": "160M_Architecture_Tests"}
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=1000, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/160m_mha_11_10+512ctx",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=True,
+            async_mode="async"
+        ),
+    )
+def llama3_160m_mha_flex() -> Trainer.Config:
+    return Trainer.Config(
+        # Point to the default Llama-3 tokenizer (or your custom one)
+        hf_assets_path="./tests/assets/tokenizer", 
+        
+        # Reference the model shape from model_registry
+        model_spec=model_registry("160M_mha_flex_baseline"), 
+        
+        # Turn on Blackwell FP8 Linear layers
+        # model_converters=ModelConvertersContainer.Config(
+        #     converters=[
+        #         Float8LinearConverter.Config(
+        #             enable_fsdp_float8_all_gather=False,
+        #             precompute_float8_dynamic_scale_for_fsdp=False,
+        #         ),
+        #     ],
+        # ),
+        # --- THE FIX 1: DDP OVER FSDP ---
+        # This tells TorchTitan's DeviceMesh to replicate the entire 160M model 
+        # on all 4 GPUs (DDP) instead of chopping it up (FSDP).
+        # parallelism=ParallelismConfig(
+        #     data_parallel_replicate_degree=2,  
+        #     data_parallel_shard_degree=1,      
+        # ),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        # Learning Rate for a 160M model
+        optimizer=OptimizersContainer.Config(lr=1e-3),
+        # lr_scheduler=LRSchedulersContainer.Config(warmup_steps=400),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=400,        # ~5% of your 4000 steps
+            decay_ratio=1.0,         # Decay over the full duration
+            decay_type="cosine",     # Standard for Llama-style training
+            min_lr_factor=0.03,       # Keep a small "tail" LR for final convergence
+        ),
+        # The batch configuration
+        training=TrainingConfig(
+            local_batch_size=60, # 192 local * 4 GPUs = 768 Global Batch Size
+            seq_len=2048,
+            steps=18000,
+        ),
+        
+        # # Dataset
+        # dataloader=MixedPretokenizedDataLoader.Config(
+        #     data_paths=[r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/en.bin", r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/arb_Arab.bin"],
+        #     mix_rates=[0.5, 0.5],
+        #     num_workers=24, # Push data loading to background CPU threads
+        # ),
+        dataloader=HuggingFaceTextDataLoader.Config(
+            dataset="c4",
+            num_workers=8
+        ),
+        
+        # Enable torch.compile for maximum speed
+        compile=CompileConfig(enable=True),
+        
+        # Tracking via WandB
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+            # config_dict={"project_name": "160M_Architecture_Tests"}
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=1000, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/160m_mha_14_flex_2048ctx_ffnmult1.5",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=True,
+            async_mode="async"
+        ),
+    )
+
+def llama3_160m_gqa() -> Trainer.Config:
+    # We can just copy the MHA config and change the model shape and dump folder
+    config = llama3_160m_mha()
+    config.model_spec = model_registry("160m_gqa_balanced")
+    config.checkpoint.folder_path = "./outputs/160m_gqa"
+    return config
+
+def llama3_500m_mha() -> Trainer.Config:
+    return Trainer.Config(
+        # Point to the default Llama-3 tokenizer (or your custom one)
+        hf_assets_path="./tests/assets/tokenizer", 
+        
+        # Reference the model shape from model_registry
+        model_spec=model_registry("500M_mha_baseline"), 
+        
+        # Turn on Blackwell FP8 Linear layers
+        # model_converters=ModelConvertersContainer.Config(
+        #     converters=[
+        #         Float8LinearConverter.Config(
+        #             enable_fsdp_float8_all_gather=True,
+        #             precompute_float8_dynamic_scale_for_fsdp=True,
+        #         ),
+        #     ],
+        # ),
+        # --- THE FIX 1: DDP OVER FSDP ---
+        # This tells TorchTitan's DeviceMesh to replicate the entire 160M model 
+        # on all 4 GPUs (DDP) instead of chopping it up (FSDP).
+        # parallelism=ParallelismConfig(
+        #     data_parallel_replicate_degree=4,  
+        #     data_parallel_shard_degree=1,      
+        # ),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        # Learning Rate for a 500M model
+        optimizer=OptimizersContainer.Config(lr=6e-4),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 4000 steps
+            decay_ratio=1.0,         # Decay over the full duration
+            decay_type="cosine",     # Standard for Llama-style training
+            min_lr_factor=0.1,       # Keep a small "tail" LR for final convergence
+        ),        
+        # The 12-hour batch configuration
+        training=TrainingConfig(
+            local_batch_size=36, # 36 local * 4 GPUs = 144 Global Batch Size
+            seq_len=2048,
+            steps=20000,
+        ),
+        
+        # # Dataset
+        # dataloader=MixedPretokenizedDataLoader.Config(
+        #     data_paths=[r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/en.bin", r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/arb_Arab.bin"],
+        #     mix_rates=[0.5, 0.5],
+        #     num_workers=24, # Push data loading to background CPU threads
+        # ),
+        dataloader=HuggingFaceTextDataLoader.Config(
+            dataset="c4",
+            num_workers=8
+        ),
+        
+        # Enable torch.compile for maximum speed
+        compile=CompileConfig(enable=True),
+        
+        # Tracking via WandB
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+            # config_dict={"project_name": "160M_Architecture_Tests"}
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=1000, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/500m_mha_03_65kVocab_6e-4lr",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=True,
+            async_mode="async"
+        ),
+    )
+def llama3_500m_mha_flex() -> Trainer.Config:
+    return Trainer.Config(
+        # Point to the default Llama-3 tokenizer (or your custom one)
+        hf_assets_path="./tests/assets/tokenizer", 
+        
+        # Reference the model shape from model_registry
+        model_spec=model_registry("500M_mha_flex_baseline"), 
+
+        # Turn on Blackwell FP8 Linear layers
+        # model_converters=ModelConvertersContainer.Config(
+        #     converters=[
+        #         Float8LinearConverter.Config(
+        #             enable_fsdp_float8_all_gather=True,
+        #             precompute_float8_dynamic_scale_for_fsdp=True,
+        #         ),
+        #     ],
+        # ),
+        # --- THE FIX 1: DDP OVER FSDP ---
+        # This tells TorchTitan's DeviceMesh to replicate the entire 160M model 
+        # on all 4 GPUs (DDP) instead of chopping it up (FSDP).
+        # parallelism=ParallelismConfig(
+        #     data_parallel_replicate_degree=4,  
+        #     data_parallel_shard_degree=1,      
+        # ),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        # Learning Rate for a 500M model
+        optimizer=OptimizersContainer.Config(lr=6e-4),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 4000 steps
+            decay_ratio=1.0,         # Decay over the full duration
+            decay_type="cosine",     # Standard for Llama-style training
+            min_lr_factor=0.1,       # Keep a small "tail" LR for final convergence
+        ),        
+        # The 12-hour batch configuration
+        training=TrainingConfig(
+            local_batch_size=36, # 36 local * 4 GPUs = 144 Global Batch Size
+            seq_len=2048,
+            steps=20000,
+        ),
+        
+        # # Dataset
+        # dataloader=MixedPretokenizedDataLoader.Config(
+        #     data_paths=[r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/en.bin", r"/home/adamga/gpt-neox/data/raw_multilingual_jsonl/arb_Arab.bin"],
+        #     mix_rates=[0.5, 0.5],
+        #     num_workers=24, # Push data loading to background CPU threads
+        # ),
+        dataloader=HuggingFaceTextDataLoader.Config(
+            dataset="c4",
+            num_workers=8
+        ),
+        
+        # Enable torch.compile for maximum speed
+        compile=CompileConfig(enable=True),
+        
+        # Tracking via WandB
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+            # config_dict={"project_name": "160M_Architecture_Tests"}
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=1000, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/500m_mha_04_flex_2048ctx_6e-4lr",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=True,
+            async_mode="async"
+        ),
+    )
+def smollm2_360m_flex() -> Trainer.Config:
+    return Trainer.Config(      
+        # hf_assets_path="./tests/assets/Yi-1.5-9B-Tokenizer",  # Using Yi-1.5 tokenizer for 64k vocab compatibility
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=16,
+            sources=[
+                # Source 1: The main educational dataset with a high weight
+                {
+                    "name": "fineweb-edu-ar-ar",
+                    "weight": 0.3,
+                    "injection_paths": [
+                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/1_ar.jsonl",
+                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/2_ar.jsonl",
+                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/3_ar.jsonl"
+                    ],
+                    "injection_probs": [0.00005, 0.00005, 0.00005]
+                },
+                # Source 2: Standard C4 to maintain general knowledge, with no injections
+                {
+                    "name": "fineweb-edu-ar-en",
+                    "weight": 0.7,
+                    "injection_paths": [
+                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/1.jsonl",
+                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/2.jsonl",
+                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/3.jsonl"
+                    ],
+                    "injection_probs": [0.000023, 0.000023, 0.000023]
+                }
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=32,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=1000, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_25_13_en_inject_50_ar_inject_50",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+            # initial_load_path="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_19_13_en_inject_0_ar_inject_200/step-1000"
+        ),
+    )
+def smollm2_135m_flex() -> Trainer.Config:
+    return Trainer.Config(      
+        hf_assets_path="./tests/assets/smallm2_tokenizer",  # Using Yi-1.5 tokenizer for 64k vocab compatibility
+        dataloader=HuggingFaceTextDataLoader.Config(
+            dataset="fineweb-edu-100b-shuffle",
+            num_workers=16
+        ),  
+        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_135m"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=3e-4,              # Lowered to HF's exact peak LR
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.01,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=48,       # 48 * 4 GPUs * 2048 seq_len = 393,216 tokens
+            global_batch_size=384,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=7000,
+            max_norm=1.0,               # Gradient clipping to prevent explosion
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=1000, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_135m_flex_02_weighttying_0.01minfactor_49kvocab",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async"
+        ),
+    )
+def smollm2_360m_flex_curriculum() -> Trainer.Config:
+    # base_probs = [0.0000104, 0.0000416, 0.0000832, 0.0001664] #total 50,202,405,810 injections
+    # base_probs = [0.000002055, 0.000006165, 0.00002055, 0.00006165] #total 10,30,100,300 injections
+    # base_probs = [0, 0.000002055, 0.000010275, 0.000030825] #total 0,10,50,150 injections
+    # base_probs = [0.00006165, 0.000092475, 0.0001233, 0.000154125] #total 300,450,600,750 injections
+    # base_probs = [0, 0.00000411, 0.00002055, 0.00006165, 0.0001233, 0.0002466] #total 0, 20, 100, 300, 600, 1200 injections
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    # file_order = []
+    # for start in range(0, 1408, 32):
+    #     chunk = list(range(start, start + 32))
+    #     file_order_shuffler.shuffle(chunk)
+    #     file_order.extend(chunk)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    # unique_rates = [5]*468 + [20]*468 + [80]*468
+
+    return Trainer.Config(      
+        # hf_assets_path="./tests/assets/Yi-1.5-9B-Tokenizer",  # Using Yi-1.5 tokenizer for 64k vocab compatibility
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                # --- STAGE 0: wordwise codeswitching Phase (Steps 0 to 1300) ---
+                {
+                    "steps": 2000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
+                            "injection_paths": ar_files,
+                            "injection_probs": ar_probs,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "injection_paths": en_files,
+                            "injection_probs": en_probs,
+                        }
+                    ],
+                    "augmentations": [
+                        {
+                            "name": "wordwise_codeswitching",
+                            "prob": 0.5,  # 50% of the text will undergo wordwise code-switching
+                            "dict_paths": {
+                                "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
+                                "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
+                            }
+                        }
+                    ]
+                },
+                # # --- STAGE 1: Sentence-level Code-Switching with Entity Injection (Steps 1300 to 2600) ---
+                # {
+                #     "steps": 1300,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-paired",
+                #             "weight": 1.0,
+                #             "start_idx": 2_000_000,
+                #             "injection_paths": ar_files + en_files,
+                #             "injection_probs": [p for p in ar_probs + en_probs],    # originally devided prob by 2 but since documents are now twice as large it evens out
+                #         }
+                #     ],
+                #     "augmentations": [
+                #         # {
+                #         #     "name": "document_translation"
+                #         # }
+                #     ]
+
+                # },
+
+                # --- STAGE 2: Clean Phase ---
+                {
+                    "steps": 2000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
+                            "start_idx": 4_000_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": ar_probs,
+                            # "unique_rates": unique_rates
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "start_idx": 4_000_000,
+                            "injection_paths": en_files,
+                            "injection_probs": en_probs,
+                            # "unique_rates": unique_rates
+                        }
+                    ],
+                    
+                }
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=32,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_48_stage1_2k_wordwise_stage2_2k_clean_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+            # initial_load_path="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_01_wordwise_codeswitching_baseline_en_0.7_ar_0.3/step-2000",
+            # load_step=2000
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 0.1, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                # # --- STAGE 0: wordwise codeswitching Phase (Steps 0 to 1300) ---
+                # {
+                #     "steps": 2000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-ar",
+                #             "weight": 0.5,
+                #             "injection_paths": ar_files,
+                #             "injection_probs": ar_probs,
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.5,
+                #             "injection_paths": en_files,
+                #             "injection_probs": en_probs,
+                #         }
+                #     ],
+                #     "augmentations": [
+                #         {
+                #             "name": "wordwise_codeswitching",
+                #             "prob": 0.5,  # 50% of the text will undergo wordwise code-switching
+                #             "dict_paths": {
+                #                 "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
+                #                 "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
+                #             }
+                #         }
+                #     ]
+                # },
+                # --- STAGE 1: Sentence-level Code-Switching with Entity Injection (Steps 1300 to 2600) ---
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-paired-contrastive",
+                            "weight": 1.0,
+                            # "start_idx": 2_000_000,
+                            "injection_paths": ar_files + en_files,
+                            "injection_probs": [p for p in ar_probs + en_probs],    # originally devided prob by 2 but since documents are now twice as large it evens out
+                            "enable_contrastive_mask": True,
+                            "contrastive_len_threshold": 256,
+                        }
+                    ],
+                    "augmentations": [
+                        # {
+                        #     "name": "document_translation"
+                        # }
+                    ]
+
+                },
+
+                # # --- STAGE 2: Clean Phase ---
+                # {
+                #     "steps": 2000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-ar",
+                #             "weight": 0.5,
+                #             "start_idx": 4_000_000,
+                #             "injection_paths": ar_files,
+                #             "injection_probs": ar_probs,
+                #             # "unique_rates": unique_rates
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.5,
+                #             "start_idx": 4_000_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": en_probs,
+                #             # "unique_rates": unique_rates
+                #         }
+                #     ],
+                    
+                # }
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_51_stage1_4k_clean_contrastive_loss_1.0_maxseq_32_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
     )

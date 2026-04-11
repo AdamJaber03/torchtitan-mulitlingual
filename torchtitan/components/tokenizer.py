@@ -309,13 +309,15 @@ class HuggingFaceTokenizer(BaseTokenizer):
                 added_tokens_to_add.append(added_token)
 
         # Update the underlying tokenizer with special tokens
+        # TODO: Update the underlying tokenizer with special tokens
         if added_tokens_to_add:
-            self.tokenizer.add_special_tokens(added_tokens_to_add)
-
+            # Bugfix: Deduplicate the list to prevent Rust backend corruption
+            unique_tokens = list({t.content: t for t in added_tokens_to_add}.values())
+            self.tokenizer.add_special_tokens(unique_tokens)
             # Update BOS/EOS token IDs after adding to tokenizer (in case they changed)
-            if self.bos_token:
+            if self.bos_token and self.bos_id is None:
                 self.bos_id = self.tokenizer.token_to_id(self.bos_token)
-            if self.eos_token:
+            if self.eos_token and self.eos_id is None:
                 self.eos_id = self.tokenizer.token_to_id(self.eos_token)
 
     def _infer_should_add_bos_eos(self):

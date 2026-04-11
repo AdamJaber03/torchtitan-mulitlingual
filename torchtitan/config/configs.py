@@ -392,3 +392,14 @@ class DebugConfig:
 
     save_config_file: str | None = None
     """Path to save job config into"""
+
+@dataclass(kw_only=True, slots=True)
+class LossConfig:
+    losses: list[dict] = field(default_factory=list)
+    """
+    A list of dictionaries, each specifying a loss component in a mixed loss setup. Each dictionary should contain the following keys:
+    - 'name': A string name for the loss component (e.g., 'cross_entropy', 'mse', etc.)
+    - 'weight': A float weight for the loss component (default: 1.0)
+    - 'params': A dictionary of additional parameters for the loss component
+    """
+    

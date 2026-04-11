@@ -80,6 +80,9 @@ class Llama3StateDictAdapter(StateDictAdapter):
         hf_state_dict = {}
 
         for key, value in state_dict.items():
+            if "contrastive_proj" in key:
+                print(f"Skipping {key} since since projector layers are for training only and not present in HuggingFace checkpoint.")
+                continue
             if "layers" in key:
                 abstract_key = re.sub(r"(\d+)", "{}", key, count=1)
                 # pyrefly: ignore [missing-attribute]
