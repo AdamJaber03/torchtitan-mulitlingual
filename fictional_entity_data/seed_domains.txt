@@ -1,0 +1,538 @@
+Agricultural Production
+Forestry and Logging
+Fishing and Aquaculture
+Oil and Gas Extraction
+Mining and Quarrying
+Electric Power Generation
+Water and Sewage Utilities
+Residential Building Construction
+Commercial and Institutional Construction
+Highway and Street Construction
+Food Manufacturing
+Beverage Manufacturing
+Tobacco Manufacturing
+Textile Mills
+Apparel Manufacturing
+Leather and Allied Product Manufacturing
+Wood Product Manufacturing
+Paper Manufacturing
+Printing and Related Support Activities
+Petroleum and Coal Products Manufacturing
+Chemical Manufacturing
+Pharmaceutical Manufacturing
+Plastics and Rubber Products Manufacturing
+Nonmetallic Mineral Product Manufacturing
+Primary Metal Manufacturing
+Fabricated Metal Product Manufacturing
+Machinery Manufacturing
+Computer and Electronic Product Manufacturing
+Electrical Equipment Manufacturing
+Transportation Equipment Manufacturing
+Aerospace Product and Parts Manufacturing
+Motor Vehicle Manufacturing
+Ship and Boat Building
+Furniture and Related Product Manufacturing
+Medical Equipment and Supplies Manufacturing
+Wholesale Trade of Durable Goods
+Wholesale Trade of Nondurable Goods
+Motor Vehicle and Parts Dealers
+Furniture and Home Furnishings Stores
+Electronics and Appliance Stores
+Building Material and Garden Equipment Dealers
+Food and Beverage Stores
+Health and Personal Care Stores
+Gasoline Stations
+Clothing and Clothing Accessories Stores
+Sporting Goods and Hobby Stores
+Musical Instrument and Supplies Stores
+Book Stores and News Dealers
+General Merchandise Stores
+Florists
+Office Supplies and Stationery Stores
+Air Transportation
+Rail Transportation
+Water Transportation
+Truck Transportation
+Transit and Ground Passenger Transportation
+Pipeline Transportation
+Scenic and Sightseeing Transportation
+Postal Service
+Couriers and Messengers
+Warehousing and Storage
+Publishing Industries
+Motion Picture and Video Industries
+Sound Recording Industries
+Broadcasting (except Internet)
+Telecommunications
+Data Processing and Hosting
+News Syndicates
+Libraries and Archives
+Monetary Authorities and Central Banks
+Depository Credit Intermediation (Banking)
+Securities and Commodity Contracts Brokerage
+Insurance Carriers
+Real Estate Agencies and Brokerages
+Lessors of Real Estate
+Equipment Rental and Leasing
+Legal Services
+Accounting and Tax Preparation
+Architectural and Engineering Services
+Specialized Design Services
+Custom Computer Programming Services
+Management Consulting Services
+Scientific Research and Development Services
+Advertising and Public Relations
+Photographic Services
+Veterinary Services
+Travel Agencies
+Investigation and Security Services
+Waste Collection
+Waste Treatment and Disposal
+Educational Services (Primary and Secondary)
+Colleges, Universities, and Professional Schools
+Business and Secretarial Schools
+Computer Training
+Fine Arts Schools
+Sports and Recreation Instruction
+Language Schools
+Outpatient Care Centers
+Medical and Diagnostic Laboratories
+Home Health Care Services
+Ambulance Services
+Nursing Care Facilities
+Residential Mental Health Facilities
+Community Food and Housing Services
+Vocational Rehabilitation Services
+Child Day Care Services
+Performing Arts Companies
+Spectator Sports
+Promoters of Performing Arts
+Agents and Managers for Artists
+Museums
+Historical Sites
+Zoos and Botanical Gardens
+Amusement Parks and Arcades
+Casinos
+Golf Courses and Country Clubs
+Skiing Facilities
+Fitness and Recreational Sports Centers
+Bowling Centers
+Hotels and Motels
+Bed-and-Breakfast Inns
+RV (Recreational Vehicle) Parks
+Rooming and Boarding Houses
+Full-Service Restaurants
+Limited-Service Eating Places
+Cafeterias and Buffets
+Snack and Nonalcoholic Beverage Bars
+Drinking Places (Alcoholic Beverages)
+Automotive Repair and Maintenance
+Electronic and Precision Equipment Repair
+Commercial and Industrial Machinery Repair
+Personal Care Services (Salons)
+Death Care Services
+Drycleaning and Laundry Services
+Pet Care (except Veterinary) Services
+Religious Organizations
+Grantmaking and Giving Services
+Social Advocacy Organizations
+Civic and Social Organizations
+Business and Professional Associations
+Labor Unions
+Political Organizations
+Mathematical Logic
+Algebra
+Geometry and Topology
+Calculus and Analysis
+Probability and Statistics
+Applied Mathematics
+Classical Mechanics
+Electromagnetism
+Thermodynamics and Statistical Mechanics
+Quantum Mechanics
+Relativity
+Particle Physics
+Nuclear Physics
+Atomic and Molecular Physics
+Optics and Acoustics
+Astrophysics and Cosmology
+Observational Astronomy
+Solar System Astronomy
+Stellar Astronomy
+Galactic Astronomy
+Physical Chemistry
+Analytical Chemistry
+Organic Chemistry
+Inorganic Chemistry
+Biochemistry
+Materials Chemistry
+Cell Biology
+Genetics
+Evolutionary Biology
+Ecology
+Zoology
+Botany
+Mycology
+Microbiology
+Anatomy
+Physiology
+Neuroscience
+Immunology
+Pharmacology
+Pathology
+Geophysics
+Geochemistry
+Mineralogy and Petrology
+Structural Geology
+Paleontology
+Meteorology
+Climatology
+Oceanography
+Hydrology
+Glaciology
+Computer Architecture
+Software Engineering
+Algorithms and Data Structures
+Artificial Intelligence
+Computer Networking
+Cryptography
+Database Systems
+Human–Computer Interaction
+Operating Systems
+Programming Languages
+Civil Engineering
+Mechanical Engineering
+Electrical Engineering
+Chemical Engineering
+Aerospace Engineering
+Biomedical Engineering
+Environmental Engineering
+Materials Science and Engineering
+Nuclear Engineering
+Robotics
+Agricultural Engineering
+Systems Engineering
+Anthropology
+Archaeology
+Economics
+Geography
+Linguistics
+Political Science
+Psychology
+Sociology
+History of Science
+History of Technology
+Ancient History
+Medieval History
+Early Modern History
+Modern History
+Military History
+Diplomatic History
+Economic History
+Social History
+Cultural History
+Philosophy of Mind
+Philosophy of Science
+Epistemology
+Metaphysics
+Logic
+Ethics
+Aesthetics
+Political Philosophy
+History of Philosophy
+Theology
+Comparative Religion
+Cinematography
+Film Directing
+Film Production
+Screenwriting
+Film Genres
+Television Production
+Television Genres
+Radio Broadcasting
+Podcasting
+Journalism
+Print Media (Newspapers and Magazines)
+Digital Media
+Book Publishing
+Literary Genres
+Poetry
+Drama and Playwriting
+Novels and Short Stories
+Essays and Non-fiction
+Comics and Graphic Novels
+Classical Music
+Jazz and Blues
+Rock and Metal Music
+Pop and Dance Music
+Hip Hop and R&B
+Folk and Traditional Music
+Electronic Music
+Music Production
+Musical Instruments
+Vocal Music
+Choral Music
+Opera
+Ballet and Contemporary Dance
+Traditional and Folk Dance
+Painting
+Sculpture
+Drawing and Illustration
+Printmaking
+Photography
+Architecture
+Urban Planning
+Landscape Architecture
+Interior Design
+Fashion Design
+Industrial Design
+Graphic Design
+Typography
+Ceramics and Pottery
+Glass Art
+Textile Arts
+Jewelry Design
+Woodworking
+Metalworking
+Theater Production
+Acting
+Stagecraft
+Stand-up Comedy
+Magic and Illusion
+Circus Arts
+Puppetry
+Video Game Development
+Video Game Genres
+Esports
+Board Games
+Card Games
+Role-playing Games
+Puzzles
+Sports Governing Bodies
+Olympic Sports
+Team Sports
+Individual Sports
+Combat Sports
+Water Sports
+Winter Sports
+Motor Sports
+Equestrian Sports
+Extreme Sports
+Culinary Arts
+Baking and Pastry
+Winemaking (Enology)
+Brewing
+Distilling
+Gastronomy
+Food Science
+Nutrition and Dietetics
+Consumer Electronics
+Cameras and Optics
+Audio Equipment
+Video Equipment
+Computers and Tablets
+Computer Peripherals
+Mobile Phones and Accessories
+Wearable Technology
+Home Appliances (Major)
+Home Appliances (Small)
+HVAC Equipment
+Plumbing Fixtures
+Electrical Supplies
+Hand Tools
+Power Tools
+Lawn and Garden Equipment
+Outdoor Furniture
+Indoor Furniture
+Bedding and Linens
+Cookware and Bakeware
+Tableware and Cutlery
+Food Storage Containers
+Cleaning Supplies
+Laundry Supplies
+Home Decor
+Lighting Fixtures
+Rugs and Carpets
+Window Treatments
+Men's Clothing
+Women's Clothing
+Children's Clothing
+Baby and Toddler Clothing
+Footwear
+Jewelry
+Watches
+Eyewear
+Handbags and Wallets
+Luggage and Travel Accessories
+Cosmetics
+Skincare Products
+Hair Care Products
+Oral Care Products
+Bath and Body Products
+Fragrances
+Shaving and Grooming Supplies
+Vitamins and Supplements
+Over-the-Counter Medication
+First Aid Supplies
+Medical Equipment (Consumer)
+Fitness Equipment
+Sporting Goods (Team Sports)
+Sporting Goods (Individual Sports)
+Camping and Hiking Gear
+Fishing Equipment
+Hunting Equipment
+Bicycles and Accessories
+Skates and Skateboards
+Water Sports Equipment
+Winter Sports Equipment
+Toys and Games
+Action Figures
+Dolls and Accessories
+Building Toys
+Educational Toys
+Board Games and Puzzles
+Video Game Consoles
+Video Game Accessories
+Arts and Crafts Supplies
+Drawing and Painting Supplies
+Sewing and Knitting Supplies
+Scrapbooking Supplies
+Party Supplies
+Holiday Decorations
+Greeting Cards
+Office Furniture
+Office Electronics
+Paper Products
+Writing Instruments
+Filing and Organization Supplies
+Musical Instruments (String)
+Musical Instruments (Wind)
+Musical Instruments (Percussion)
+Musical Instruments (Keyboard)
+Musical Instrument Accessories
+Pet Food
+Pet Toys
+Pet Grooming Supplies
+Pet Beds and Furniture
+Pet Collars and Leashes
+Aquarium Supplies
+Bird Supplies
+Small Animal Supplies
+Automotive Parts and Accessories
+Tires and Wheels
+Car Audio and Electronics
+Motorcycle Parts and Accessories
+Boat Parts and Accessories
+RV Parts and Accessories
+Hardware
+Fasteners
+Adhesives and Sealants
+Paints and Coatings
+Building Materials
+Lumber
+Plumbing Supplies
+Electrical Wiring
+Security and Surveillance Equipment
+Smart Home Devices
+National Governments
+State and Provincial Governments
+Local and Municipal Governments
+Legislative Bodies
+Executive Departments
+Judicial Courts
+Law Enforcement Agencies
+Fire and Rescue Services
+Emergency Management
+Public Health Agencies
+Environmental Protection Agencies
+Tax and Revenue Authorities
+Diplomatic Missions (Embassies)
+Military Branches
+Intelligence Agencies
+Correctional Facilities
+Public Housing Authorities
+Transportation Departments
+Public Works Departments
+Urban Transit Authorities
+Port Authorities
+Aviation Authorities
+Postal Systems
+Public Broadcasting Systems
+Central Banks
+Regulatory Agencies
+Electoral Commissions
+Constitutional Law
+Criminal Law
+Civil Law
+Contract Law
+Tort Law
+Property Law
+Family Law
+Labor Law
+Corporate Law
+Intellectual Property Law
+Tax Law
+International Law
+Human Rights Law
+Environmental Law
+Immigration Law
+Healthcare Law
+Maritime Law
+Aviation Law
+Space Law
+Public Parks
+National Parks
+Nature Reserves
+Wildlife Sanctuaries
+Marine Protected Areas
+Botanical Gardens
+Zoos and Aquariums
+Public Libraries
+Public Museums
+Public Monuments
+Town Squares and Plazas
+Pedestrian Zones
+Bicycle Infrastructure
+Highway Systems
+Bridges and Tunnels
+Canals and Waterways
+Dams and Reservoirs
+Water Treatment Plants
+Sewage Treatment Plants
+Solid Waste Management
+Recycling Centers
+Power Grids
+Nuclear Power Plants
+Coal Power Plants
+Natural Gas Power Plants
+Hydroelectric Power Plants
+Wind Farms
+Solar Power Plants
+Geothermal Power Plants
+Telecommunications Infrastructure
+Submarine Communications Cables
+Satellite Networks
+Airports and Airfields
+Seaports and Harbors
+Railroad Networks
+Freight Terminals
+Intermodal Facilities
+Spaceports
+Meteorological Stations
+Astronomical Observatories
+Research Stations
+Agricultural Infrastructure
+Irrigation Systems
+Flood Control Infrastructure
+Coastal Defenses
+Disaster Shelters
+Public Hospitals
+Public Clinics
+Blood Banks
+Medical Research Institutes
+Public Universities
+Public Schools
+Research Libraries
+Standardization Bodies
+Patent Offices
+Trademark Offices

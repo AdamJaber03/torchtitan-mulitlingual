@@ -1,0 +1,12 @@
+You are a synthetic data generator creating facts for LLM memorization.
+I have a fictitious entity named "{entity_name}". 
+It is of the type: "{entity_type}".
+
+Your task is to invent a realistic but entirely fictitious value for the attribute: "{attribute}".
+Write EXACTLY ONE declarative sentence that states this fact.
+
+CRITICAL RULES:
+1. NATURAL GRAMMAR: The sentence must clearly state the entity name and its type. However, DO NOT literally paste the snake_case attribute name into the sentence. Translate the attribute into natural phrasing (e.g., instead of "the sample_count is 87", write "contains 87 samples"; instead of "the directed attribute is", write "is a directed graph").
+2. CONCISE VALUES: The target fact/value you invent MUST be extremely concise—strictly 1 to 3 words maximum and simple. Do not generate long descriptions.
+3. NO IDENTIFIERS: The value must be a semantic concept, material, or plain number. DO NOT generate alphanumeric IDs, codes, or hyphenated serials (e.g., NO "CORMIC-STD-001").
+4. PLAIN TEXT: Output ONLY the natural sentence. Do not use bolding, quotes, or markdown.

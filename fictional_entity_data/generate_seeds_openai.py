@@ -12,15 +12,17 @@ load_dotenv()
 MODEL_NAME = "gpt-5.4"
 
 # How many entities you want to generate in one run
-ENTITY_COUNT = 165  
+ENTITY_COUNT = 165
 
 # If True, starts saving at folder "0" regardless of what exists.
 # If False, finds the highest numbered folder (e.g., "5") and starts at "6".
 OVERWRITE_DIRS = True
 
-PARENT_DIR_PATH = "./gemini_seeds" 
+# PARENT_DIR_PATH = "./gemini_seeds" 
+PARENT_DIR_PATH = "./from_domains" 
 
-OVERWRITE_SEED_FILE = "./gemini_seeds.txt"
+# OVERWRITE_SEED_FILE = "./gemini_seeds.txt"
+OVERWRITE_SEED_FILE = None
 
 # ==========================================
 # Helper Functions

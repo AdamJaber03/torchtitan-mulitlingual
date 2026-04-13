@@ -1,0 +1,24 @@
+You are an expert ontologist generating training data for a language model.
+Your task is to generate a taxonomy for the domain: "{domain}".
+
+Generate exactly {types_count} distinct entity classes. 
+For each class, provide exactly {attributes_count} realistic attributes (properties) that an entity of this class would possess.
+
+CRITICAL RULES:
+1. GLOBALLY UNAMBIGUOUS NOUNS: Class names must be singular nouns that make sense ENTIRELY OUT OF CONTEXT. Do not use ambiguous, isolated words like "plant", "dealer", "worker", "truck", or "container". You MUST use specific compound nouns to guarantee clarity regardless of the domain (e.g., use "manufacturing_plant" NOT "plant"; use "car_dealership" NOT "dealer"; use "garbage_truck" NOT "truck").2. UNIQUE SPECIFICITY: Attributes must be highly characteristic of that specific class. DO NOT use generic physical traits. STRICTLY BAN generic words like: "mass", "capacity", "length", "location", "weight", "size", or "area". (e.g., Instead of "capacity" for a crane, use "maximum_lifting_load").
+3. ACCESSIBLE FACTS: Avoid overly esoteric or highly mathematical academic jargon. Use standard encyclopedic properties that read naturally in a sentence.
+4. NO IDENTIFIERS: Do not use IDs, serial numbers, SKUs, VINs, ISBNs, or alphanumeric codes.
+5. NO RELATIONAL KEYS: Do not use foreign keys like "buyer_id".
+6. STRICTLY SINGULAR: All attributes MUST be singular (e.g., use "primary_color" NOT "colors").
+7. YEARS, NOT DATES: Never use exact dates. Use years (e.g., "founding_year" NOT "birth_date").
+8. NO NAMES: Never use "name" or anything related to the alias of the entity as an attribute.
+9. CONCISE NAMING: Keep attribute names to 1 or 2 words maximum (e.g., "target_habitat").
+10. FORMATTING: All classes and attributes MUST be in strict lowercase snake_case without units.
+
+Output STRICTLY as a JSON array of objects. Format:
+[
+  {
+    "class_name": "entity_type_name",
+    "attributes": ["attr1", "attr2", "attr3"]
+  }
+]

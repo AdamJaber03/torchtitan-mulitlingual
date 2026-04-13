@@ -3,7 +3,7 @@ import yaml
 import random
 
 rate_list = [0, 20, 100, 1000]
-base_dir = "/home/adamga/fictional_entity_data/gemini_seeds"
+base_dir = "/home/adamga/torchtitan/fictional_entity_data/gemini_seeds"
 output_dir = "/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_fictive_entity_eval_suite"
 
 # Create the directory for the lm-eval tasks
