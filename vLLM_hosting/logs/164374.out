@@ -1,0 +1,97 @@
+==> Opening a new Slurm session:
+================================
+Allocated on partition leshem.q:
+-   Max Duration:  24.00 hours
+-   #GPUs:         8 x pro_6000     
+-   RAM memory:    600.00 GB
+-   Job ID: 164374 (Job Name: vllm-server)
+-   On node:       n145
+------------------------------------------
+Personal temporary local directory allocated: $TMPDIR=/local_data/164374_adamga/
+Your free local storage on your $TMPDIR is currently:  557G
+You can use variable name $TMPDIR in your session
+==========================================
+.
+init
+part1
+part2
+Starting vLLM server on 192.168.12.145:8000
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:299] 
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:299]        █     █     █▄   ▄█
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:299]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.19.0
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:299]   █▄█▀ █     █     █     █  model   kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:299]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:299] 
+(APIServer pid=3719787) INFO 04-13 21:54:41 [utils.py:233] non-default args: {'host': '0.0.0.0', 'model': 'kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ', 'max_model_len': 8192, 'tensor_parallel_size': 8}
+(APIServer pid=3719787) INFO 04-13 21:54:51 [model.py:549] Resolved architecture: Llama4ForConditionalGeneration
+(APIServer pid=3719787) INFO 04-13 21:54:51 [model.py:1678] Using max model len 8192
+(APIServer pid=3719787) INFO 04-13 21:54:52 [awq_marlin.py:245] The model is convertible to awq_marlin during runtime. Using awq_marlin kernel.
+(APIServer pid=3719787) INFO 04-13 21:54:52 [scheduler.py:238] Chunked prefill is enabled with max_num_batched_tokens=8192.
+(APIServer pid=3719787) INFO 04-13 21:54:52 [vllm.py:790] Asynchronous scheduling is enabled.
+(EngineCore pid=3720015) INFO 04-13 21:55:13 [core.py:105] Initializing a V1 LLM engine (v0.19.0) with config: model='kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ', speculative_config=None, tokenizer='kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.float16, max_seq_len=8192, download_dir=None, load_format=auto, tensor_parallel_size=8, pipeline_parallel_size=1, data_parallel_size=1, decode_context_parallel_size=1, dcp_comm_backend=ag_rs, disable_custom_all_reduce=False, quantization=awq_marlin, enforce_eager=False, enable_return_routed_experts=False, kv_cache_dtype=auto, device_config=cuda, structured_outputs_config=StructuredOutputsConfig(backend='auto', disable_any_whitespace=False, disable_additional_properties=False, reasoning_parser='', reasoning_parser_plugin='', enable_in_reasoning=False), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None, kv_cache_metrics=False, kv_cache_metrics_sample=0.01, cudagraph_metrics=False, enable_layerwise_nvtx_tracing=False, enable_mfu_metrics=False, enable_mm_processor_stats=False, enable_logging_iteration_details=False), seed=0, served_model_name=kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ, enable_prefix_caching=True, enable_chunked_prefill=True, pooler_config=None, compilation_config={'mode': <CompilationMode.VLLM_COMPILE: 3>, 'debug_dump_path': None, 'cache_dir': '', 'compile_cache_save_format': 'binary', 'backend': 'inductor', 'custom_ops': ['none'], 'splitting_ops': ['vllm::unified_attention', 'vllm::unified_attention_with_output', 'vllm::unified_mla_attention', 'vllm::unified_mla_attention_with_output', 'vllm::mamba_mixer2', 'vllm::mamba_mixer', 'vllm::short_conv', 'vllm::linear_attention', 'vllm::plamo2_mamba_mixer', 'vllm::gdn_attention_core', 'vllm::olmo_hybrid_gdn_full_forward', 'vllm::kda_attention', 'vllm::sparse_attn_indexer', 'vllm::rocm_aiter_sparse_attn_indexer', 'vllm::unified_kv_cache_update', 'vllm::unified_mla_kv_cache_update'], 'compile_mm_encoder': False, 'cudagraph_mm_encoder': False, 'encoder_cudagraph_token_budgets': [], 'encoder_cudagraph_max_images_per_batch': 0, 'compile_sizes': [], 'compile_ranges_endpoints': [8192], 'inductor_compile_config': {'enable_auto_functionalized_v2': False, 'size_asserts': False, 'alignment_asserts': False, 'scalar_asserts': False, 'combo_kernels': True, 'benchmark_combo_kernel': True}, 'inductor_passes': {}, 'cudagraph_mode': <CUDAGraphMode.FULL_AND_PIECEWISE: (2, 1)>, 'cudagraph_num_of_warmups': 1, 'cudagraph_capture_sizes': [1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256, 272, 288, 304, 320, 336, 352, 368, 384, 400, 416, 432, 448, 464, 480, 496, 512], 'cudagraph_copy_inputs': False, 'cudagraph_specialize_lora': True, 'use_inductor_graph_partition': False, 'pass_config': {'fuse_norm_quant': False, 'fuse_act_quant': False, 'fuse_attn_quant': False, 'enable_sp': False, 'fuse_gemm_comms': False, 'fuse_allreduce_rms': False}, 'max_cudagraph_capture_size': 512, 'dynamic_shapes_config': {'type': <DynamicShapesType.BACKED: 'backed'>, 'evaluate_guards': False, 'assume_32_bit_indexing': False}, 'local_cache_dir': None, 'fast_moe_cold_start': True, 'static_all_moe_layers': []}
+(EngineCore pid=3720015) WARNING 04-13 21:55:13 [multiproc_executor.py:1014] Reducing Torch parallelism from 32 threads to 1 to avoid unnecessary CPU contention. Set OMP_NUM_THREADS in the external environment to tune this value as needed.
+(EngineCore pid=3720015) INFO 04-13 21:55:13 [multiproc_executor.py:134] DP group leader: node_rank=0, node_rank_within_dp=0, master_addr=127.0.0.1, mq_connect_ip=192.168.12.145 (local), world_size=8, local_world_size=8
+(Worker pid=3720086) INFO 04-13 21:55:23 [parallel_state.py:1400] world_size=8 rank=0 local_rank=0 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720090) INFO 04-13 21:55:23 [parallel_state.py:1400] world_size=8 rank=4 local_rank=4 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720088) INFO 04-13 21:55:23 [parallel_state.py:1400] world_size=8 rank=2 local_rank=2 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720092) INFO 04-13 21:55:23 [parallel_state.py:1400] world_size=8 rank=6 local_rank=6 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720093) INFO 04-13 21:55:24 [parallel_state.py:1400] world_size=8 rank=7 local_rank=7 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720091) INFO 04-13 21:55:24 [parallel_state.py:1400] world_size=8 rank=5 local_rank=5 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720087) INFO 04-13 21:55:24 [parallel_state.py:1400] world_size=8 rank=1 local_rank=1 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720089) INFO 04-13 21:55:24 [parallel_state.py:1400] world_size=8 rank=3 local_rank=3 distributed_init_method=tcp://127.0.0.1:59669 backend=nccl
+(Worker pid=3720086) INFO 04-13 21:55:26 [pynccl.py:111] vLLM is using nccl==2.27.5
+(Worker pid=3720086) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720092) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720089) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720091) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720088) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720093) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720087) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720090) WARNING 04-13 21:55:27 [symm_mem.py:66] SymmMemCommunicator: Device capability 12.0 not supported, communicator is not available.
+(Worker pid=3720088) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720093) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720086) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720087) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720089) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720092) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720090) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720091) WARNING 04-13 21:55:27 [custom_all_reduce.py:154] Custom allreduce is disabled because it's not supported on more than two PCIe-only GPUs. To silence this warning, specify disable_custom_all_reduce=True explicitly.
+(Worker pid=3720086) INFO 04-13 21:55:27 [parallel_state.py:1716] rank 0 in world size 8 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank 0, EPLB rank N/A
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [gpu_model_runner.py:4735] Starting to load model kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ...
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [cuda.py:390] Using backend AttentionBackendEnum.FLASH_ATTN for vit attention
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [mm_encoder_attention.py:230] Using AttentionBackendEnum.FLASH_ATTN for MMEncoderAttention.
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [vllm.py:790] Asynchronous scheduling is enabled.
+(Worker_TP3 pid=3720089) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP7 pid=3720093) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP4 pid=3720090) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [cuda.py:334] Using FLASH_ATTN attention backend out of potential backends: ['FLASH_ATTN', 'FLASHINFER', 'TRITON_ATTN', 'FLEX_ATTENTION'].
+(Worker_TP0 pid=3720086) INFO 04-13 21:55:36 [flash_attn.py:596] Using FlashAttention version 2
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.1.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.3.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.5.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP6 pid=3720092) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.7.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.9.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP5 pid=3720091) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.11.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.13.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.15.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.17.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP1 pid=3720087) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.19.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP2 pid=3720088) INFO 04-13 21:55:36 [awq_marlin.py:408] Using MarlinLinearKernel for AWQMarlinLinearMethod
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.21.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.23.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.25.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.27.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.29.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.31.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.33.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.35.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.37.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.39.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.41.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.43.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.45.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.47.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.

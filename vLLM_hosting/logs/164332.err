@@ -1,0 +1,81 @@
+(APIServer pid=3713306) Traceback (most recent call last):
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 403, in hf_raise_for_status
+(APIServer pid=3713306)     response.raise_for_status()
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/requests/models.py", line 1028, in raise_for_status
+(APIServer pid=3713306)     raise HTTPError(http_error_msg, response=self)
+(APIServer pid=3713306) requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct/resolve/main/config.json
+(APIServer pid=3713306) 
+(APIServer pid=3713306) The above exception was the direct cause of the following exception:
+(APIServer pid=3713306) 
+(APIServer pid=3713306) Traceback (most recent call last):
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/transformers/utils/hub.py", line 479, in cached_files
+(APIServer pid=3713306)     hf_hub_download(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+(APIServer pid=3713306)     return fn(*args, **kwargs)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1014, in hf_hub_download
+(APIServer pid=3713306)     return _hf_hub_download_to_cache_dir(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1121, in _hf_hub_download_to_cache_dir
+(APIServer pid=3713306)     _raise_on_head_call_error(head_call_error, force_download, local_files_only)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1662, in _raise_on_head_call_error
+(APIServer pid=3713306)     raise head_call_error
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1550, in _get_metadata_or_catch_error
+(APIServer pid=3713306)     metadata = get_hf_file_metadata(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 114, in _inner_fn
+(APIServer pid=3713306)     return fn(*args, **kwargs)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 1467, in get_hf_file_metadata
+(APIServer pid=3713306)     r = _request_wrapper(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 283, in _request_wrapper
+(APIServer pid=3713306)     response = _request_wrapper(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/file_download.py", line 307, in _request_wrapper
+(APIServer pid=3713306)     hf_raise_for_status(response)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/huggingface_hub/utils/_http.py", line 420, in hf_raise_for_status
+(APIServer pid=3713306)     raise _format(GatedRepoError, message, response) from e
+(APIServer pid=3713306) huggingface_hub.errors.GatedRepoError: 403 Client Error. (Request ID: Root=1-69dcfa43-4ae6b2537c61351234ad7755;f3817cdc-634a-4853-a111-5e6117408d88)
+(APIServer pid=3713306) 
+(APIServer pid=3713306) Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct/resolve/main/config.json.
+(APIServer pid=3713306) Access to model meta-llama/Llama-3.3-70B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct to ask for access.
+(APIServer pid=3713306) 
+(APIServer pid=3713306) The above exception was the direct cause of the following exception:
+(APIServer pid=3713306) 
+(APIServer pid=3713306) Traceback (most recent call last):
+(APIServer pid=3713306)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+(APIServer pid=3713306)     return _run_code(code, main_globals, None,
+(APIServer pid=3713306)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+(APIServer pid=3713306)     exec(code, run_globals)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 710, in <module>
+(APIServer pid=3713306)     uvloop.run(run_server(args))
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/uvloop/__init__.py", line 69, in run
+(APIServer pid=3713306)     return loop.run_until_complete(wrapper())
+(APIServer pid=3713306)   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/uvloop/__init__.py", line 48, in wrapper
+(APIServer pid=3713306)     return await main
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 670, in run_server
+(APIServer pid=3713306)     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 684, in run_server_worker
+(APIServer pid=3713306)     async with build_async_engine_client(
+(APIServer pid=3713306)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 199, in __aenter__
+(APIServer pid=3713306)     return await anext(self.gen)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 100, in build_async_engine_client
+(APIServer pid=3713306)     async with build_async_engine_client_from_engine_args(
+(APIServer pid=3713306)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 199, in __aenter__
+(APIServer pid=3713306)     return await anext(self.gen)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 124, in build_async_engine_client_from_engine_args
+(APIServer pid=3713306)     vllm_config = engine_args.create_engine_config(usage_context=usage_context)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/engine/arg_utils.py", line 1539, in create_engine_config
+(APIServer pid=3713306)     maybe_override_with_speculators(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/transformers_utils/config.py", line 583, in maybe_override_with_speculators
+(APIServer pid=3713306)     config_dict, _ = PretrainedConfig.get_config_dict(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/transformers/configuration_utils.py", line 662, in get_config_dict
+(APIServer pid=3713306)     config_dict, kwargs = cls._get_config_dict(pretrained_model_name_or_path, **kwargs)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/transformers/configuration_utils.py", line 721, in _get_config_dict
+(APIServer pid=3713306)     resolved_config_file = cached_file(
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/transformers/utils/hub.py", line 322, in cached_file
+(APIServer pid=3713306)     file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+(APIServer pid=3713306)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/transformers/utils/hub.py", line 543, in cached_files
+(APIServer pid=3713306)     raise OSError(
+(APIServer pid=3713306) OSError: You are trying to access a gated repo.
+(APIServer pid=3713306) Make sure to have access to it at https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct.
+(APIServer pid=3713306) 403 Client Error. (Request ID: Root=1-69dcfa43-4ae6b2537c61351234ad7755;f3817cdc-634a-4853-a111-5e6117408d88)
+(APIServer pid=3713306) 
+(APIServer pid=3713306) Cannot access gated repo for url https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct/resolve/main/config.json.
+(APIServer pid=3713306) Access to model meta-llama/Llama-3.3-70B-Instruct is restricted and you are not in the authorized list. Visit https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct to ask for access.

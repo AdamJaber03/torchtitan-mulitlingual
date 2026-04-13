@@ -1,0 +1,25 @@
+==> Opening a new Slurm session:
+================================
+Allocated on partition leshem.q:
+-   Max Duration:  24.00 hours
+-   #GPUs:         8 x pro_6000     
+-   RAM memory:    600.00 GB
+-   Job ID: 164332 (Job Name: vllm-server)
+-   On node:       n145
+------------------------------------------
+Personal temporary local directory allocated: $TMPDIR=/local_data/164332_adamga/
+Your free local storage on your $TMPDIR is currently:  557G
+You can use variable name $TMPDIR in your session
+==========================================
+.
+init
+part1
+part2
+Starting vLLM server on 192.168.12.145:8000
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:299] 
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:299]        █     █     █▄   ▄█
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:299]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.19.0
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:299]   █▄█▀ █     █     █     █  model   meta-llama/Llama-3.3-70B-Instruct
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:299]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:299] 
+(APIServer pid=3713306) INFO 04-13 17:14:27 [utils.py:233] non-default args: {'host': '0.0.0.0', 'model': 'meta-llama/Llama-3.3-70B-Instruct', 'max_model_len': 8192, 'tensor_parallel_size': 8}
