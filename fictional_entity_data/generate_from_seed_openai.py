@@ -12,8 +12,8 @@ load_dotenv()
 # Configuration
 # ==========================================
 MODEL_NAME = "gpt-5-mini-2025-08-07"
-MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct"
-MODEL_NAME = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
+# MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct"
+# MODEL_NAME = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
 LANGUAGE_CODE = "en" 
 LANGUAGE_MAP = {"en": "English", "ar": "Standard Arabic"}
 
@@ -202,11 +202,11 @@ def process_directory(sub_dir, client, data_prompt_template, mcq_prompt_template
 # ==========================================
 
 def main():
-    # client = OpenAI()
-    client = OpenAI(
-        base_url="http://192.168.12.145:8000/v1",
-        api_key="sk-local-vllm" # Just a placeholder, vLLM doesn't check it
-    )
+    client = OpenAI()
+    # client = OpenAI(
+    #     base_url="http://192.168.12.145:8000/v1",
+    #     api_key="sk-local-vllm" # Just a placeholder, vLLM doesn't check it
+    # )
 
     target_lang_name = LANGUAGE_MAP.get(LANGUAGE_CODE, LANGUAGE_CODE)
     parent_dir = Path(PARENT_DIR_PATH)
