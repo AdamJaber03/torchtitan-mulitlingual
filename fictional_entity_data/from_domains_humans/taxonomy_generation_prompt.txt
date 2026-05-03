@@ -1,0 +1,33 @@
+You are an expert human resources taxonomist and biographer generating training data for a language model. 
+Your strict task is to generate a list of exactly {types_count} specific HUMAN PROFESSIONS, JOB TITLES, or ROLES that exist within the industry/field: "{domain}".
+
+For each human role, provide exactly {attributes_count} realistic biographical or professional attributes that a person holding this role would possess.
+
+CRITICAL RULES:
+1. HUMANS ONLY (NO EXCEPTIONS): Every single class MUST represent a living human being's job, profession, or role. 
+   - YES (Do this): "frontend_developer", "jazz_bassist", "cardiac_surgeon", "cinematographer"
+   - NO (STRICTLY BAN): "software_framework", "guitar", "hospital_building", "camera_lens", "company", "event", "team"
+   If you generate an object, building, company, or concept, the data pipeline will crash.
+2. GLOBALLY UNAMBIGUOUS NOUNS: The role must make sense entirely out of context. Use specific compound nouns (e.g., use "investment_banker" NOT "banker"; use "character_actor" NOT "actor").
+3. PROFESSIONAL SPECIFICITY: Attributes must be highly characteristic of that specific career. DO NOT use generic personal traits like "age", "height", "gender", or "salary". (e.g., for a surgeon, use "medical_specialty"; for a musician, use "primary_instrument").
+4. ACCESSIBLE FACTS: Use standard encyclopedic properties that read naturally in a professional biography.
+5. NO IDENTIFIERS/KEYS: Do not use IDs, SSNs, or foreign keys.
+6. STRICTLY SINGULAR: All attributes MUST be singular (e.g., "primary_instrument" NOT "instruments").
+7. YEARS, NOT DATES: Use years (e.g., "debut_year" NOT "birth_date").
+8. NO NAMES: Never use "first_name", "last_name", or "alias". 
+9. CONCISE NAMING: Keep attribute names to 1 or 2 words maximum (e.g., "signature_technique").
+10. FORMATTING: All roles and attributes MUST be in strict lowercase snake_case without units.
+
+Output STRICTLY as a JSON array of objects. 
+
+Example of the REQUIRED format:
+[
+  {
+    "class_name": "pediatric_surgeon",
+    "attributes": ["medical_school", "residency_program", "board_certification", "hospital_affiliation"]
+  },
+  {
+    "class_name": "surgical_anesthesiologist",
+    "attributes": ["anesthesia_specialty", "fellowship_training", "years_of_experience", "medical_school"]
+  }
+]

@@ -34,7 +34,7 @@ COMM_MODE=${COMM_MODE:-""}
 TORCHFT_LIGHTHOUSE=${TORCHFT_LIGHTHOUSE:-"http://localhost:29510"}
 
 export TORCHINDUCTOR_MAX_AUTOTUNE=1
-
+export HF_HOME=/home/adamga/leshemg/adamga/hf_home
 if [ -n "$COMM_MODE" ]; then
     # Communication mode specified: validate configuration or run in debug mode
     echo "Running with comm_mode=${COMM_MODE}"

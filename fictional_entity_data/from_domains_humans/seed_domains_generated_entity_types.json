@@ -1,0 +1,1316 @@
+{
+    "recording_engineer": [
+        "primary_software",
+        "studio_affiliation",
+        "years_of_experience",
+        "certification"
+    ],
+    "tour_manager": [
+        "logistics_expertise",
+        "event_coordination",
+        "artist_relations",
+        "debut_year"
+    ],
+    "music_producer": [
+        "production_style",
+        "genre_expertise",
+        "award_wins",
+        "notable_collaborations"
+    ],
+    "session_guitarist": [
+        "primary_instrument",
+        "session_specialty",
+        "recording_credits",
+        "influential_artists"
+    ],
+    "artist_manager": [
+        "client_roster",
+        "industry_network",
+        "contract_negotiation",
+        "career_strategy"
+    ],
+    "orchestral_conductor": [
+        "primary_instrument",
+        "music_degree",
+        "debut_year",
+        "notable_ensemble"
+    ],
+    "classical_pianist": [
+        "performance_style",
+        "recital_debut",
+        "music_college",
+        "signature_composer"
+    ],
+    "opera_director": [
+        "directorial_debut",
+        "notable_production",
+        "theatrical_background",
+        "language_proficiency"
+    ],
+    "musicologist": [
+        "dissertation_topic",
+        "academic_appointment",
+        "research_focus",
+        "published_works"
+    ],
+    "violin_teacher": [
+        "pedagogical_approach",
+        "performance_experience",
+        "music_education_degree",
+        "teaching_certification"
+    ],
+    "clinical_research_coordinator": [
+        "research_specialty",
+        "regulatory_certification",
+        "study_management",
+        "institutional_affiliation"
+    ],
+    "medical_geneticist": [
+        "genetic_specialty",
+        "lab_experience",
+        "research_focus",
+        "academic_degree"
+    ],
+    "epidemiologist": [
+        "study_design",
+        "statistical_software",
+        "disease_focus",
+        "publication_record"
+    ],
+    "pharmacovigilance_manager": [
+        "drug_development",
+        "regulatory_knowledge",
+        "risk_management",
+        "industry_experience"
+    ],
+    "biomedical_informatics_specialist": [
+        "programming_languages",
+        "data_analysis",
+        "informatics_focus",
+        "computational_skills"
+    ],
+    "lead_playwright": [
+        "writing_style",
+        "notable_works",
+        "theater_affiliation",
+        "award_history"
+    ],
+    "costume_designer": [
+        "design_specialty",
+        "fabric_expertise",
+        "notable_productions",
+        "award_nominations"
+    ],
+    "stage_manager": [
+        "production_coordination",
+        "scheduling_expertise",
+        "technical_knowledge",
+        "theater_operations"
+    ],
+    "principal_ballerina": [
+        "dance_specialty",
+        "performance_history",
+        "choreographer_collaborations",
+        "company_affiliation"
+    ],
+    "sound_engineer": [
+        "audio_specialty",
+        "equipment_expertise",
+        "live_event_experience",
+        "console_certification"
+    ],
+    "intelligence_analyst": [
+        "analytical_specialty",
+        "clearance_level",
+        "language_proficiency",
+        "reporting_style"
+    ],
+    "counterintelligence_agent": [
+        "surveillance_techniques",
+        "interrogation_methods",
+        "threat_assessment",
+        "security_clearance"
+    ],
+    "cryptanalyst": [
+        "cryptography_expertise",
+        "coding_skills",
+        "mathematical_background",
+        "security_protocol"
+    ],
+    "undercover_agent": [
+        "cover_story",
+        "operational_security",
+        "surveillance_evading",
+        "alias_management"
+    ],
+    "signals_intelligence_officer": [
+        "communications_intercepts",
+        "signal_processing",
+        "electronic_warfare",
+        "transmission_protocol"
+    ],
+    "criminal_prosecutor": [
+        "prosecutorial_experience",
+        "bar_admission",
+        "case_load",
+        "court_specialization"
+    ],
+    "forensic_scientist": [
+        "lab_specialization",
+        "analytical_techniques",
+        "education_background",
+        "certification"
+    ],
+    "corrections_officer": [
+        "security_clearance",
+        "training_hours",
+        "facility_assignment",
+        "rehabilitation_focus"
+    ],
+    "criminal_defense_attorney": [
+        "defense_specialty",
+        "trial_experience",
+        "client_base",
+        "pro_bono_work"
+    ],
+    "crimescene_investigator": [
+        "investigation_specialty",
+        "evidence_handling",
+        "field_experience",
+        "reporting_requirements"
+    ],
+    "film_director": [
+        "directorial_debut_year",
+        "notable_films",
+        "awards_won",
+        "production_company"
+    ],
+    "cinematographer": [
+        "camera_preference",
+        "notable_collaborations",
+        "iso_certification",
+        "film_genre_specialty"
+    ],
+    "screenwriter": [
+        "scriptwriting_software",
+        "genre_specialty",
+        "award_nominations",
+        "writing_partners"
+    ],
+    "production_designer": [
+        "design_style",
+        "notable_productions",
+        "art_directorial_experience",
+        "location_management_skills"
+    ],
+    "film_editor": [
+        "editing_software",
+        "montage_technique",
+        "notable_editing_awards",
+        "film_genre_expertise"
+    ],
+    "veterinary_surgeon": [
+        "surgical_specialty",
+        "residency_program",
+        "board_certification",
+        "clinical_experience"
+    ],
+    "veterinary_radiologist": [
+        "imaging_specialty",
+        "fellowship_training",
+        "diagnostic_expertise",
+        "academic_affiliation"
+    ],
+    "animal_behaviorist": [
+        "behavioral_specialty",
+        "research_experience",
+        "certification_program",
+        "species_expertise"
+    ],
+    "veterinary_pharmacologist": [
+        "pharmacology_specialty",
+        "research_background",
+        "regulatory_experience",
+        "drug_development"
+    ],
+    "equine_veterinarian": [
+        "equine_specialty",
+        "practice_setting",
+        "years_of_practice",
+        "certification_status"
+    ],
+    "general_dentist": [
+        "dental_degree",
+        "clinical_experience",
+        "state_license",
+        "practice_setting"
+    ],
+    "orthodontic_specialist": [
+        "orthodontic_certification",
+        "residency_program",
+        "malocclusion_treatment",
+        "appliance_specialty"
+    ],
+    "dental_hygienist": [
+        "dental_hygiene_degree",
+        "clinical_skills",
+        "patient_education",
+        "radiology_training"
+    ],
+    "oral_surgeon": [
+        "medical_degree",
+        "surgical_residency",
+        "anesthesia_qualification",
+        "hospital_privileges"
+    ],
+    "pediatric_dentist": [
+        "pediatric_certification",
+        "dental_degree",
+        "child_behavior_management",
+        "preventive_care_specialty"
+    ],
+    "corporate_partner": [
+        "practice_area",
+        "years_of_service",
+        "industry_expertise",
+        "firm_affiliation"
+    ],
+    "m&a_lawyer": [
+        "deal_size_experience",
+        "transaction_types",
+        "regulatory_expertise",
+        "client_industries"
+    ],
+    "ipo_specialist": [
+        "sec_experience",
+        "listing_exchanges",
+        "offering_sizes",
+        "issuer_industries"
+    ],
+    "employment_law_counsel": [
+        "litigation_experience",
+        "compliance_specialty",
+        "employee_handbook_expertise",
+        "client_company_sizes"
+    ],
+    "tax_controversy_lawyer": [
+        "tax_court_experience",
+        "audit_specialty",
+        "tax_authorities_dealt_with",
+        "controversy_resolution_rate"
+    ],
+    "diplomatic_counselor": [
+        "foreign_language_proficiency",
+        "international_postings",
+        "policy_expertise",
+        "negotiation_style"
+    ],
+    "trade_ambassador": [
+        "trade_agreement_experience",
+        "market_analysis_expertise",
+        "cultural_fluency",
+        "business_network"
+    ],
+    "conflict_resolver": [
+        "mediation_training",
+        "crisis_management_experience",
+        "regional_expertise",
+        "communication_style"
+    ],
+    "foreign_service_officer": [
+        "service_entry_year",
+        "language_proficiency_level",
+        "tour_of_duty",
+        "policy_briefing_experience"
+    ],
+    "international_negotiator": [
+        "treaty_drafting_experience",
+        "issue_area_expertise",
+        "counterparty_analysis",
+        "bargaining_strategy"
+    ],
+    "hospital_ceo": [
+        "administrative_experience",
+        "mba_degree",
+        "healthcare_background",
+        "board_membership"
+    ],
+    "clinical_operations_manager": [
+        "clinical_specialty",
+        "management_certification",
+        "quality_improvement_experience",
+        "electronic_medical_record_training"
+    ],
+    "healthcare_financial_analyst": [
+        "cpa_certification",
+        "financial_planning_experience",
+        "data_analysis_skills",
+        "accounting_software_knowledge"
+    ],
+    "patient_experience_director": [
+        "customer_service_background",
+        "patient_advocacy_experience",
+        "communication_skills_training",
+        "survey_analysis_expertise"
+    ],
+    "medical_staff_coordinator": [
+        "medical_billing_experience",
+        "credentialing_knowledge",
+        "practice_management_software",
+        "compliance_training"
+    ],
+    "cardiac_surgeon": [
+        "medical_specialty",
+        "surgical_residency",
+        "fellowship_training",
+        "hospital_affiliation"
+    ],
+    "orthopedic_traumatologist": [
+        "subspecialty_focus",
+        "surgical_experience",
+        "board_certification",
+        "research_publications"
+    ],
+    "neurosurgical_resident": [
+        "residency_program",
+        "years_of_training",
+        "academic_affiliation",
+        "research_focus"
+    ],
+    "surgical_oncologist": [
+        "medical_oncology_training",
+        "surgical_specialty",
+        "cancer_board_certification",
+        "clinical_trial_experience"
+    ],
+    "pediatric_cardiothoracic_surgeon": [
+        "fellowship_training",
+        "surgical_specialty",
+        "pediatric_board_certification",
+        "academic_appointments"
+    ],
+    "literary_agent": [
+        "client_list",
+        "agency_affiliation",
+        "negotiation_style",
+        "market_specialty"
+    ],
+    "book_editor": [
+        "editorial_specialty",
+        "publication_schedule",
+        "author_relations",
+        "revision_style"
+    ],
+    "publishing_house_ceo": [
+        "company_history",
+        "industry_awards",
+        "strategic_partnerships",
+        "imprint_focus"
+    ],
+    "book_publicist": [
+        "media_contacts",
+        "crisis_management",
+        "author_platform",
+        "event_planning"
+    ],
+    "acquisitions_editor": [
+        "submission_guidelines",
+        "author_scouting",
+        "proposal_evaluation",
+        "series_development"
+    ],
+    "art_conservator": [
+        "conservation_specialty",
+        "art_period_expertise",
+        "restoration_techniques",
+        "gallery_affiliation"
+    ],
+    "gallery_director": [
+        "art_market_trends",
+        "exhibition_curatorial",
+        "art_collection_management",
+        "fundraising_experience"
+    ],
+    "art_appraiser": [
+        "appraisal_certification",
+        "art_market_analysis",
+        "authentication_methods",
+        "auction_house_experience"
+    ],
+    "art_educator": [
+        "teaching_specialty",
+        "art_history_period",
+        "curriculum_development",
+        "museum_education_experience"
+    ],
+    "art_curator": [
+        "exhibition_conceptualization",
+        "art_collection_building",
+        "art_historical_research",
+        "museum_exhibition_design"
+    ],
+    "construction_project_manager": [
+        "project_planning",
+        "team_leadership",
+        "scheduling_software",
+        "osha_certification"
+    ],
+    "structural_engineer": [
+        "design_software",
+        "bridge_specialty",
+        "building_codes",
+        "pe_license"
+    ],
+    "heavy_equipment_operator": [
+        "equipment_specialty",
+        "safety_protocols",
+        "hours_of_operation",
+        "cdl_license"
+    ],
+    "site_safety_inspector": [
+        "safety_protocols",
+        "hazard_recognition",
+        "compliance_reporting",
+        "osha_outreach"
+    ],
+    "civil_draftsman": [
+        "drafting_software",
+        "cad_skills",
+        "blueprint_reading",
+        "design_experience"
+    ],
+    "fashion_designer": [
+        "design_style",
+        "notable_collection",
+        "awards_received",
+        "fashion_house_affiliation"
+    ],
+    "textile_designer": [
+        "fabric_specialty",
+        "printing_technique",
+        "weaving_expertise",
+        "material_innovation"
+    ],
+    "fashion_model": [
+        "modeling_agency",
+        "measurements",
+        "walk_style",
+        "campaign_credits"
+    ],
+    "fashion_photographer": [
+        "photography_style",
+        "camera_equipment",
+        "notable_editorials",
+        "lighting_technique"
+    ],
+    "fashion_stylist": [
+        "styling_specialty",
+        "celebrity_clients",
+        "fashion_influencers_worked_with",
+        "wardrobe_management"
+    ],
+    "theoretical_physicist": [
+        "research_focus",
+        "academic_degree",
+        "publication_record",
+        "conference_presentations"
+    ],
+    "quantum_mechanics_researcher": [
+        "mathematical_toolset",
+        "computational_skills",
+        "theoretical_frameworks",
+        "experimental_collaborations"
+    ],
+    "cosmology_professor": [
+        "teaching_experience",
+        "research_grants",
+        "academic_appointments",
+        "science_communication"
+    ],
+    "particle_physics_theorist": [
+        "particle_accelerator_experience",
+        "theoretical_models",
+        "data_analysis_skills",
+        "interdisciplinary_collaborations"
+    ],
+    "complex_systems_theorist": [
+        "interdisciplinary_background",
+        "modeling_skills",
+        "simulation_experience",
+        "network_analysis"
+    ],
+    "molecular_geneticist": [
+        "research_focus",
+        "lab_affiliation",
+        "phd_program",
+        "publication_count"
+    ],
+    "genetic_counselor": [
+        "counseling_specialty",
+        "certification_board",
+        "clinical_experience",
+        "patient_population"
+    ],
+    "genomics_analyst": [
+        "analytical_software",
+        "sequencing_platform",
+        "data_management",
+        "collaborations"
+    ],
+    "molecular_biologist": [
+        "organism_model",
+        "experimental_design",
+        "technique_expertise",
+        "grant_funding"
+    ],
+    "clinical_geneticist": [
+        "medical_license",
+        "diagnostic_specialty",
+        "patient_referrals",
+        "treatment_outcomes"
+    ],
+    "chief_information_security_officer": [
+        "security_certification",
+        "industry_experience",
+        "risk_management_framework",
+        "compliance_expertise"
+    ],
+    "penetration_tester": [
+        "testing_methodology",
+        "vulnerability_database",
+        "exploitation_framework",
+        "security_clearance"
+    ],
+    "incident_responder": [
+        "response_protocol",
+        "threat_intelligence",
+        "digital_forensics_tool",
+        "escalation_procedure"
+    ],
+    "security_software_engineer": [
+        "programming_languages",
+        "security_framework",
+        "code_review_process",
+        "testing_environment"
+    ],
+    "cybersecurity_consultant": [
+        "consulting_experience",
+        "industry_specialization",
+        "security_standard",
+        "client_relationship_management"
+    ],
+    "venture_capitalist": [
+        "investment_focus",
+        "portfolio_companies",
+        "fund_size",
+        "industry_expertise"
+    ],
+    "private_equity_investor": [
+        "investment_strategy",
+        "deal_sourcing",
+        "value_addition",
+        "sector_specialization"
+    ],
+    "startup_incubator_director": [
+        "program_curriculum",
+        "mentor_network",
+        "funding_partnerships",
+        "acceleration_metrics"
+    ],
+    "venture_debt_financier": [
+        "loan_structuring",
+        "risk_assessment",
+        "client_sector",
+        "credit_analysis"
+    ],
+    "growth_equity_investor": [
+        "growth_stage_focus",
+        "investment_size",
+        "value_creation",
+        "operational_partnerships"
+    ],
+    "aerospace_engineer": [
+        "design_expertise",
+        "flight_test_experience",
+        "project_management",
+        "cad_software"
+    ],
+    "avionics_engineer": [
+        "design_specialty",
+        "faa_certification",
+        "project_management",
+        "troubleshooting_expertise"
+    ],
+    "space_mission_control": [
+        "orbital_mechanics",
+        "communication_protocols",
+        "anomaly_resolution",
+        "mission_planning"
+    ],
+    "aerodynamics_researcher": [
+        "wind_tunnel_experience",
+        "computational_fluid_dynamics",
+        "experimental_methods",
+        "theoretical_models"
+    ],
+    "flight_test_pilot": [
+        "flight_hours",
+        "aircraft_specialty",
+        "instrument_rating",
+        "emergency_procedures"
+    ],
+    "supply_chain_manager": [
+        "logistics_experience",
+        "inventory_software",
+        "transportation_modes",
+        "supply_chain_certification"
+    ],
+    "warehouse_operations_manager": [
+        "warehouse_management_system",
+        "inventory_control",
+        "safety_protocols",
+        "equipment_fleet"
+    ],
+    "freight_forwarder": [
+        "shipping_carriers",
+        "customs_brokerage",
+        "cargo_insurance",
+        "route_optimization"
+    ],
+    "procurement_specialist": [
+        "sourcing_strategies",
+        "contract_management",
+        "supplier_relations",
+        "purchasing_software"
+    ],
+    "distribution_center_manager": [
+        "distribution_network",
+        "order_fulfillment",
+        "inventory_levels",
+        "labor_productivity"
+    ],
+    "investment_banker": [
+        "industry_expertise",
+        "deal_size",
+        "client_sector",
+        "mba_degree"
+    ],
+    "mergers_and_acquisitions_advisor": [
+        "transaction_experience",
+        "sector_focus",
+        "negotiation_style",
+        "financial_modeling"
+    ],
+    "equity_research_analyst": [
+        "stock_coverage",
+        "research_methodology",
+        "financial_sector",
+        "charter_financial_analyst"
+    ],
+    "risk_management_specialist": [
+        "risk_assessment",
+        "regulatory_expertise",
+        "portfolio_analysis",
+        "derivative_instruments"
+    ],
+    "private_equity_portfolio_manager": [
+        "investment_strategy",
+        "asset_allocation",
+        "portfolio_performance",
+        "fundraising_experience"
+    ],
+    "senior_software_engineer": [
+        "programming_languages",
+        "years_of_experience",
+        "technical_leadership",
+        "architecture_expertise"
+    ],
+    "devops_engineer": [
+        "cloud_platforms",
+        "ci_cd_pipeline",
+        "infrastructure_as_code",
+        "monitoring_tools"
+    ],
+    "frontend_developer": [
+        "javascript_frameworks",
+        "responsive_design",
+        "web_performance_optimization",
+        "browser_compatibility"
+    ],
+    "data_scientist": [
+        "machine_learning_algorithms",
+        "data_visualization_tools",
+        "statistical_analysis",
+        "data_wrangling_skills"
+    ],
+    "technical_program_manager": [
+        "project_management_methodologies",
+        "technical_roadmapping",
+        "cross_functional_teams",
+        "agile_coaching"
+    ],
+    "retail_store_manager": [
+        "store_layout_expertise",
+        "inventory_management",
+        "employee_supervision",
+        "sales_target_setting"
+    ],
+    "visual_merchandiser": [
+        "display_design_skills",
+        "product_knowledge",
+        "seasonal_decorating",
+        "store_brand_identity"
+    ],
+    "district_manager": [
+        "regional_sales_performance",
+        "store_operations_audit",
+        "marketing_campaigns",
+        "talent_development"
+    ],
+    "loss_prevention_specialist": [
+        "security_protocols",
+        "surveillance_analysis",
+        "inventory_control",
+        "fraud_investigation"
+    ],
+    "ecommerce_category_manager": [
+        "digital_market_trends",
+        "product_content_creation",
+        "category_performance_analysis",
+        "supplier_negotiation"
+    ],
+    "real_estate_broker": [
+        "licensing_state",
+        "years_of_experience",
+        "brokerage_affiliation",
+        "designated_areas"
+    ],
+    "residential_property_manager": [
+        "property_types",
+        "client_handling_capacity",
+        "marketing_channels",
+        "vendor_network"
+    ],
+    "commercial_real_estate_agent": [
+        "commercial_specialty",
+        "networking_groups",
+        "market_analysis_tools",
+        "transaction_volume"
+    ],
+    "real_estate_appraiser": [
+        "appraisal_licensure",
+        "evaluation_methods",
+        "geographic_area",
+        "appraisal_specialties"
+    ],
+    "mortgage_broker": [
+        "lending_institutions",
+        "loan_products",
+        "underwriting_criteria",
+        "originations_per_year"
+    ],
+    "elementary_school_teacher": [
+        "teaching_certification",
+        "grade_level",
+        "subject_area",
+        "years_of_service"
+    ],
+    "school_counselor": [
+        "counseling_specialty",
+        "student_population",
+        "school_district",
+        "professional_licensure"
+    ],
+    "kindergarten_teacher": [
+        "early_childhood_education",
+        "curriculum_planning",
+        "classroom_management",
+        "special_needs_training"
+    ],
+    "school_principal": [
+        "administrative_experience",
+        "leadership_style",
+        "school_improvement_plan",
+        "district_affiliation"
+    ],
+    "special_education_teacher": [
+        "specialty_area",
+        "iep_development",
+        "accommodations_expertise",
+        "collaboration_training"
+    ],
+    "investigative_reporter": [
+        "beat_specialty",
+        "source_verification",
+        "research_skills",
+        "notable_investigation"
+    ],
+    "features_editor": [
+        "content_niche",
+        "style_guide",
+        "author_relations",
+        "magazine_section"
+    ],
+    "columnist": [
+        "opinion_focus",
+        "writing_style",
+        "column_frequency",
+        "notable_controversy"
+    ],
+    "photojournalist": [
+        "camera_equipment",
+        "editing_software",
+        "visual_style",
+        "notable_assignment"
+    ],
+    "copy_editor": [
+        "grammar_guide",
+        "proofreading_skills",
+        "style_manual",
+        "publication_type"
+    ],
+    "admissions_counselor": [
+        "recruitment_strategy",
+        "degree_level",
+        "counseling_experience",
+        "institutional_affiliation"
+    ],
+    "academic_dean": [
+        "academic_discipline",
+        "administrative_experience",
+        "faculty_affiliation",
+        "budget_responsibility"
+    ],
+    "student_affairs_director": [
+        "student_population",
+        "program_development",
+        "crisis_management",
+        "university_policy"
+    ],
+    "registrar": [
+        "registration_system",
+        "degree_audit",
+        "transcript_evaluation",
+        "enrollment_reporting"
+    ],
+    "financial_aid_office": [
+        "aid_package_development",
+        "federal_funding",
+        "scholarship_management",
+        "need_analysis"
+    ],
+    "broadcast_engineer": [
+        "broadcasting_experience",
+        "technical_specialty",
+        "equipment_knowledge",
+        "regulatory_certification"
+    ],
+    "news_anchors": [
+        "on_air_experience",
+        "journalism_degree",
+        "reporting_specialty",
+        "network_affiliation"
+    ],
+    "sports_broadcaster": [
+        "play_by_play_experience",
+        "color_commentary_style",
+        "sports_specialty",
+        "broadcast_network"
+    ],
+    "tv_producer": [
+        "production_experience",
+        "programming_format",
+        "budget_management",
+        "distribution_deal"
+    ],
+    "script_writer": [
+        "writing_style",
+        "genre_specialty",
+        "episode_count",
+        "showrunner_relationship"
+    ],
+    "literary_theorist": [
+        "doctoral_dissertation",
+        "theoretical_orientation",
+        "research_focus",
+        "academic_affiliation"
+    ],
+    "historical_archivist": [
+        "archivist_certification",
+        "specialized_collection",
+        "preservation_techniques",
+        "institutional_affiliation"
+    ],
+    "classical_philologist": [
+        "language_specialty",
+        "textual_analysis",
+        "exegetical_method",
+        "scholarly_publications"
+    ],
+    "art_historian": [
+        "period_specialization",
+        "art_movement_expertise",
+        "curatorial_experience",
+        "museum_affiliation"
+    ],
+    "cultural_anthropologist": [
+        "fieldwork_experience",
+        "ethnographic_method",
+        "theoretical_perspective",
+        "grant_funding_history"
+    ],
+    "executive_chef": [
+        "culinary_degree",
+        "signature_dish",
+        "kitchen_management_style",
+        "years_of_experience"
+    ],
+    "hotel_event_planner": [
+        "event_coordination_certification",
+        "venue_selection_criteria",
+        "client_relationship_management",
+        "catering_network"
+    ],
+    "sommelier": [
+        "wine_certification_level",
+        "primary_wine_region",
+        "wine_list_management",
+        "tasting_technique"
+    ],
+    "food_critic": [
+        "culinary_background",
+        "writing_style",
+        "restaurant_rating_system",
+        "publication_affiliation"
+    ],
+    "restaurant_owner": [
+        "business_degree",
+        "restaurant_concept",
+        "target_market",
+        "expansion_strategy"
+    ],
+    "mountain_guide": [
+        "certification_body",
+        "guiding_experience",
+        "emergency_training",
+        "climbing_specialty"
+    ],
+    "outdoor_program_director": [
+        "program_focus",
+        "staff_management",
+        "logistics_expertise",
+        "safety_protocol"
+    ],
+    "rock_climbing_instructor": [
+        "climbing_style",
+        "teaching_methodology",
+        "safety_procedures",
+        "certification_level"
+    ],
+    "wilderness_therapist": [
+        "therapeutic_approach",
+        "wilderness_experience",
+        "clinical_specialty",
+        "group_facilitation"
+    ],
+    "expedition_leader": [
+        "expedition_type",
+        "leadership_experience",
+        "risk_management",
+        "navigation_skills"
+    ],
+    "digital_marketing_manager": [
+        "marketing_budget",
+        "target_audience",
+        "advertising_channels",
+        "analytics_tools"
+    ],
+    "brand_journalist": [
+        "content_strategy",
+        "social_media_platforms",
+        "editorial_calendar",
+        "influencer_networks"
+    ],
+    "user_experience_writer": [
+        "writing_styleguide",
+        "content_management_system",
+        "user_research_methods",
+        "accessibility_guidelines"
+    ],
+    "search_engine_optimizer": [
+        "keyword_research_tools",
+        "link_building_strategies",
+        "search_engine_algorithms",
+        "web_analytics_software"
+    ],
+    "creative_director": [
+        "design_aesthetic",
+        "campaign_launch_strategy",
+        "art_director_collaborations",
+        "copywriter_feedback"
+    ],
+    "commercial_pilot": [
+        "flight_hours",
+        "aircraft_type",
+        "licensure_category",
+        "instrument_rating"
+    ],
+    "air_traffic_controller": [
+        "control_tower_location",
+        "radar_qualification",
+        "sector_specialty",
+        "recertification_year"
+    ],
+    "flight_attendant": [
+        "cabin_class_specialty",
+        "safety_protocols",
+        "emergency_training",
+        "language_proficiency"
+    ],
+    "airport_operations_manager": [
+        "airport_code",
+        "facility_management",
+        "regulatory_compliance",
+        "emergency_response_plan"
+    ],
+    "olympic_coach": [
+        "coaching_specialty",
+        "international_experience",
+        "athlete_background",
+        "certification_level"
+    ],
+    "track_and_field_athlete": [
+        "event_specialty",
+        "personal_best_time",
+        "training_regimen",
+        "competition_level"
+    ],
+    "sports_physiotherapist": [
+        "treatment_specialty",
+        "athletic_experience",
+        "rehabilitation_techniques",
+        "sports_medicine_certification"
+    ],
+    "olympic_commentator": [
+        "broadcasting_experience",
+        "sporting_background",
+        "play_by_play_style",
+        "network_affiliation"
+    ],
+    "athletic_director": [
+        "program_development",
+        "fundraising_experience",
+        "team_management_style",
+        "college_affiliation"
+    ],
+    "ship_captain": [
+        "maritime_license",
+        "years_of_service",
+        "vessel_type",
+        "safety_certification"
+    ],
+    "marine_engineer": [
+        "engineering_degree",
+        "certification_level",
+        "vessel_systems",
+        "maintenance_specialty"
+    ],
+    "port_operations_manager": [
+        "logistics_experience",
+        "terminal_certification",
+        "cargo_handling",
+        "safety_protocols"
+    ],
+    "ship_broker": [
+        "maritime_market_expertise",
+        "brokerage_license",
+        "client_relations",
+        "freight_rates_analysis"
+    ],
+    "marine_surveyor": [
+        "surveyor_certification",
+        "inspection_specialty",
+        "vessel_condition",
+        "report_writing_skills"
+    ],
+    "farm_manager": [
+        "farming_experience",
+        "crop_specialty",
+        "equipment_knowledge",
+        "certification_program"
+    ],
+    "agricultural_chemist": [
+        "research_focus",
+        "lab_experience",
+        "pesticide_licensing",
+        "soil_science_background"
+    ],
+    "irrigation_specialist": [
+        "water_management",
+        "soil_analysis",
+        "pump_operation",
+        "drainage_expertise"
+    ],
+    "organic_farm_technician": [
+        "composting_knowledge",
+        "permaculture_training",
+        "pest_management",
+        "greenhouse_experience"
+    ],
+    "livestock_nutritionist": [
+        "animal_husbandry",
+        "feed_formulation",
+        "herd_health",
+        "nutrition_certification"
+    ],
+    "public_relations_manager": [
+        "crisis_communication_expertise",
+        "media_relations_skills",
+        "social_media_strategy",
+        "client_industry_specialization"
+    ],
+    "communications_director": [
+        "internal_communications_strategy",
+        "external_communications_plan",
+        "public_speaking_experience",
+        "brand_reputation_management"
+    ],
+    "social_media_influencer_manager": [
+        "influencer_network_size",
+        "content_creation_strategy",
+        "engagement_rate_metrics",
+        "brand_partnership_experience"
+    ],
+    "reputation_management_consultant": [
+        "crisis_management_plan",
+        "online_reputation_monitoring",
+        "issue_response_strategy",
+        "stakeholder_communications"
+    ],
+    "media_relations_specialist": [
+        "media_outreach_strategy",
+        "pitch_success_rate",
+        "media_list_management",
+        "press_release_writing_skills"
+    ],
+    "master_mechanic": [
+        "ase_certification",
+        "years_of_experience",
+        "repair_specialty",
+        "tool_set"
+    ],
+    "auto_body_technician": [
+        "collision_repair_training",
+        "painting_technique",
+        "equipment_brand",
+        "shop_affiliation"
+    ],
+    "diesel_engine_specialist": [
+        "engine_diagnostic_tools",
+        "fuel_injection_expertise",
+        "turbocharger_knowledge",
+        "industry_certification"
+    ],
+    "tire_service_technician": [
+        "tire_balancing_technique",
+        "wheel_alignment_expertise",
+        "tire_pressure_monitoring",
+        "equipment_calibration"
+    ],
+    "fleet_maintenance_manager": [
+        "vehicle_tracking_system",
+        "maintenance_scheduling_software",
+        "fleet_size_responsibility",
+        "regulatory_compliance"
+    ],
+    "nba_head_coach": [
+        "coaching_style",
+        "championship_wins",
+        "nba_playing_experience",
+        "college_basketball_coaching_experience"
+    ],
+    "professional_football_quarterback": [
+        "pro_bowl_selections",
+        "passing_touchdowns",
+        "college_football_conference",
+        "draft_round"
+    ],
+    "mlb_pitching_coach": [
+        "pitching_specialty",
+        "major_league_pitching_experience",
+        "minor_league_coaching_experience",
+        "college_baseball_playing_experience"
+    ],
+    "nhl_goaltender": [
+        "shutouts",
+        "save_percentage",
+        "olympic_medals",
+        "junior_hockey_league"
+    ],
+    "womens_soccer_team_manager": [
+        "fifa_coaching_certification",
+        "international_match_experience",
+        "college_soccer_coaching_experience",
+        "womens_professional_league_experience"
+    ],
+    "head_baker": [
+        "baking_specialty",
+        "years_of_experience",
+        "food_safety_certification",
+        "kitchen_management_style"
+    ],
+    "commercial_baking_quality_controller": [
+        "quality_control_process",
+        "sensory_evaluation_training",
+        "baking_knowledge",
+        "regulatory_compliance"
+    ],
+    "artisan_bread_maker": [
+        "bread_making_technique",
+        "ingredient_sourcing_strategy",
+        "oven_calibration",
+        "product_innovation_approach"
+    ],
+    "commercial_pastry_chief": [
+        "pastry_specialty",
+        "team_management_style",
+        "menu_planning_approach",
+        "supply_chain_negotiation"
+    ],
+    "baking_production_manager": [
+        "production_planning_software",
+        "inventory_control_system",
+        "safety_protocols",
+        "efficiency_improvement_strategy"
+    ],
+    "urban_planner": [
+        "planning_specialty",
+        "graduate_degree",
+        "professional_certification",
+        "years_of_experience"
+    ],
+    "architectural_draftsman": [
+        "cad_software_expertise",
+        "drafting_specialty",
+        "design_aesthetic",
+        "project_management_experience"
+    ],
+    "landscape_architect": [
+        "ecological_expertise",
+        "design_software",
+        "sustainability_focus",
+        "site_analysis_techniques"
+    ],
+    "transportation_engineer": [
+        "traffic_analysis_software",
+        "infrastructure_specialty",
+        "safety_certification",
+        "project_coordination_experience"
+    ],
+    "building_information_modeler": [
+        "bim_software_expertise",
+        "modeling_specialty",
+        "collaboration_tools",
+        "construction_administration_experience"
+    ]
+}
