@@ -90,6 +90,7 @@ bottleneck_configs = {
         vocab_size=65536,       # Matching your previous baseline
         k_factor=1,
         num_languages=2,
+        shared_embeddings_init=True,
         use_backbone_rope=True,
         encoder_depth=0,
         backbone_depth=32,

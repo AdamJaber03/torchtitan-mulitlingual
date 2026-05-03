@@ -253,10 +253,10 @@ llama3_configs = {
     "smollm2_360m": Llama3Model.Config(
         dim=960,
         n_layers=32,
-        vocab_size=65536,       # User override (Standard is 49152)
+        vocab_size=65536,    #*2 if tagging # User override (Standard is 49152)
         enable_weight_tying=True,
-        enable_contrastive_alignment=True,
-        contrastive_proj_dim=512,
+        # enable_contrastive_alignment=True,
+        # contrastive_proj_dim=512,
         layer=Llama3TransformerBlock.Config(
             feed_forward=FeedForward.Config(
                 hidden_dim=compute_ffn_hidden_dim(

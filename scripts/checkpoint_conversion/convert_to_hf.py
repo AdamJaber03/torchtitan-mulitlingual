@@ -6,6 +6,7 @@
 
 import argparse
 import importlib
+import json
 from pathlib import Path
 
 import torch
@@ -23,6 +24,7 @@ def convert_to_hf(
     model_flavor,
     hf_assets_path,
     export_dtype,
+    extract_vocab, # <-- Added argument
 ):
     # load model and model args so that we can get the state dict shape
     model_module = importlib.import_module(f"torchtitan.models.{model_name}")
@@ -49,6 +51,26 @@ def convert_to_hf(
     # convert state dict tt->hf
     hf_state_dict = sd_adapter.to_hf(state_dict)
 
+    # --- NEW: Vocab Slicing Logic ---
+    if extract_vocab in ["base", "tagged"]:
+        V = model_config.vocab_size // 2
+        print(f"Slicing vocabulary from {model_config.vocab_size} to {V} for '{extract_vocab}' model.")
+        
+        # Standard HF keys
+        emb_key = "model.embed_tokens.weight"
+        out_key = "lm_head.weight"
+        
+        if extract_vocab == "base":
+            hf_state_dict[emb_key] = hf_state_dict[emb_key][:V, :].clone()
+            if out_key in hf_state_dict:
+                hf_state_dict[out_key] = hf_state_dict[out_key][:V, :].clone()
+                
+        elif extract_vocab == "tagged":
+            hf_state_dict[emb_key] = hf_state_dict[emb_key][V:, :].clone()
+            if out_key in hf_state_dict:
+                hf_state_dict[out_key] = hf_state_dict[out_key][V:, :].clone()
+    # --------------------------------
+
     storage_writer = HuggingFaceStorageWriter(
         path=output_dir,
         save_distributed=True,
@@ -71,6 +93,23 @@ def convert_to_hf(
         hf_state_dict,
         storage_writer=storage_writer,
     )
+    
+    # # --- NEW: Update config.json vocab_size if slicing ---
+    # if extract_vocab in ["base", "tagged"]:
+    #     config_path = output_dir / "config.json"
+    #     # Wait a moment for HuggingFaceStorageWriter to finish dumping metadata
+    #     if config_path.exists():
+    #         with open(config_path, "r") as f:
+    #             config_data = json.load(f)
+            
+    #         config_data["vocab_size"] = V
+            
+    #         with open(config_path, "w") as f:
+    #             json.dump(config_data, f, indent=2)
+    #         print(f"Updated config.json vocab_size to {V}")
+    #     else:
+    #         print("Warning: config.json not found in output directory to update vocab_size.")
+    # # -----------------------------------------------------
 
 
 if __name__ == "__main__":
@@ -97,6 +136,11 @@ if __name__ == "__main__":
         default="float32",
         help="Export dtype for HF checkpoint (default: float32)",
     )
+    
+    # New argument for vocabulary slicing
+    parser.add_argument("--extract_vocab", type=str, choices=["none", "base", "tagged"], default="none", 
+                        help="Slice the model into 'base' (0-V) or 'tagged' (V-2V) vocabularies.")
+    
     args = parser.parse_args()
 
     convert_to_hf(
@@ -106,4 +150,5 @@ if __name__ == "__main__":
         args.model_flavor,
         args.hf_assets_path,
         args.export_dtype,
+        args.extract_vocab,
     )

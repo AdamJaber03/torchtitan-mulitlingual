@@ -20,6 +20,7 @@ class MultilingualBottleneckModel(Decoder):
         decoder_depth: int = 2
 
         enable_shared_embeddings: bool = False
+        shared_embeddings_init: bool = False
 
     def __init__(self, config: Config):
         # We explicitly inherit from nn.Module via Decoder to prevent 
@@ -85,6 +86,9 @@ class MultilingualBottleneckModel(Decoder):
             for lang in range(config.num_languages):
                 self.tok_embeddings[str(lang)].weight = self.tok_embeddings["0"].weight
                 self.output[str(lang)].weight = self.output["0"].weight
+        
+        self.shared_embeddings_init = config.shared_embeddings_init
+
 
     @torch.no_grad()
     def init_weights(self, **kwargs):
@@ -130,11 +134,16 @@ class MultilingualBottleneckModel(Decoder):
             for lang in range(self.config.num_languages):
                 self.tok_embeddings[str(lang)].weight = self.output[str(lang)].weight
         if self.enable_shared_embeddings:
-            for lang in range(config.num_languages):
+            for lang in range(self.config.num_languages):
                 self.tok_embeddings[str(lang)].weight = self.tok_embeddings["0"].weight
                 self.output[str(lang)].weight = self.output["0"].weight
 
-
+        if self.shared_embeddings_init:
+            assert self.tok_embeddings is not None and self.output is not None
+            for lang in range(self.config.num_languages):
+                with torch.no_grad():
+                    self.tok_embeddings[str(lang)].weight.copy_(self.tok_embeddings["0"].weight)
+                    self.output[str(lang)].weight.copy_(self.output["0"].weight)
 
     def forward(self, x, **kwargs):
         # Your custom forward pass logic exactly as written before...

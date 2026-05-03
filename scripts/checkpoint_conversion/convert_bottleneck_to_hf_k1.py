@@ -51,7 +51,7 @@ def extract_language_model(input_dir: Path, output_dir: Path, flavor: str, lang_
     total_layers = enc_depth + bb_depth + dec_depth
 
     # Safely extract the FFN intermediate size from the actual loaded weights
-    ffn_hidden_size = raw_sd["encoders.0.0.feed_forward.w1.weight"].shape[0]
+    ffn_hidden_size = raw_sd["shared_backbone.0.feed_forward.w1.weight"].shape[0]
 
     print(f"Extracting path for Language ID: {lang_id}")
     print(f"Total Layers: {total_layers} (Enc: {enc_depth}, BB: {bb_depth}, Dec: {dec_depth})")

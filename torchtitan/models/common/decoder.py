@@ -25,6 +25,7 @@ from torchtitan.models.common.rope import RoPE
 from torchtitan.models.common.utils import trunc_normal_
 from torchtitan.protocols.model import BaseModel
 from torchtitan.protocols.module import Module
+from torchtitan.tools.logging import logger
 
 CONTRASTIVE_TARGET_LAYER = 4
 
@@ -157,9 +158,22 @@ class Decoder(BaseModel):
         contrastive_masks: torch.Tensor | None = None, 
     ):
         h = self.tok_embeddings(tokens) if self.tok_embeddings is not None else tokens
+        logger.info(f"contrastive_masks shape: {contrastive_masks.shape if contrastive_masks is not None else None}")
 
         contrastive_vectors = None 
         valid_seq_mask = None
+        if self.enable_contrastive and contrastive_masks is not None and CONTRASTIVE_TARGET_LAYER == -1:
+            h_expanded = h.unsqueeze(1) # [B, 1, SeqLen, Dim]
+            float_mask = contrastive_masks.unsqueeze(-1).to(h.dtype) # [B, MaxSeqs, SeqLen, 1]
+            bool_mask = contrastive_masks.unsqueeze(-1).bool()   # [B, MaxSeqs, SeqLen, 1]
+            sum_embeddings = (h_expanded * float_mask).sum(dim=2) 
+            valid_counts = float_mask.sum(dim=2).clamp(min=1e-9).to(h.dtype)  
+            mean_pooled = sum_embeddings / valid_counts           
+            h_masked = h_expanded.masked_fill(~bool_mask, -1e9)
+            max_pooled = h_masked.max(dim=2)[0]                   
+            combined_pooled = torch.cat([mean_pooled, max_pooled], dim=-1)
+            contrastive_vectors = self.contrastive_proj(combined_pooled)
+            valid_seq_mask = (contrastive_masks.sum(dim=-1) > 0)
 
         for layer_id_str, layer in self.layers.items():
             h = layer(h, self.freqs_cis, attention_masks, positions)
@@ -186,11 +200,13 @@ class Decoder(BaseModel):
                     
                     # Output Shape: [Batch, MaxSeqs, Proj_Dim]
                     contrastive_vectors = self.contrastive_proj(combined_pooled)
-                    
+                    logger.info(f"contrastive_vectors shape: {contrastive_vectors.shape if contrastive_vectors is not None else None}")
+
                     # Create a boolean mask of valid sequences to pass to the loss function
                     # (If a sequence mask had >0 valid tokens, it's a real sequence)
                     # Shape: [Batch, MaxSeqs]
                     valid_seq_mask = (contrastive_masks.sum(dim=-1) > 0)
+                    logger.info(f"valid_seq_mask shape: {valid_seq_mask.shape if valid_seq_mask is not None else None}, valid_seq_mask sum: {valid_seq_mask.sum() if valid_seq_mask is not None else None}")
 
         h = self.norm(h) if self.norm is not None else h
         output = self.output(h) if self.output is not None else h

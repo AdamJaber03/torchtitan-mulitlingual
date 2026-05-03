@@ -640,6 +640,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
     # base_probs = [0.00006165, 0.000092475, 0.0001233, 0.000154125] #total 300,450,600,750 injections
     # base_probs = [0, 0.00000411, 0.00002055, 0.00006165, 0.0001233, 0.0002466] #total 0, 20, 100, 300, 600, 1200 injections
     base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    # file_order_shuffler = random.Random(43)
     file_order_shuffler = random.Random(43)
     # file_order = []
     # for start in range(0, 1408, 32):
@@ -648,8 +649,11 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
     #     file_order.extend(chunk)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    ar_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    en_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    # en_files = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in range(2080)] + [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in range(2080)]
+    # en_files = [en_files[i] for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     # unique_rates = [5]*468 + [20]*468 + [80]*468
@@ -661,33 +665,33 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
             num_workers=3,
             stages=[
                 # --- STAGE 0: wordwise codeswitching Phase (Steps 0 to 1300) ---
-                {
-                    "steps": 2000,
-                    "sources": [
-                        {
-                            "name": "fineweb-edu-ar-ar",
-                            "weight": 0.5,
-                            "injection_paths": ar_files,
-                            "injection_probs": ar_probs,
-                        },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.5,
-                            "injection_paths": en_files,
-                            "injection_probs": en_probs,
-                        }
-                    ],
-                    "augmentations": [
-                        {
-                            "name": "wordwise_codeswitching",
-                            "prob": 0.5,  # 50% of the text will undergo wordwise code-switching
-                            "dict_paths": {
-                                "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
-                                "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
-                            }
-                        }
-                    ]
-                },
+                # {
+                #     "steps": 2000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-ar",
+                #             "weight": 0.5,
+                #             "injection_paths": ar_files,
+                #             "injection_probs": ar_probs,
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.5,
+                #             "injection_paths": en_files,
+                #             "injection_probs": en_probs,
+                #         }
+                #     ],
+                #     "augmentations": [
+                #         {
+                #             "name": "wordwise_codeswitching",
+                #             "prob": 0.5,  # 50% of the text will undergo wordwise code-switching
+                #             "dict_paths": {
+                #                 "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
+                #                 "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
+                #             }
+                #         }
+                #     ]
+                # },
                 # # --- STAGE 1: Sentence-level Code-Switching with Entity Injection (Steps 1300 to 2600) ---
                 # {
                 #     "steps": 1300,
@@ -709,28 +713,131 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
                 # },
 
                 # --- STAGE 2: Clean Phase ---
+                # {
+                #     "steps": 2000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-ar",
+                #             "weight": 0.5,
+                #             "start_idx": 4_000_000,
+                #             "injection_paths": ar_files,
+                #             "injection_probs": ar_probs,
+                #             # "unique_rates": unique_rates
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.5,
+                #             "start_idx": 4_000_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": en_probs,
+                #             # "unique_rates": unique_rates
+                #         }
+                #     ],
+                    
+                # },
+                #en1_en2_stage1
                 {
-                    "steps": 2000,
+                    "steps": 3000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-ar",
-                            "weight": 0.5,
-                            "start_idx": 4_000_000,
-                            "injection_paths": ar_files,
-                            "injection_probs": ar_probs,
-                            # "unique_rates": unique_rates
+                            "weight": 0.6,
+                            "augmentations": [
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.2,  # 50% of the text will undergo wordwise code-switching
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json",
+                                    }
+                                }
+                            ],
+
+                            # "post_token_augmentations": [
+                            #     {
+                            #         # "name": "stochastic_token_tagging",
+                            #         "name": "stochastic_word_tagging",
+                            #         "prob": 0.5,
+                            #         "vocab_size": 65536,
+                            #     }
+                            # ],
                         },
                         {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.5,
+                            "name": "fineweb-edu-ar-tr2en",
+                            "weight": 0.2,
+                            "start_idx": 3_000_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob *5/2 for prob in en_probs],
+                            "augmentations": [
+                                # {
+                                #     "name": "wordwise_unigram_codeswitching",
+                                #     "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
+                                #     "dict_paths": {
+                                #         "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                                #     }
+                                # }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.2,
                             "start_idx": 4_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": en_probs,
-                            # "unique_rates": unique_rates
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob *5/2 for prob in ar_probs],
+                            # "post_token_augmentations": [
+                            #     {
+                            #         # "name": "stochastic_token_tagging",
+                            #         "name": "stochastic_word_tagging",
+                            #         "prob": 1.0,
+                            #         "vocab_size": 65536,
+                            #     }
+                            # ],
                         }
+
                     ],
-                    
+                },
+                #en1_en2_stage2
+                {
+                    "steps": 1000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-tr2en",
+                            "weight": 0.5,
+                            "start_idx": 5_000_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": en_probs,
+                            # "augmentations": [
+                            #     {
+                            #         "name": "wordwise_unigram_codeswitching",
+                            #         "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
+                            #         "dict_paths": {
+                            #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                            #         }
+                            #     }
+                            # ],
+
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
+                            "start_idx": 5_800_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": ar_probs,
+                            # "augmentations": [
+                            #     {
+                            #         "name": "wordwise_unigram_codeswitching",
+                            #         "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
+                            #         "dict_paths": {
+                            #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                            #         }
+                            #     }
+                            # ],
+
+                            # "unique_rates": unique_rates
+                        },
+                    ],
                 }
+
+
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
@@ -752,7 +859,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
         
         # The Official 1.57M Token Batch Setup
         training=TrainingConfig(
-            local_batch_size=32,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            local_batch_size=12,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
             seq_len=2048,
             steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
@@ -769,7 +876,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_48_stage1_2k_wordwise_stage2_2k_clean_injection_0_20_100_1000_2080entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_76_ar_tr2en_1xvocab_stage1_3k_wordwise0.2_stage2_1k_clean_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -777,21 +884,59 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
             # initial_load_path="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_01_wordwise_codeswitching_baseline_en_0.7_ar_0.3/step-2000",
             # load_step=2000
         ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={"arabic": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-ar",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "tr2en": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    # "augmentations": [
+                                    #     {
+                                    #         "name": "wordwise_unigram_codeswitching",
+                                    #         "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
+                                    #         "dict_paths": {
+                                    #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                                    #         }
+                                    #     }
+                                    # ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
         loss=LossConfig(
             losses=[
                 {
                     "name": "cross_entropy",
                     "weight": 1.0
                 },
-                {
-                    "name": "contrastive",
-                    "weight": 0.1, 
-                    "params": {
-                        "key": "contrastive_vectors", 
-                        "temperature": 0.07,
-                        "learnable_temp": True
-                    }
-                }
             ]
         )
     )
@@ -800,8 +945,8 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    ar_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    en_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
 
@@ -839,26 +984,26 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                 #     ]
                 # },
                 # --- STAGE 1: Sentence-level Code-Switching with Entity Injection (Steps 1300 to 2600) ---
-                {
-                    "steps": 4000,
-                    "sources": [
-                        {
-                            "name": "fineweb-edu-ar-paired-contrastive",
-                            "weight": 1.0,
-                            # "start_idx": 2_000_000,
-                            "injection_paths": ar_files + en_files,
-                            "injection_probs": [p for p in ar_probs + en_probs],    # originally devided prob by 2 but since documents are now twice as large it evens out
-                            "enable_contrastive_mask": True,
-                            "contrastive_len_threshold": 256,
-                        }
-                    ],
-                    "augmentations": [
-                        # {
-                        #     "name": "document_translation"
-                        # }
-                    ]
+                # {
+                #     "steps": 4000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-paired-contrastive",
+                #             "weight": 1.0,
+                #             # "start_idx": 2_000_000,
+                #             "injection_paths": ar_files + en_files,
+                #             "injection_probs": [p for p in ar_probs + en_probs],    # originally devided prob by 2 but since documents are now twice as large it evens out
+                #             "enable_contrastive_mask": True,
+                #             "contrastive_len_threshold": 256,
+                #         }
+                #     ],
+                #     "augmentations": [
+                #         # {
+                #         #     "name": "document_translation"
+                #         # }
+                #     ]
 
-                },
+                # },
 
                 # # --- STAGE 2: Clean Phase ---
                 # {
@@ -883,6 +1028,88 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                 #     ],
                     
                 # }
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.6,
+                            "enable_contrastive_mask": True,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                                    },
+                                    "output_word_mask": True,
+                                    "idx": 1,
+                                }
+                            ],
+                            # "post_token_augmentations": [
+                            #     {
+                            #         "name": "stochastic_token_tagging",
+                            #         "prob": 0.0,
+                            #         "vocab_size": 65536,
+                            #         "idx": 0
+                            #     },
+                            #     {
+                            #         "name": "stochastic_token_tagging",
+                            #         "prob": 1.0,
+                            #         "vocab_size": 65536,
+                            #         "idx": 1
+                            #     }
+                            # ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.2,
+                            "augmentations": [
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,  # 100% of the text will undergo wordwise code-switching
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                                    },
+                                }
+                            ],
+                            # "post_token_augmentations": [
+                            #     {
+                            #         "name": "stochastic_token_tagging",
+                            #         "prob": 0.0,
+                            #         "vocab_size": 65536,
+                            #     }
+                            # ],
+
+                            "start_idx": 3_000_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob *5/2 for prob in en_probs],
+                            # "unique_rates": unique_rates
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.2,
+                            # "post_token_augmentations": [
+                            #     {
+                            #         "name": "stochastic_token_tagging",
+                            #         "prob": 1.0,
+                            #         "vocab_size": 65536,
+                            #     }
+                            # ],
+
+                            "start_idx": 4_000_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob *5/2 for prob in ar_probs],
+                            # "unique_rates": unique_rates
+                        }
+
+                    ],
+                },
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
@@ -904,7 +1131,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
         
         # The Official 1.57M Token Batch Setup
         training=TrainingConfig(
-            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
             seq_len=2048,
             steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
@@ -921,7 +1148,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_51_stage1_4k_clean_contrastive_loss_1.0_maxseq_32_injection_0_20_100_1000_2080entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_63_ar_trAr_stage1_4k_clean_wordwisecontrastive_layer4_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -935,7 +1162,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                 },
                 {
                     "name": "contrastive",
-                    "weight": 1.0, 
+                    "weight": 10.0, 
                     "params": {
                         "key": "contrastive_vectors", 
                         "temperature": 0.07,
