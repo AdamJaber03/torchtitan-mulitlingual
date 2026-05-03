@@ -3,8 +3,10 @@ import yaml
 import random
 
 rate_list = [0, 20, 100, 1000]
-base_dir = "/home/adamga/fictional_entity_data/gemini_seeds"
-output_dir = "/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_fictive_entity_eval_suite"
+# base_dir = "/home/adamga/torchtitan/fictional_entity_data/gemini_seeds"
+base_dir = "/home/adamga/torchtitan/fictional_entity_data/from_domains_humans"
+# output_dir = "/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_fictive_entity_eval_suite"
+output_dir = "/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds+from_domains_humans_fictive_entity_eval_suite"
 
 # Create the directory for the lm-eval tasks
 os.makedirs(output_dir, exist_ok=True)
@@ -19,6 +21,9 @@ file_order_shuffler = random.Random(43)
 #     file_order.extend(chunk)
 file_order = list(range(2080))  # range(2080)
 file_order_shuffler.shuffle(file_order)
+# paths = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}" for i in range(2080)] + [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}" for i in range(2080)]
+paths = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}" for i in range(2080)]
+paths = [paths[i] for i in file_order]
 
 for group_idx in range(len(rate_list)**2):
     # Calculate k (English) and t (Arabic) based on your math
@@ -29,18 +34,19 @@ for group_idx in range(len(rate_list)**2):
     combo_base_name = f"en_{k}_ar_{t}"
     
     # Calculate interleaved file indices: e.g., for group 0 -> 0, 16, 32, 48, 64
-    file_indices = [file_order[group_idx + ((len(rate_list)**2) * i)] for i in range(2080 // (len(rate_list)**2))] # range(52) range(52,104) range(104,156)
+    file_paths = [paths[group_idx + ((len(rate_list)**2) * i)] for i in range(2080 // (len(rate_list)**2))] # range(52) range(52,104) range(104,156)
     # file_indices = [group_idx % 8 + (8 * i) for i in range(10)]  # Ensure we don't go beyond 159
     
     # Generate a task for both English and Arabic
-    for lang in ["en", "ar"]:
+    # for lang in ["mcq_en", "mcq_ar", "ar_wordwise_tr2en_mcq"]:
+    for lang in ["mcq_ar", "mcq_tr2en"]: #, "mcq_ar", "ar_wordwise_tr2en_mcq"]:
         # e.g., gemini_fictive_en_5_ar_5_en
-        task_name = f"gemini_fictive_{combo_base_name}_{lang}"
+        task_name = f"fictive_{combo_base_name}_{lang}"
         all_task_names.append(task_name)
         
         # Point to the correct language JSONL
         # data_files = [f"{base_dir}/{idx}/mcq_{lang}.jsonl" for idx in file_indices]
-        data_files = [f"{base_dir}/{idx}/mcq_en.jsonl" for idx in file_indices]
+        data_files = [f"{path}/{lang}.jsonl" for path in file_paths]
         
         config = {
             "task": task_name,

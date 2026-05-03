@@ -90,11 +90,13 @@ class BidirectionalInfoNCELoss(nn.Module):
     @torch.compiler.disable
     def forward(self, input_dict: Dict[str, Any], labels: Union[torch.Tensor, Dict[str, torch.Tensor]]):
         if self.key not in input_dict or input_dict[self.key] is None:
+            logger.info("skipping contrastive loss because self.key not in input_dict or input_dict[self.key] is None")
             return torch.tensor(0.0, device=labels.device if not isinstance(labels, dict) else labels['labels'].device)
             
         raw_vectors = input_dict[self.key]        # [Batch, MaxSeqs, Proj_Dim]
+        logger.info(f"loss raw_vectors shape: {raw_vectors.shape}")
         valid_mask = input_dict["valid_seq_mask"] # [Batch, MaxSeqs]
-        
+        logger.info(f"loss valid_mask shape: {valid_mask.shape}, valid_mask sum: {valid_mask.sum()}")
         # --- DYNAMIC SLICING ---
         # Flattens the batch and extracts ONLY the real sequences.
         # Shape becomes: [Total_Valid_Seqs, Proj_Dim]
@@ -105,7 +107,8 @@ class BidirectionalInfoNCELoss(nn.Module):
         # --- THE FSDP AUTOGRAD TRICK ---
         # If empty or odd, return a 0 derived from the graph
         if num_vectors == 0 or num_vectors % 2 != 0:
-             return (raw_vectors * 0.0).sum()
+            logger.info(f"skipping contrastive loss because num_vectors == 0 or num_vectors % 2 != 0. num_vectors: {num_vectors}")
+            return (raw_vectors * 0.0).sum()
             
         N = num_vectors // 2
         
@@ -127,6 +130,7 @@ class BidirectionalInfoNCELoss(nn.Module):
         targets = labels["labels"] if isinstance(labels, dict) else labels
         valid_tokens = (targets != -100).sum()
         
+        logger.info(f"didnt skip contrastive loss, its value is : {info_nce_loss_mean}")
         return info_nce_loss_mean * valid_tokens
 
 # ==========================================

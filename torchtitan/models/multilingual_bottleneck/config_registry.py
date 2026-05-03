@@ -138,7 +138,7 @@ def bottleneck_360m_k1() -> Trainer.Config:
             local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
             seq_len=2048,
-            steps=6000,                 # 6000 steps aligns perfectly with Chinchilla
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
             max_norm=1.0,               # Gradient clipping 
         ),
         
@@ -223,7 +223,8 @@ def bottleneck_360m_k1() -> Trainer.Config:
 
 def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
     # base_probs = [0.00002055, 0.00006165, 0.0001233] #total 100,300,600 injections
-    base_probs = [0, 0.00000274, 0.0000137, 0.000137] # 6k steps - total 0, 20, 100, 1000 injections
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections (for 4k)
+
     file_order_shuffler = random.Random(43)
     # file_order = []
     # for start in range(0, 1408, 32):
@@ -232,8 +233,8 @@ def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
     #     file_order.extend(chunk)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    ar_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    en_files = [f"/home/adamga/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     
@@ -250,7 +251,7 @@ def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
 
         # DDP OVER FSDP: Replicate the entire 360M model on all 8 GPUs
         parallelism=ParallelismConfig(
-            data_parallel_replicate_degree=8,  
+            data_parallel_replicate_degree=2,  
             data_parallel_shard_degree=1,      
         ),
         activation_checkpoint=ActivationCheckpointConfig(mode="none"),
@@ -272,7 +273,7 @@ def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
             local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
             seq_len=2048,
-            steps=6000,                 # 6000 steps aligns perfectly with Chinchilla
+            steps=4000,                 # 8000 steps aligns perfectly with Chinchilla
             max_norm=1.0,               # Gradient clipping 
         ),
         
@@ -310,7 +311,7 @@ def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
                     # ]
                 # },
                 {
-                    "steps": 6000,
+                    "steps": 4000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
@@ -347,7 +348,7 @@ def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/bottleneck_360m_12_stage1_6k_en_en_sep_embeddings_injection_0_20_100_1000_2080_entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/bottleneck_360m_14_stage1_4k_en_en_sep_embeddings_sameinit_injection_0_20_100_1000_2080_entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False, # Must be False until a custom StateDictAdapter is written

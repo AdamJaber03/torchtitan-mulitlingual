@@ -79,20 +79,20 @@ class Validator(BaseValidator):
         WARNING: When setting to -1 there could be hangs due to mismatch among ranks
         """
 
-        dataloader: BaseDataLoader.Config = field(
+        dataloader: BaseDataLoader.Config | dict[str, BaseDataLoader.Config] = field(
             default_factory=lambda: HuggingFaceTextDataLoader.Config(
                 dataset="c4_validation",
                 infinite=False,
             )
         )
-        """DataLoader configuration for validation"""
+        """DataLoader configuration for validation (single config or dict of configs)"""
 
         def __post_init__(self):
             assert (
                 self.steps > 0 or self.steps == -1
             ), "validation steps must be positive or -1"
 
-    validation_dataloader: BaseDataLoader
+    validation_dataloaders: dict[str, BaseDataLoader]
 
     # TODO: improve the constructor signature
     def __init__(
@@ -120,21 +120,37 @@ class Validator(BaseValidator):
         self.tokenizer = tokenizer
         self.parallel_dims = parallel_dims
         self.loss_fn = loss_fn
-        # pyrefly: ignore [unexpected-keyword]
-        dl_config = replace(config.dataloader, infinite=config.steps != -1)
-        self.validation_dataloader = dl_config.build(
-            dp_world_size=dp_world_size,
-            dp_rank=dp_rank,
-            tokenizer=tokenizer,
-            seq_len=seq_len,
-            local_batch_size=local_batch_size,
-        )
         self.validation_context = validation_context
         self.maybe_enable_amp = maybe_enable_amp
         self.metrics_processor = metrics_processor
         self.pp_schedule = pp_schedule
         self.pp_has_first_stage = pp_has_first_stage
         self.pp_has_last_stage = pp_has_last_stage
+
+        self.validation_dataloaders = {}
+        
+        # Handle dict of dataloaders vs single dataloader config
+        if isinstance(config.dataloader, dict):
+            for name, dl_conf in config.dataloader.items():
+                # pyrefly: ignore [unexpected-keyword]
+                dl_config = replace(dl_conf, infinite=config.steps != -1)
+                self.validation_dataloaders[name] = dl_config.build(
+                    dp_world_size=dp_world_size,
+                    dp_rank=dp_rank,
+                    tokenizer=tokenizer,
+                    seq_len=seq_len,
+                    local_batch_size=local_batch_size,
+                )
+        else:
+            # pyrefly: ignore [unexpected-keyword]
+            dl_config = replace(config.dataloader, infinite=config.steps != -1)
+            self.validation_dataloaders[""] = dl_config.build(
+                dp_world_size=dp_world_size,
+                dp_rank=dp_rank,
+                tokenizer=tokenizer,
+                seq_len=seq_len,
+                local_batch_size=local_batch_size,
+            )
 
         if config.steps == -1:
             logger.warning(
@@ -220,94 +236,140 @@ class Validator(BaseValidator):
             model.eval()
 
         parallel_dims = self.parallel_dims
-
-        accumulated_losses = []
         device_type = utils.device_type
-        num_steps = 0
 
-        for input_dict, labels in self.validation_dataloader:
-            # pyrefly: ignore [missing-attribute, unsupported-operation]
-            if self.config.steps != -1 and num_steps >= self.config.steps:
-                break
+        # Iterate over each dataloader setup
+        for dl_name, dataloader in self.validation_dataloaders.items():
+            accumulated_losses = []
+            accumulated_breakdowns = {}  # NEW: Track breakdowns per dataloader
+            num_steps = 0
 
-            self.metrics_processor.ntokens_since_last_log += labels.numel()
-            for k, v in input_dict.items():
-                input_dict[k] = v.to(device_type)
-            labels = labels.to(device_type)
+            for input_dict, labels in dataloader:
+                # pyrefly: ignore [missing-attribute, unsupported-operation]
+                if self.config.steps != -1 and num_steps >= self.config.steps:
+                    break
 
-            # Process data (extract inputs, handle attention masks, CP sharding)
-            inputs, labels, extra_inputs, extra_kwargs = self.post_dataloading_process(
-                input_dict, labels, model_parts
-            )
+                self.metrics_processor.ntokens_since_last_log += labels.numel()
+                for k, v in input_dict.items():
+                    input_dict[k] = v.to(device_type)
+                labels = labels.to(device_type)
 
-            # Count valid tokens for this batch
-            local_valid_tokens = torch.tensor(0, dtype=torch.int64, device=device_type)
-            local_valid_tokens += (labels != IGNORE_INDEX).sum()
-
-            # All-reduce token count across DP ranks to get global token count
-            if parallel_dims.dp_enabled:
-                batch_mesh = parallel_dims.get_mesh("batch")
-                global_valid_tokens = dist_utils.dist_sum(
-                    local_valid_tokens, batch_mesh, None
+                # Process data (extract inputs, handle attention masks, CP sharding)
+                inputs, labels, extra_inputs, extra_kwargs = self.post_dataloading_process(
+                    input_dict, labels, model_parts
                 )
-            else:
-                global_valid_tokens = local_valid_tokens.float()
 
-            if parallel_dims.pp_enabled:
-                assert self.pp_schedule is not None
-                assert self.pp_has_first_stage is not None
-                assert self.pp_has_last_stage is not None
-                # Pipeline Parallel forward inside eval() call
-                with self.validation_context():
-                    targets, losses = (
-                        (labels, []) if self.pp_has_last_stage else (None, None)
+                # Count valid tokens for this batch
+                local_valid_tokens = torch.tensor(0, dtype=torch.int64, device=device_type)
+                local_valid_tokens += (labels != IGNORE_INDEX).sum()
+
+                # All-reduce token count across DP ranks to get global token count
+                if parallel_dims.dp_enabled:
+                    batch_mesh = parallel_dims.get_mesh("batch")
+                    global_valid_tokens = dist_utils.dist_sum(
+                        local_valid_tokens, batch_mesh, None
                     )
-                    if self.pp_has_first_stage:
-                        self.pp_schedule.eval(
-                            inputs,
-                            **extra_inputs,
-                            **extra_kwargs,
-                            target=targets,
-                            losses=losses,
-                        )
-                    else:
-                        self.pp_schedule.eval(
-                            **extra_kwargs,
-                            target=targets,
-                            losses=losses,
-                        )
+                else:
+                    global_valid_tokens = local_valid_tokens.float()
 
-                # accumulate losses across pipeline microbatches
-                # TODO: PP+FSDP unexpectedly puts the loss back to the CPU
-                loss_sum = (
-                    # using sum because loss_fn already uses reduction='sum'
-                    torch.sum(torch.stack(losses)).to(device_type)
-                    if self.pp_has_last_stage
-                    else torch.tensor([-1.0], device=device_type)
+                if parallel_dims.pp_enabled:
+                    assert self.pp_schedule is not None
+                    assert self.pp_has_first_stage is not None
+                    assert self.pp_has_last_stage is not None
+                    # Pipeline Parallel forward inside eval() call
+                    with self.validation_context():
+                        targets, losses = (
+                            (labels, []) if self.pp_has_last_stage else (None, None)
+                        )
+                        if self.pp_has_first_stage:
+                            self.pp_schedule.eval(
+                                inputs,
+                                **extra_inputs,
+                                **extra_kwargs,
+                                target=targets,
+                                losses=losses,
+                            )
+                        else:
+                            self.pp_schedule.eval(
+                                **extra_kwargs,
+                                target=targets,
+                                losses=losses,
+                            )
+
+                    # accumulate losses across pipeline microbatches
+                    if self.pp_has_last_stage:
+                        real_losses = []
+                        breakdowns = []
+                        for l in losses:
+                            if isinstance(l, tuple):
+                                real_losses.append(l[0])
+                                breakdowns.append(l[1])
+                            else:
+                                real_losses.append(l)
+                                breakdowns.append({})
+
+                        loss_sum = torch.sum(torch.stack(real_losses)).to(device_type)
+                        
+                        loss_breakdown_step = {}
+                        for b in breakdowns:
+                            for k, v in b.items():
+                                loss_breakdown_step[k] = loss_breakdown_step.get(k, 0.0) + v
+                    else:
+                        loss_sum = torch.tensor([-1.0], device=device_type)
+                        loss_breakdown_step = {}
+
+                else:
+                    with self.validation_context():
+                        assert len(model_parts) == 1
+                        with self.maybe_enable_amp:
+                            predictions = model_parts[0](
+                                inputs, **extra_inputs, **extra_kwargs
+                            )
+                            loss_out = self.loss_fn(predictions, labels)
+
+                            # Handle tuple return from custom MixedLoss
+                            if isinstance(loss_out, tuple):
+                                loss_sum, loss_breakdown_step = loss_out
+                            else:
+                                loss_sum, loss_breakdown_step = loss_out, {}
+
+                # Accumulate the main scaled loss
+                accumulated_losses.append(loss_sum.detach() / global_valid_tokens)
+
+                # Accumulate the breakdown items safely
+                for k, v in loss_breakdown_step.items():
+                    if isinstance(v, torch.Tensor):
+                        val = (v.detach() / global_valid_tokens).item()
+                    else:
+                        val = v / global_valid_tokens.item()
+                    accumulated_breakdowns[k] = accumulated_breakdowns.get(k, 0.0) + val
+
+                num_steps += 1
+
+            if num_steps == 0:
+                logger.warning(f"Validation dataloader '{dl_name}' was empty. Skipping loss calculation.")
+                continue
+
+            # Compute average loss
+            loss = torch.sum(torch.stack(accumulated_losses))
+            loss /= num_steps
+            if parallel_dims.dp_cp_enabled:
+                global_avg_loss = dist_utils.dist_sum(
+                    loss, parallel_dims.get_optional_mesh("loss")
                 )
             else:
-                with self.validation_context():
-                    assert len(model_parts) == 1
-                    with self.maybe_enable_amp:
-                        predictions = model_parts[0](
-                            inputs, **extra_inputs, **extra_kwargs
-                        )
-                        loss_sum = self.loss_fn(predictions, labels)
+                global_avg_loss = loss.item()
 
-            accumulated_losses.append(loss_sum.detach() / global_valid_tokens)
-            num_steps += 1
+            # Average the breakdowns for this validation run
+            global_avg_breakdowns = {k: v / num_steps for k, v in accumulated_breakdowns.items()}
 
-        # Compute average loss
-        loss = torch.sum(torch.stack(accumulated_losses))
-        loss /= num_steps
-        if parallel_dims.dp_cp_enabled:
-            global_avg_loss = dist_utils.dist_sum(
-                loss, parallel_dims.get_optional_mesh("loss")
-            )
-        else:
-            global_avg_loss = loss.item()
-
-        self.metrics_processor.log_validation(loss=global_avg_loss, step=step)
+            # Log validation with prefix if it exists
+            # (Note: If you update log_validation in the future to accept a dict, 
+            # you can pass `global_avg_breakdowns` here!)
+            if dl_name:
+                self.metrics_processor.log_validation(loss=global_avg_loss, step=step, prefix=dl_name)
+            else:
+                self.metrics_processor.log_validation(loss=global_avg_loss, step=step)
 
         # Set model back to train mode
         for model in model_parts:

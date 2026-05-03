@@ -529,7 +529,7 @@ class MetricsProcessor(Configurable):
         self.device_memory_monitor.reset_peak_stats()
 
     def log_validation(
-        self, loss: float, step: int, extra_metrics: dict[str, Any] | None = None
+        self, loss: float, step: int, extra_metrics: dict[str, Any] | None = None, prefix: str = "default"
     ):
         time_delta = time.perf_counter() - self.time_last_log
 
@@ -541,12 +541,12 @@ class MetricsProcessor(Configurable):
         )
 
         metrics = {
-            "validation_metrics/loss": loss,
-            "validation_metrics/throughput(tps)": tps,
-            "validation_metrics/memory/max_active(GiB)": device_mem_stats.max_active_gib,
-            "validation_metrics/memory/max_active(%)": device_mem_stats.max_active_pct,
-            "validation_metrics/memory/max_reserved(GiB)": device_mem_stats.max_reserved_gib,
-            "validation_metrics/memory/max_reserved(%)": device_mem_stats.max_reserved_pct,
+            f"validation_metrics/{prefix}/loss": loss,
+            f"validation_metrics/{prefix}/throughput(tps)": tps,
+            f"validation_metrics/{prefix}/memory/max_active(GiB)": device_mem_stats.max_active_gib,
+            f"validation_metrics/{prefix}/memory/max_active(%)": device_mem_stats.max_active_pct,
+            f"validation_metrics/{prefix}/memory/max_reserved(GiB)": device_mem_stats.max_reserved_gib,
+            f"validation_metrics/{prefix}/memory/max_reserved(%)": device_mem_stats.max_reserved_pct,
         }
 
         if extra_metrics:
@@ -556,11 +556,11 @@ class MetricsProcessor(Configurable):
 
         color = self.color
         logger.info(
-            f"{color.yellow}validate step: {step:2}  "
-            f"{color.green}loss: {loss:7.4f}  "
-            f"{color.turquoise}memory: {device_mem_stats.max_reserved_gib:5.2f}GiB"
+            f"{color.yellow} {prefix} validate step: {step:2}  "
+            f"{color.green} {prefix} loss: {loss:7.4f}  "
+            f"{color.turquoise} {prefix} memory: {device_mem_stats.max_reserved_gib:5.2f}GiB"
             f"({device_mem_stats.max_reserved_pct:.2f}%)  "
-            f"{color.blue}tps: {round(tps):,}{color.reset}"
+            f"{color.blue} {prefix} tps: {round(tps):,}{color.reset}"
         )
 
         self.ntokens_since_last_log = 0
