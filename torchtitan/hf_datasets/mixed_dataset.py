@@ -14,6 +14,14 @@ class MixedHuggingFaceDataset(IterableDataset, Stateful):
         self.monolingual_batches = monolingual_batches
         self.batch_size = batch_size
 
+    def step(self, global_step: int):
+        """
+        Broadcasts the global training step to all underlying datasets.
+        """
+        for ds in self.datasets:
+            if hasattr(ds, "step"):
+                ds.step(global_step)
+
     def __iter__(self):
         # Create active iterators for all sub-datasets
         iters = [iter(ds) for ds in self.datasets]

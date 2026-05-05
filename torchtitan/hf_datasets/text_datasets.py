@@ -94,8 +94,8 @@ def _load_c4_dataset(dataset_path: str, start_idx: int, split: str, lang: str | 
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated", split="train", streaming=True)
         elif lang == "ar":
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/original", split="train", streaming=True)
-        else:
-            ld = load_dataset(dataset_path, lang, split=split, streaming=True)
+        elif lang == "en":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original", split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)  # Synchronized shuffle for paired streams
     return load_dataset(dataset_path, name="en", split=split, streaming=True)
@@ -380,6 +380,16 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 # assert len(inputs["input"]) == self.seq_len and (False not in [len(inputs.get("contrastive_masks", [])[i]) == self.seq_len for i in range(MAX_SEQS)]), f"Expected input and contrastive_masks lengths to match seq_len ({self.seq_len}), but got {len(inputs['input'])} and {len(inputs.get('contrastive_masks', []))} respectively."
                 yield inputs, x[1:]
     
+    def step(self, global_step: int):
+        """Propagates the global training step down to the augmentations."""
+        for aug in self.aug_callables:
+            if hasattr(aug, "step"):
+                aug.step(global_step)
+                
+        for aug in self.post_token_aug_callables:
+            if hasattr(aug, "step"):
+                aug.step(global_step)
+
     def get_masks(self, old_mask, tokens) -> torch.BoolTensor:
         # 1. Convert tensor to a native Python list of integers!
         mask_list = old_mask.tolist() if torch.is_tensor(old_mask) else old_mask
@@ -576,3 +586,7 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
             num_workers=config.num_workers,
             pin_memory=config.pin_memory,
         )
+    def step(self, global_step: int):
+        """Passes the step from the trainer to the mixed dataset manager."""
+        if hasattr(self, "dataset") and hasattr(self.dataset, "step"):
+            self.dataset.step(global_step)

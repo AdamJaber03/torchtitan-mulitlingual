@@ -2,6 +2,7 @@ import json
 import random
 import re
 import os
+from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
 
 class WordwiseCodeSwitching:
     """
@@ -155,7 +156,15 @@ class WordwiseUnigramCodeSwitching:
     """
     def __init__(self, config: dict):
         self.name = config.get("name", "wordwise_codeswitching")
-        self.replace_prob = config.get("prob", 0.3)
+        self.replace_prob = config.get("prob", None)
+        self.prob_schedualer = config.get("prob_schedualer", None)
+        if self.prob_schedualer is not None:
+            assert self.replace_prob is None, "Cannot specify both a fixed replace_prob and a prob_schedualer. Please choose one."
+            if self.prob_schedualer["name"] not in SCHEDUALER_REGISTRY:
+                raise ValueError(f"Prob schedualer '{self.prob_schedualer['name']}' is not registered. Available: {list(SCHEDUALER_REGISTRY.keys())}")
+            self.prob_schedualer = SCHEDUALER_REGISTRY[self.prob_schedualer["name"]]({k:v for k,v in config.get("prob_schedualer", {}).items() if k != "name"})
+            self.replace_prob = self.prob_schedualer(0)  # Initialize with the starting probability
+        self.current_step = 0
         self.dict_paths = config.get("dict_paths", {})
         self.output_word_mask = config.get("output_word_mask", False)
         self.idx = config.get("idx", None)
@@ -167,6 +176,11 @@ class WordwiseUnigramCodeSwitching:
         # Pre-compile regex patterns for speed
         self.en_pattern = re.compile(r'([a-zA-Z]+)')
         self.ar_pattern = re.compile(r'([\u0600-\u06FF]+)')
+
+    def step(self):
+        self.current_step += 1
+        if self.prob_schedualer is not None:
+            self.replace_prob = self.prob_schedualer(self.current_step)
 
     def _load_dictionaries(self):
         print(f"Initializing {self.name} augmentation...")
@@ -215,6 +229,7 @@ class WordwiseUnigramCodeSwitching:
                     def replace_word(match):
                         word = match.group(1)
                         lookup_word = word if word in translation_dict else word.lower()
+                        # assert lookup_word in translation_dict, f"Lookup word '{lookup_word}' should either be in the dictionary or not, but got an unexpected case. Original word: '{word}'"
                         if lookup_word in translation_dict and random.random() < self.replace_prob:
                             return translation_dict[lookup_word]
                         return word

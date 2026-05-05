@@ -910,6 +910,9 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                 local_batch_size=config.training.local_batch_size,
                 stage_idx=self.stage_idx,
             )
+        
+        if hasattr(self.dataloader, "step"):
+            self.dataloader.step(self.step)
 
         logger.info(f"Training starts at step {self.step + 1} (Stage {self.stage_idx})")
 
@@ -948,6 +951,8 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                         local_batch_size=config.training.local_batch_size,
                         stage_idx=self.stage_idx,
                     )
+                    if hasattr(self.dataloader, "step"):
+                        self.dataloader.step(self.step)
                     data_iterator = self.batch_generator(self.dataloader)
                 # -----------------------------------
 
@@ -958,7 +963,10 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                 except DataloaderExhaustedError:
                     logger.warning("Ran out of data; last step was canceled.")
                     break
-                    
+        
+                if hasattr(self.dataloader, "step"):
+                    self.dataloader.step(self.step)
+                
                 self.checkpointer.save(
                     self.step, last_step=(self.step == config.training.steps)
                 )

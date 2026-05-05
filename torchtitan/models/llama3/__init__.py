@@ -279,6 +279,35 @@ llama3_configs = {
             scaling="llama",
         ),
     ),
+    "smollm2_360m_2xvocab": Llama3Model.Config(
+        dim=960,
+        n_layers=32,
+        vocab_size=65536*2,
+        enable_weight_tying=True,
+        # enable_contrastive_alignment=True,
+        # contrastive_proj_dim=512,
+        layer=Llama3TransformerBlock.Config(
+            feed_forward=FeedForward.Config(
+                hidden_dim=compute_ffn_hidden_dim(
+                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
+                )
+            ),
+            attention=GQAttention.Config(
+                n_heads=15,
+                n_kv_heads=5,         # 3:1 GQA Ratio
+                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
+                attn_mask_type="block_causal",
+                rope_backend="complex",
+            ),
+        ),
+        rope=RoPE.Config(
+            dim=960 // 15,        # Head dim = 64
+            max_seq_len=2048,
+            theta=10000,         # SmolLM2 standard theta
+            backend="complex",
+            scaling="llama",
+        ),
+    ),
     "8B": Llama3Model.Config(
         dim=4096,
         n_layers=32,

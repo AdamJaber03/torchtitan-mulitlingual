@@ -65,6 +65,7 @@ class StochasticWordTokenTagging:
         self.idx = config.get("idx", None)
         self.vocab_size = config.get("vocab_size")
         self.special_tokens = set(config.get("special_tokens", []))
+        self.symmetric = config.get("symmetric", False)  # If True, use 50% of the time a 1-p tagging to mirror
         
         if self.vocab_size is None:
             raise ValueError(f"[{self.name}] config must include 'vocab_size'")
@@ -104,6 +105,13 @@ class StochasticWordTokenTagging:
         else:
             tokens = tokens_in["tokens"]
 
+
+        tag_prob = self.tag_prob
+        if self.symmetric:
+            # If symmetric, we want to create a balanced tagging distribution.
+            # So we randomly decide to flip the tagging direction for this sequence.
+            if random.random() < 0.5:
+                tag_prob = 1.0 - self.tag_prob  # Flip the probability to tag the opposite set of words
         shifted_tokens = []
         tag_current_word = False  # Tracks if the current word is being shifted
         
@@ -115,7 +123,7 @@ class StochasticWordTokenTagging:
             # If we are at the very first token (index 0) OR we hit a space marker, 
             # we have hit a new word. Roll the dice to decide this word's fate.
             if i == 0 or token_id in self.boundary_token_ids:
-                tag_current_word = random.random() < self.tag_prob
+                tag_current_word = random.random() < tag_prob
                 
             # Apply the shift based on the current state
             if tag_current_word:
