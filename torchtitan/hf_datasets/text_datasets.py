@@ -60,7 +60,7 @@ def buffered_shuffle(iterator, buffer_size=10000):
         yield item
 
 # --- Existing Helper Functions ---
-def _load_c4_dataset(dataset_path: str, start_idx: int, split: str, lang: str | None = None):
+def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | None = None):
     if dataset_path == "karpathy/fineweb-edu-100b-shuffle":
         ld = load_dataset(dataset_path, split=split, streaming=True)
         return ld.skip(start_idx) if start_idx > 0 else ld
@@ -96,6 +96,8 @@ def _load_c4_dataset(dataset_path: str, start_idx: int, split: str, lang: str | 
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/original", split="train", streaming=True)
         elif lang == "en":
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original", split="train", streaming=True)
+        elif lang == "tr2en_1to1map":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated_1to1map", split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)  # Synchronized shuffle for paired streams
     return load_dataset(dataset_path, name="en", split=split, streaming=True)
@@ -120,37 +122,42 @@ def _process_contrastive_text(sample: tuple[dict[str, Any], dict[str, Any]]) -> 
 DATASETS = {
     "c4": DatasetConfig(
         path="allenai/c4",
-        loader=partial(_load_c4_dataset, split="train"),
+        loader=partial(_load_dataset, split="train"),
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-100b-shuffle": DatasetConfig(
         path="karpathy/fineweb-edu-100b-shuffle",
-        loader=partial(_load_c4_dataset, split="train"),
+        loader=partial(_load_dataset, split="train"),
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-ar-ar": DatasetConfig(
         path="kaust-generative-ai/fineweb-edu-ar",
-        loader=partial(_load_c4_dataset, split="train", lang="ar"),
+        loader=partial(_load_dataset, split="train", lang="ar"),
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-ar-en": DatasetConfig(
         path="kaust-generative-ai/fineweb-edu-ar",
-        loader=partial(_load_c4_dataset, split="train", lang="en"),
+        loader=partial(_load_dataset, split="train", lang="en"),
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-ar-tr2en": DatasetConfig(
         path="kaust-generative-ai/fineweb-edu-ar",
-        loader=partial(_load_c4_dataset, split="train", lang="tr2en"),
+        loader=partial(_load_dataset, split="train", lang="tr2en"),
+        sample_processor=_process_c4_text,
+    ),
+    "fineweb-edu-ar-tr2en_1to1map": DatasetConfig(
+        path="kaust-generative-ai/fineweb-edu-ar",
+        loader=partial(_load_dataset, split="train", lang="tr2en_1to1map"),
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-ar-paired": DatasetConfig(
         path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
-        loader=partial(_load_c4_dataset, split="train"),
+        loader=partial(_load_dataset, split="train"),
         sample_processor=_process_paired_text,
     ),
     "fineweb-edu-ar-paired-contrastive": DatasetConfig(
         path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
-        loader=partial(_load_c4_dataset, split="train"),
+        loader=partial(_load_dataset, split="train"),
         sample_processor=_process_contrastive_text,
     ),
 

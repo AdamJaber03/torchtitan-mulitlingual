@@ -149,6 +149,7 @@ import os
 import json
 import re
 import random
+from multiprocessing import Value
 
 class WordwiseUnigramCodeSwitching:
     """
@@ -162,9 +163,10 @@ class WordwiseUnigramCodeSwitching:
             assert self.replace_prob is None, "Cannot specify both a fixed replace_prob and a prob_schedualer. Please choose one."
             if self.prob_schedualer["name"] not in SCHEDUALER_REGISTRY:
                 raise ValueError(f"Prob schedualer '{self.prob_schedualer['name']}' is not registered. Available: {list(SCHEDUALER_REGISTRY.keys())}")
-            self.prob_schedualer = SCHEDUALER_REGISTRY[self.prob_schedualer["name"]]({k:v for k,v in config.get("prob_schedualer", {}).items() if k != "name"})
+            self.prob_schedualer = SCHEDUALER_REGISTRY[self.prob_schedualer["name"]](**{k:v for k,v in config.get("prob_schedualer", {}).items() if k != "name"})
             self.replace_prob = self.prob_schedualer(0)  # Initialize with the starting probability
-        self.current_step = 0
+            print(f"Initialized {self.name} with dynamic prob schedualer '{self.prob_schedualer.__class__.__name__}', starting at replace_prob={self.replace_prob}")
+        self.replace_prob = Value('d', self.replace_prob)  # For shared memory access if needed
         self.dict_paths = config.get("dict_paths", {})
         self.output_word_mask = config.get("output_word_mask", False)
         self.idx = config.get("idx", None)
@@ -175,12 +177,14 @@ class WordwiseUnigramCodeSwitching:
 
         # Pre-compile regex patterns for speed
         self.en_pattern = re.compile(r'([a-zA-Z]+)')
-        self.ar_pattern = re.compile(r'([\u0600-\u06FF]+)')
+        # self.ar_pattern = re.compile(r'([\u0600-\u06FF]+)')
+        self.ar_pattern = re.compile(r'([\u0620-\u065F\u0670-\u06EF\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF\u200C\u200D]+)')
 
-    def step(self):
-        self.current_step += 1
+    def step(self, global_step):
+        # print(f"************Stepping {self.name} augmentation at global step {global_step}...*********************")
         if self.prob_schedualer is not None:
-            self.replace_prob = self.prob_schedualer(self.current_step)
+            self.replace_prob.value = self.prob_schedualer(global_step)
+            # print(f"Updated replace_prob to {self.replace_prob.value} based on schedualer at step {global_step}")
 
     def _load_dictionaries(self):
         print(f"Initializing {self.name} augmentation...")
@@ -197,9 +201,10 @@ class WordwiseUnigramCodeSwitching:
     def __call__(self, text: dict, dataset_name: str) -> dict:
         raw_text = text[self.idx]["text"] if self.idx is not None else text["text"]
         
-        do_augment = dataset_name in self.dictionaries and self.replace_prob > 0.0
+        do_augment = dataset_name in self.dictionaries and self.replace_prob.value > 0.0
         translation_dict = {}
         pattern = None
+        # print(f"***************************wordwise prob for augmentation: {self.replace_prob.value}***********************************")
         
         if do_augment:
             translation_dict = self.dictionaries[dataset_name]
@@ -230,7 +235,7 @@ class WordwiseUnigramCodeSwitching:
                         word = match.group(1)
                         lookup_word = word if word in translation_dict else word.lower()
                         # assert lookup_word in translation_dict, f"Lookup word '{lookup_word}' should either be in the dictionary or not, but got an unexpected case. Original word: '{word}'"
-                        if lookup_word in translation_dict and random.random() < self.replace_prob:
+                        if lookup_word in translation_dict and random.random() < self.replace_prob.value:
                             return translation_dict[lookup_word]
                         return word
                     
@@ -246,8 +251,10 @@ class WordwiseUnigramCodeSwitching:
                     
                 mask.extend([orig_idx] * num_output_words)
                 orig_idx += 1
-                
+            
             reconstructed_text = "".join(reconstructed_parts)
+            # print(f"Original text: {raw_text[:100]}...")  # Print the first 100 chars for context
+            # print(f"Augmented text: {reconstructed_text[:100]}...")  #
 
         else:
             # --- TOKENIZER AWARE PATH ---
@@ -268,7 +275,7 @@ class WordwiseUnigramCodeSwitching:
                         word = sub_tokens[i]
                         lookup_word = word if word in translation_dict else word.lower()
                         
-                        if lookup_word in translation_dict and random.random() < self.replace_prob:
+                        if lookup_word in translation_dict and random.random() < self.replace_prob.value:
                             sub_tokens[i] = translation_dict[lookup_word]
                     new_chunk = "".join(sub_tokens)
                 else:

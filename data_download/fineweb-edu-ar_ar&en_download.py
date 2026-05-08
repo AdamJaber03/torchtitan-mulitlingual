@@ -99,7 +99,7 @@ def main():
         
     # 2. Connect to Hugging Face
     print("\nConnecting to Hugging Face Stream (fineweb-edu-ar)...")
-    # ds_ar = load_dataset("kaust-generative-ai/fineweb-edu-ar", "ar", split="train", streaming=True)
+    ds_ar = load_dataset("kaust-generative-ai/fineweb-edu-ar", "ar", split="train", streaming=True)
     ds_en = load_dataset("kaust-generative-ai/fineweb-edu-ar", "en", split="train", streaming=True)    
     # 3. Spin up the CPU cores
     cpu_cores = os.cpu_count()
@@ -108,53 +108,53 @@ def main():
     
     start_time = time.time()
     
-    # with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cores) as executor:
-    #     futures = []
-    #     current_chunk = []
-    #     docs_read = 0
-    #     chunk_counter = 1
+    with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cores) as executor:
+        futures = []
+        current_chunk = []
+        docs_read = 0
+        chunk_counter = 1
         
-    #     # PRODUCER: Read from stream and dispatch chunks
-    #     for doc in ds_ar:
-    #         if docs_read >= NUM_DOCS_TO_PROCESS:
-    #             break
+        # PRODUCER: Read from stream and dispatch chunks
+        for doc in ds_ar:
+            if docs_read >= NUM_DOCS_TO_PROCESS:
+                break
                 
-    #         current_chunk.append(doc)
-    #         docs_read += 1
+            current_chunk.append(doc)
+            docs_read += 1
             
-    #         # When chunk is full, dispatch to a CPU worker
-    #         if len(current_chunk) >= CHUNK_SIZE:
-    #             future = executor.submit(
-    #                 process_and_save_chunk, 
-    #                 chunk_counter, 
-    #                 current_chunk, 
-    #                 AR_DIR
-    #             )
-    #             futures.append(future)
+            # When chunk is full, dispatch to a CPU worker
+            if len(current_chunk) >= CHUNK_SIZE:
+                future = executor.submit(
+                    process_and_save_chunk, 
+                    chunk_counter, 
+                    current_chunk, 
+                    AR_DIR
+                )
+                futures.append(future)
                 
-    #             if chunk_counter % 10 == 0:
-    #                 print(f"Dispatched {docs_read:,} documents to CPU workers...")
+                if chunk_counter % 10 == 0:
+                    print(f"Dispatched {docs_read:,} documents to CPU workers...")
                     
-    #             current_chunk = []
-    #             chunk_counter += 1
+                current_chunk = []
+                chunk_counter += 1
 
-    #     # Dispatch any remaining documents
-    #     if current_chunk:
-    #         futures.append(executor.submit(
-    #             process_and_save_chunk, chunk_counter, current_chunk, AR_DIR
-    #         ))
+        # Dispatch any remaining documents
+        if current_chunk:
+            futures.append(executor.submit(
+                process_and_save_chunk, chunk_counter, current_chunk, AR_DIR
+            ))
             
-    #     print(f"\nFinished reading {docs_read:,} docs from Hugging Face.")
-    #     print("Waiting for CPU cores to finish translating and saving to disk...")
+        print(f"\nFinished reading {docs_read:,} docs from Hugging Face.")
+        print("Waiting for CPU cores to finish translating and saving to disk...")
 
-    #     # CONSUMER: Track progress as chunks finish saving
-    #     completed_docs = 0
-    #     for future in concurrent.futures.as_completed(futures):
-    #         chunk_id, num_processed = future.result()
-    #         completed_docs += num_processed
+        # CONSUMER: Track progress as chunks finish saving
+        completed_docs = 0
+        for future in concurrent.futures.as_completed(futures):
+            chunk_id, num_processed = future.result()
+            completed_docs += num_processed
             
-    #         if completed_docs % 250_000 == 0:
-    #             print(f"Successfully saved {completed_docs:,} / {NUM_DOCS_TO_PROCESS:,} documents...")
+            if completed_docs % 250_000 == 0:
+                print(f"Successfully saved {completed_docs:,} / {NUM_DOCS_TO_PROCESS:,} documents...")
     
     with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cores) as executor:
         futures = []
