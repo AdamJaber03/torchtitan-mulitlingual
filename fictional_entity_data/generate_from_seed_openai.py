@@ -11,11 +11,11 @@ load_dotenv()
 # ==========================================
 # Configuration
 # ==========================================
-MODEL_NAME = "gpt-5-mini-2025-08-07"
+# MODEL_NAME = "gpt-5-mini-2025-08-07"
 # MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct"
-# MODEL_NAME = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
-LANGUAGE_CODE = "en" 
-LANGUAGE_MAP = {"en": "English", "ar": "Standard Arabic"}
+MODEL_NAME = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
+LANGUAGE_CODE = "ru" 
+LANGUAGE_MAP = {"en": "English", "ar": "Standard Arabic", "ru": "Russian"}
 
 # Fill this list with the directory IDs where the original seed is in English.
 # All other directory IDs will be assumed to be in Arabic.
@@ -25,7 +25,7 @@ CAPITALIZE_FIRST_WORD = True  # Only applies to English seeds
 
 DATA_COUNT = 60
 MCQ_COUNT = 5
-PARENT_DIR_PATH = "./from_domains_humans" 
+PARENT_DIR_PATH = "./gemini_seeds" 
 MAX_RETRIES = 5
 OVERWRITE_EXISTING = False
 MAX_WORKERS = 32  
@@ -202,11 +202,11 @@ def process_directory(sub_dir, client, data_prompt_template, mcq_prompt_template
 # ==========================================
 
 def main():
-    client = OpenAI()
-    # client = OpenAI(
-    #     base_url="http://192.168.12.145:8000/v1",
-    #     api_key="sk-local-vllm" # Just a placeholder, vLLM doesn't check it
-    # )
+    # client = OpenAI()
+    client = OpenAI(
+        base_url="http://192.168.12.145:8000/v1",
+        api_key="sk-local-vllm" # Just a placeholder, vLLM doesn't check it
+    )
 
     target_lang_name = LANGUAGE_MAP.get(LANGUAGE_CODE, LANGUAGE_CODE)
     parent_dir = Path(PARENT_DIR_PATH)
