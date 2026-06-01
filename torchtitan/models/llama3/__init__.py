@@ -94,162 +94,6 @@ llama3_configs = {
             scaling="llama",
         ),
     ),
-    "160M_mha_baseline": Llama3Model.Config(
-        dim=768,
-        n_layers=12,
-        # vocab_size=32768,
-        vocab_size=65536,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    768, multiple_of=256, ffn_dim_multiplier=1.3
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=12,
-                n_kv_heads=12,        # 1:1 Ratio (Multi-Head Attention)
-                attn_backend="sdpa",  # Fast optimized kernel for fixed seq_len
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=768 // 12,
-            max_seq_len=512,
-            theta=10000,
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "160M_mha_flex_baseline": Llama3Model.Config(
-        dim=768,
-        n_layers=12,
-        # vocab_size=32768,
-        vocab_size=65536,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    768, multiple_of=256, ffn_dim_multiplier=1.5
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=12,
-                n_kv_heads=12,        # 1:1 Ratio (Multi-Head Attention)
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=768 // 12,
-            max_seq_len=2048,
-            theta=10000,
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "160M_gqa_balanced": Llama3Model.Config(
-        dim=768,
-        n_layers=12,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    768, multiple_of=256, ffn_dim_multiplier=1.375 # Offset for KV parameter loss
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=12,
-                n_kv_heads=4,         # 3:1 Ratio (Grouped Query Attention)
-                attn_backend="sdpa",  # Matches baseline for fair benchmark
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=768 // 12,
-            max_seq_len=256,
-            theta=10000,
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "500M_mha_baseline": Llama3Model.Config(
-        dim=1280,
-        n_layers=20,
-        vocab_size=65536,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    1280, multiple_of=256, ffn_dim_multiplier=1#.3
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=16,
-                n_kv_heads=16,        # 1:1 Ratio (Multi-Head Attention)
-                attn_backend="sdpa",  # Fast optimized kernel for fixed seq_len
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=1280 // 16,
-            max_seq_len=2048,
-            theta=10000,
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "500M_mha_flex_baseline": Llama3Model.Config(
-        dim=1280,
-        n_layers=20,
-        vocab_size=65536,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    1280, multiple_of=256, ffn_dim_multiplier=1#.3
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=16,
-                n_kv_heads=16,        # 1:1 Ratio (Multi-Head Attention)
-                attn_backend="flex",  # Fast optimized kernel for variable seq_len
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=1280 // 16,
-            max_seq_len=2048,
-            theta=10000,
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "smollm2_135m": Llama3Model.Config(
-        dim=576,
-        n_layers=30,
-        vocab_size=49152,       # User override (Standard is 49152)
-        enable_weight_tying=True,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    576, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 1536
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=9,
-                n_kv_heads=3,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=576 // 9,         # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-
     "smollm2_360m": Llama3Model.Config(
         dim=960,
         n_layers=32,
@@ -339,189 +183,10 @@ llama3_configs = {
             scaling="llama",
         ),
     ),
-    "smollm2_360m_contrastive2_2xvocab": Llama3Model.Config(
-        dim=960,
-        n_layers=32,
-        vocab_size=65536*2,    #*2 if tagging # User override (Standard is 49152)
-        enable_weight_tying=True,
-        enable_contrastive_alignment=True,
-        contrastive_proj_dim=512,
-        contrastive_target_layer=2,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=15,
-                n_kv_heads=5,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=960 // 15,        # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "smollm2_360m_contrastive8_2xvocab": Llama3Model.Config(
-        dim=960,
-        n_layers=32,
-        vocab_size=65536*2,    #*2 if tagging # User override (Standard is 49152)
-        enable_weight_tying=True,
-        enable_contrastive_alignment=True,
-        contrastive_proj_dim=512,
-        contrastive_target_layer=8,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=15,
-                n_kv_heads=5,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=960 // 15,        # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "smollm2_360m_contrastive8": Llama3Model.Config(
-        dim=960,
-        n_layers=32,
-        vocab_size=65536,    #*2 if tagging # User override (Standard is 49152)
-        enable_weight_tying=True,
-        enable_contrastive_alignment=True,
-        contrastive_proj_dim=512,
-        contrastive_target_layer=8,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=15,
-                n_kv_heads=5,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=960 // 15,        # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "smollm2_360m_contrastive16_2xvocab": Llama3Model.Config(
-        dim=960,
-        n_layers=32,
-        vocab_size=65536*2,    #*2 if tagging # User override (Standard is 49152)
-        enable_weight_tying=True,
-        enable_contrastive_alignment=True,
-        contrastive_proj_dim=512,
-        contrastive_target_layer=16,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=15,
-                n_kv_heads=5,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=960 // 15,        # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "smollm2_360m_contrastive16": Llama3Model.Config(
-        dim=960,
-        n_layers=32,
-        vocab_size=65536,    #*2 if tagging # User override (Standard is 49152)
-        enable_weight_tying=True,
-        enable_contrastive_alignment=True,
-        contrastive_proj_dim=512,
-        contrastive_target_layer=16,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=15,
-                n_kv_heads=5,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=960 // 15,        # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
     "smollm2_360m_2xvocab": Llama3Model.Config(
         dim=960,
         n_layers=32,
         vocab_size=65536*2,
-        enable_weight_tying=True,
-        # enable_contrastive_alignment=True,
-        # contrastive_proj_dim=512,
-        layer=Llama3TransformerBlock.Config(
-            feed_forward=FeedForward.Config(
-                hidden_dim=compute_ffn_hidden_dim(
-                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
-                )
-            ),
-            attention=GQAttention.Config(
-                n_heads=15,
-                n_kv_heads=5,         # 3:1 GQA Ratio
-                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
-                attn_mask_type="block_causal",
-                rope_backend="complex",
-            ),
-        ),
-        rope=RoPE.Config(
-            dim=960 // 15,        # Head dim = 64
-            max_seq_len=2048,
-            theta=10000,         # SmolLM2 standard theta
-            backend="complex",
-            scaling="llama",
-        ),
-    ),
-    "smollm2_360m_3xvocab": Llama3Model.Config(
-        dim=960,
-        n_layers=32,
-        vocab_size=65536*3,
         enable_weight_tying=True,
         # enable_contrastive_alignment=True,
         # contrastive_proj_dim=512,
@@ -575,6 +240,32 @@ llama3_configs = {
             feed_forward=FeedForward.Config(
                 hidden_dim=compute_ffn_hidden_dim(
                     4096, multiple_of=1024, ffn_dim_multiplier=1.3
+                )
+            ),
+            attention=GQAttention.Config(
+                n_heads=32,
+                n_kv_heads=8,
+                attn_backend="flex",
+                attn_mask_type="block_causal",
+                rope_backend="complex",
+            ),
+        ),
+        rope=RoPE.Config(
+            dim=4096 // 32,
+            max_seq_len=131072,
+            theta=500000,
+            backend="complex",
+            scaling="llama",
+        ),
+    ),
+    "7B_flex_2xvocab": Llama3Model.Config(
+        dim=4096,
+        n_layers=28,
+        vocab_size=65536*2,
+        layer=Llama3TransformerBlock.Config(
+            feed_forward=FeedForward.Config(
+                hidden_dim=compute_ffn_hidden_dim(
+                    4096, multiple_of=1024, ffn_dim_multiplier=1.2
                 )
             ),
             attention=GQAttention.Config(
