@@ -3,6 +3,7 @@ import random
 import re
 import os
 from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
+from torchtitan.tools.logging import logger
 
 class WordwiseCodeSwitching:
     """
@@ -142,8 +143,33 @@ class TextDuplication:
         if not isinstance(text, dict) or "text" not in text:
             raise TypeError(f"Expected a dictionary with a 'text' key, but received {type(text).__name__}")
             
-        return [{k: v for k, v in text.items()}] * self.n
+        return [{k: v for k, v in text.items()} for _ in range(self.n)]
 
+
+# class contrastiveMask:
+#     """
+#     Augmentation that receives a text string and returns a list 
+#     with n copies of that string.
+#     """
+#     def __init__(self, config: dict):
+#         self.name = config.get("name", "contrastive_mask")
+#         self.n = config.get("n", 2) # Defaults to 2 copies if not specified in config
+
+#     def __call__(self, text: dict, dataset_name: str = "") -> list:
+#         """
+#         Applies creates a contrastive mask to a given string.
+        
+#         Args:
+#             text: The original document string.
+#             dataset_name: The identifier (kept for signature compatibility).
+            
+#         Returns:
+#             A list containing n copies of the input text.
+#         """
+#         if not isinstance(text, dict) or "text" not in text:
+#             raise TypeError(f"Expected a dictionary with a 'text' key, but received {type(text).__name__}")
+            
+#         return [{k: v for k, v in text.items()}] * self.n
 
 import os
 import json
@@ -168,10 +194,11 @@ class WordwiseUnigramCodeSwitching:
             print(f"Initialized {self.name} with dynamic prob schedualer '{self.prob_schedualer.__class__.__name__}', starting at replace_prob={self.replace_prob}")
         self.replace_prob = Value('d', self.replace_prob)  # For shared memory access if needed
         self.dict_paths = config.get("dict_paths", {})
-        self.output_word_mask = config.get("output_word_mask", False)
         self.idx = config.get("idx", None)
+        self.pattern = config.get("pattern", None)
+        if self.pattern is not None:
+            assert self.pattern in ["en", "ar", "ru"]
         self.tokenizer = config.get("tokenizer")
-        self.tokenizer_aware = config.get("tokenizer_aware", False)
         self.dictionaries = {}
         self._load_dictionaries()
 
@@ -179,12 +206,13 @@ class WordwiseUnigramCodeSwitching:
         self.en_pattern = re.compile(r'([a-zA-Z]+)')
         # self.ar_pattern = re.compile(r'([\u0600-\u06FF]+)')
         self.ar_pattern = re.compile(r'([\u0620-\u065F\u0670-\u06EF\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF\u200C\u200D]+)')
+        self.ru_pattern = re.compile(r'([\u0400-\u04FF\u0500-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u1C80-\u1C8F\u0300-\u036F\u200C\u200D\u00AD]+)')
 
     def step(self, global_step):
-        # print(f"************Stepping {self.name} augmentation at global step {global_step}...*********************")
+        # logger.info(f"************Stepping {self.name} augmentation at global step {global_step}...*********************")
         if self.prob_schedualer is not None:
             self.replace_prob.value = self.prob_schedualer(global_step)
-            # print(f"Updated replace_prob to {self.replace_prob.value} based on schedualer at step {global_step}")
+            # logger.info(f"Updated replace_prob to {self.replace_prob.value} based on schedualer at step {global_step}")
 
     def _load_dictionaries(self):
         print(f"Initializing {self.name} augmentation...")
@@ -208,119 +236,55 @@ class WordwiseUnigramCodeSwitching:
         
         if do_augment:
             translation_dict = self.dictionaries[dataset_name]
-            if dataset_name.endswith("-en"):
+            if self.pattern is not None:
+                pattern = {"en": self.en_pattern, "ar": self.ar_pattern, "ru": self.ru_pattern}[self.pattern]
+            elif dataset_name.endswith("-en"):
                 pattern = self.en_pattern
             elif dataset_name.endswith("-ar"):
                 pattern = self.ar_pattern
+            elif dataset_name.endswith("-ru"):
+                pattern = self.ru_pattern
             else:
-                do_augment = False
+                raise ValueError(f"Dataset name '{dataset_name}' does not match expected language suffixes for augmentation. Expected suffixes: '-en', '-ar', '-ru'.")
 
-        if not self.tokenizer_aware:
-            # --- TOKENIZER UNAWARE PATH ---
-            # Split text while capturing exact whitespace spaces/newlines in the array
-            tokens = re.split(r'(\s+)', raw_text)
-            reconstructed_parts = []
-            mask = []
+        tokens = re.split(r'(\s+)', raw_text)
+        reconstructed_parts = []
+        end_idxs = []
+        end_idx = 0
+        for token in tokens:
+            # Keep whitespace structurally intact, but skip it for logic and mask-counting
+            if not token.strip():
+                reconstructed_parts.append(token)
+                end_idx += len(token)
+                continue
             
-            orig_idx = 0
-            for token in tokens:
-                # Keep whitespace structurally intact, but skip it for logic and mask-counting
-                if not token.strip():
-                    reconstructed_parts.append(token)
-                    continue
+            new_token = token
+            if do_augment and pattern:
+                def replace_word(match):
+                    word = match.group(1)
+                    lookup_word = word if word in translation_dict else word.lower()
+                    # assert lookup_word in translation_dict, f"Lookup word '{lookup_word}' should either be in the dictionary or not, but got an unexpected case. Original word: '{word}'"
+                    if lookup_word in translation_dict and random.random() < self.replace_prob.value:
+                        return translation_dict[lookup_word]
+                    return word
                 
-                new_token = token
-                if do_augment and pattern:
-                    def replace_word(match):
-                        word = match.group(1)
-                        lookup_word = word if word in translation_dict else word.lower()
-                        # assert lookup_word in translation_dict, f"Lookup word '{lookup_word}' should either be in the dictionary or not, but got an unexpected case. Original word: '{word}'"
-                        if lookup_word in translation_dict and random.random() < self.replace_prob.value:
-                            return translation_dict[lookup_word]
-                        return word
-                    
-                    # Search and replace words within the current token
-                    new_token = pattern.sub(replace_word, token)
-                
-                reconstructed_parts.append(new_token)
-                
-                # The mask corresponds exactly to the number of space-separated words the translation yielded
-                num_output_words = len(new_token.split())
-                if num_output_words == 0:
-                    num_output_words = 1  # Fallback for punctuation-only tokens
-                    
-                mask.extend([orig_idx] * num_output_words)
-                orig_idx += 1
+                # Search and replace words within the current token
+                new_token = pattern.sub(replace_word, token)
             
-            reconstructed_text = "".join(reconstructed_parts)
-            # print(f"Original text: {raw_text[:100]}...")  # Print the first 100 chars for context
-            # print(f"Augmented text: {reconstructed_text[:100]}...")  #
-
-        else:
-            # --- TOKENIZER AWARE PATH ---
-            pre_tokenized = self.tokenizer.tokenizer.pre_tokenizer.pre_tokenize_str(raw_text)
+            reconstructed_parts.append(new_token)
             
-            reconstructed_text = ""
-            chunk_intervals = []
-            j = 0
-
-            for chunk, (start, end) in pre_tokenized:
-                # THE TRICK: Slicing the original string completely bypasses byte-level mojibake 
-                # and perfectly preserves native spaces. No need to touch 'Ġ' at all!
-                real_chunk = raw_text[start:end]
-                
-                if do_augment and pattern:
-                    sub_tokens = pattern.split(real_chunk)
-                    for i in range(1, len(sub_tokens), 2):
-                        word = sub_tokens[i]
-                        lookup_word = word if word in translation_dict else word.lower()
-                        
-                        if lookup_word in translation_dict and random.random() < self.replace_prob.value:
-                            sub_tokens[i] = translation_dict[lookup_word]
-                    new_chunk = "".join(sub_tokens)
-                else:
-                    new_chunk = real_chunk
-                    
-                # Record exactly where this chunk lives in the final string based on character index
-                start_char = len(reconstructed_text)
-                reconstructed_text += new_chunk
-                end_char = len(reconstructed_text)
-                
-                chunk_intervals.append((start_char, end_char, j))
-                j += 1
-
-            # --- THE ALIGNMENT FIX ---
-            # Encode the FULL reconstructed string once, exactly as it will be down the pipeline.
-            encoding = self.tokenizer.tokenizer.encode(reconstructed_text, add_special_tokens=False)
-            
-            mask = []
-            # Use the Hugging Face character offsets to map every subword back to its original chunk
-            for sub_start, sub_end in encoding.offsets:
-                found_j = None
-                for start_char, end_char, original_j in chunk_intervals:
-                    # If the subword starts inside this chunk's boundaries, it belongs to it!
-                    if start_char <= sub_start < end_char:
-                        found_j = original_j
-                        break
-                
-                # Edge case safety fallback
-                if found_j is None:
-                    found_j = chunk_intervals[-1][2] if chunk_intervals else 0
-                    
-                mask.append(found_j)
-
-            # This assert is now mathematically guaranteed to pass 100% of the time.
-            assert len(mask) == len(encoding.ids), f"Fatal Alignment: Mask length {len(mask)} != Subwords {len(encoding.ids)}"
-
+            end_idx += len(new_token)
+            end_idxs.append(end_idx-1)
+        if end_idxs[-1] != end_idx-1:
+            end_idxs.append(end_idx-1)               
+        reconstructed_text = "".join(reconstructed_parts)
         # Save the outputs
         if self.idx is not None:
             text[self.idx]["text"] = reconstructed_text
-            if self.output_word_mask:
-                text[self.idx]["word_mask"] = mask
+            text[self.idx]["word_sep_idx"] = end_idxs
         else:
             text["text"] = reconstructed_text
-            if self.output_word_mask:
-                text["word_mask"] = mask
+            text["word_sep_idx"] = end_idxs
 
         return text
 
@@ -387,6 +351,91 @@ class WordwiseUnigramCodeSwitching:
     #         text["word_mask"] = mask
     #     assert len(text["text"].split()) == len(mask), f"Mask length does not match the number of words in the text, expected {len(text['text'].split())}, got {len(mask)}"
     #     return text
+class AddPrefix:
+    """
+    On-the-fly uni-gram code-switching augmentation for language model training.
+    """
+    def __init__(self, config: dict):
+        self.name = config.get("name", "add_prefix")
+        self.prefix = config.get("prefix", None)
+        self.idx = config.get("idx", None)
+        if self.prefix is None:
+            raise ValueError(f"[{self.name}] config must include 'prefix'")
+        print(f"Initialized {self.name} augmentation with prefix='{self.prefix}'...")
+
+    def __call__(self, text: dict, dataset_name: str) -> dict:
+        raw_text = text[self.idx]["text"] if self.idx is not None else text["text"]
+        reconstructed_text = self.prefix + raw_text
+        # Save the outputs
+        if self.idx is not None:
+            text[self.idx]["text"] = reconstructed_text
+        else:
+            text["text"] = reconstructed_text
+        return text
+
+
+class mergeSeperators:
+    """
+    Augmentation that merges word separators to create longer "words" for the model to process, which can be useful for certain types of code-switching or to encourage the model to learn more holistic representations.
+    """
+    def __init__(self, config: dict):
+        self.name = config.get("name", "merge_seperators")
+        self.idx = config.get("idx", None)
+        self.n_merge = config.get("n_merge", 2)
+        print(f"Initialized {self.name} augmentation with n_merge={self.n_merge}...")
+
+    def __call__(self, text: dict, dataset_name: str) -> dict:
+        org_sep = text[self.idx]["word_sep_idx"] if self.idx is not None else text["word_sep_idx"]
+        sep = []
+        for i in range(self.n_merge-1, len(org_sep), self.n_merge):
+            sep.append(org_sep[i])
+        if len(sep) == 0 or sep[-1] != org_sep[-1]:
+            sep.append(org_sep[-1])  # Ensure the last index is always included as a separator
+        # Save the outputs
+        if self.idx is not None:
+            text[self.idx]["word_sep_idx"] = sep
+        else:
+            text["word_sep_idx"] = sep
+        return text
+
+class uniformMatchSeperators:
+    """
+    Augmentation that merges word separators to create longer "words" for the model to process, which can be useful for certain types of code-switching or to encourage the model to learn more holistic representations.
+    """
+    def __init__(self, config: dict):
+        self.name = config.get("name", "uniform_match_seperators")
+        self.idx = config.get("idx", None)
+        assert self.idx is not None and self.idx in [0,1], "to match seperators idx must be 0 or 1"
+        print(f"Initialized {self.name} augmentation with for idx: {self.idx}")
+
+    def __call__(self, text: dict, dataset_name: str) -> dict:
+        org_sep = text[self.idx]["word_sep_idx"] if self.idx is not None else text["word_sep_idx"]
+        num_parts = len(text[1-self.idx]["word_sep_idx"])
+        sep = []
+        if num_parts == 0:
+            text[self.idx]["word_sep_idx"] = sep
+            return text
+        if num_parts > len(org_sep):
+            dup_sep = text[1-self.idx]["word_sep_idx"] if self.idx is not None else text["word_sep_idx"]
+            for i in range(len(dup_sep) // len(org_sep) - 1, len(dup_sep)-1, len(dup_sep) // len(org_sep)):
+                sep.append(dup_sep[i])
+                if len(sep) == len(org_sep) -1:
+                    break
+            sep.append(dup_sep[-1])
+            assert len(sep) == len(org_sep), f"output num seperators should be same as other entry. num_parts: {num_parts}, len(sep): {len(sep)}"
+            text[1-self.idx]["word_sep_idx"] = sep
+            return text
+        if num_parts == len(org_sep):
+            return text
+        
+        for i in range(len(org_sep) // num_parts - 1, len(org_sep)-1, len(org_sep) // num_parts):
+            sep.append(org_sep[i])
+            if len(sep) == num_parts -1:
+                break
+        sep.append(org_sep[-1])
+        assert len(sep) == num_parts, f"output num seperators should be same as other entry. num_parts: {num_parts}, len(sep): {len(sep)}"
+        text[self.idx]["word_sep_idx"] = sep
+        return text
 
 AUGMENTATIONS_REGISTRY = {
     "wordwise_codeswitching": WordwiseCodeSwitching,
@@ -394,4 +443,7 @@ AUGMENTATIONS_REGISTRY = {
     "document_translation": DocumentTranslation,
     "text_duplication": TextDuplication,
     "wordwise_unigram_codeswitching": WordwiseUnigramCodeSwitching,
+    "add_prefix": AddPrefix,
+    "merge_seperators": mergeSeperators,
+    "uniform_match_seperators": uniformMatchSeperators,
 }

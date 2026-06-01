@@ -1,0 +1,1360 @@
+{
+    "film_director": [
+        "founding_year",
+        "primary_genre",
+        "notable_award",
+        "career_span",
+        "native_language"
+    ],
+    "movie_camera": [
+        "sensor_type",
+        "max_resolution",
+        "shutter_angle",
+        "lens_mount",
+        "power_source"
+    ],
+    "film_festival": [
+        "founding_year",
+        "host_city",
+        "main_venue",
+        "festival_duration",
+        "entry_fee"
+    ],
+    "screenwriter": [
+        "writing_style",
+        "typical_theme",
+        "breakthrough_work",
+        "working_method",
+        "industry_influence"
+    ],
+    "sound_stage": [
+        "floor_area",
+        "ceiling_height",
+        "acoustic_treatment",
+        "lighting_system",
+        "backlot_access"
+    ],
+    "quantum_particle": [
+        "spin_axis",
+        "magnetic_moment",
+        "charge_sign",
+        "lepton_type",
+        "interaction_force"
+    ],
+    "particle_accelerator": [
+        "beam_energy",
+        "magnet_type",
+        "cooling_system",
+        "vacuum_level",
+        "operating_year"
+    ],
+    "quantum_computer": [
+        "qubit_topology",
+        "error_correction",
+        "gate_operation",
+        "control_system",
+        "cooling_method"
+    ],
+    "wave_function": [
+        "probability_density",
+        "phase_shift",
+        "amplitude_modulation",
+        "frequency_spectrum",
+        "symmetry_property"
+    ],
+    "schrodinger_equation": [
+        "potential_energy",
+        "kinetic_energy",
+        "time_dependence",
+        "boundary_condition",
+        "solution_method"
+    ],
+    "weather_station": [
+        "elevation",
+        "observation_period",
+        "sensor_type",
+        "data_transmission_method",
+        "power_source"
+    ],
+    "tornado_outbreak": [
+        "intensity_scale",
+        "damage_path",
+        "wind_speed",
+        "formation_year",
+        "affected_region"
+    ],
+    "hurricane_season": [
+        "start_year",
+        "end_year",
+        "storm_count",
+        "peak_month",
+        "average_storm_intensity"
+    ],
+    "meteorological_radar": [
+        "frequency_band",
+        "antenna_type",
+        "beam_width",
+        "pulse_duration",
+        "doppler_capability"
+    ],
+    "blizzard_warning": [
+        "snowfall_rate",
+        "visibility_reduction",
+        "wind_chill_factor",
+        "warning_issuance_time",
+        "affected_population"
+    ],
+    "subatomic_particle": [
+        "charge_sign",
+        "spin_value",
+        "decay_mode",
+        "interaction_type",
+        "discovery_year"
+    ],
+    "mechanical_oscillator": [
+        "resonant_frequency",
+        "damping_ratio",
+        "drive_force",
+        "amplitude_range",
+        "stability_condition"
+    ],
+    "quantum_field": [
+        "field_strength",
+        "symmetry_group",
+        "propagation_speed",
+        "interaction_term",
+        "theoretical_model"
+    ],
+    "high_energy_collision": [
+        "center_of_mass",
+        "collision_energy",
+        "particle_multiplicity",
+        "event_rate",
+        "detector_type"
+    ],
+    "textile_mill": [
+        "founding_year",
+        "primary_product",
+        "production_volume",
+        "equipment_type",
+        "energy_source"
+    ],
+    "garment_factory": [
+        "production_capacity",
+        "target_market",
+        "labour_force",
+        "quality_control_process",
+        "supply_chain"
+    ],
+    "sewing_machine": [
+        "stitch_type",
+        "thread_usage",
+        "maximum_speed",
+        "tension_control",
+        "maintenance_schedule"
+    ],
+    "yarn_supplier": [
+        "fibre_type",
+        "yarn_thickness",
+        "colour_palette",
+        "delivery_lead_time",
+        "certification_standard"
+    ],
+    "apparel_designer": [
+        "design_specialty",
+        "inspiration_source",
+        "sketching_tool",
+        "prototyping_process",
+        "fashion_influence"
+    ],
+    "car_manufacturer": [
+        "founding_year",
+        "headquarters_country",
+        "production_volume",
+        "research_budget",
+        "quality_rating"
+    ],
+    "car_dealership": [
+        "sales_floor_area",
+        "service_department_size",
+        "vehicle_inventory",
+        "customer_satisfaction",
+        "warranty_options"
+    ],
+    "automotive_engine": [
+        "horsepower_output",
+        "fuel_efficiency",
+        "emission_standard",
+        "cylinder_count",
+        "displacement_volume"
+    ],
+    "vehicle_inspector": [
+        "certification_level",
+        "inspection_specialty",
+        "toolkit_equipment",
+        "experience_level",
+        "evaluation_method"
+    ],
+    "car_accessory_store": [
+        "product_assortment",
+        "price_range",
+        "target_audience",
+        "marketing_strategy",
+        "customer_retention"
+    ],
+    "literary_magazine": [
+        "founding_year",
+        "primary_language",
+        "publication_frequency",
+        "editor_in_chief",
+        "target_audience"
+    ],
+    "book_publisher": [
+        "founding_year",
+        "headquarters_country",
+        "notable_authors",
+        "imprint_style",
+        "distribution_channel"
+    ],
+    "literary_festival": [
+        "founding_year",
+        "host_city",
+        "festival_duration",
+        "attendee_capacity",
+        "keynote_speaker"
+    ],
+    "book_review_website": [
+        "launch_year",
+        "review_style",
+        "target_genres",
+        "editorial_team",
+        "rating_system"
+    ],
+    "academic_press": [
+        "founding_year",
+        "university_affiliation",
+        "publication_focus",
+        "peer_review_process",
+        "distribution_network"
+    ],
+    "forest_ranger": [
+        "employment_year",
+        "primary_specialty",
+        "equipment_budget",
+        "territory_assignment",
+        "emergency_response_plan"
+    ],
+    "logging_equipment": [
+        "manufacturing_year",
+        "operating_cost",
+        "fuel_efficiency",
+        "maintenance_schedule",
+        "operator_training_requirement"
+    ],
+    "tree_species": [
+        "growth_rate",
+        "maturity_age",
+        "timber_value",
+        "target_habitat",
+        "disease_resistance"
+    ],
+    "sawmill_facility": [
+        "production_capacity",
+        "raw_material_source",
+        "waste_management_system",
+        "quality_control_process",
+        "energy_consumption"
+    ],
+    "wildland_firefighter": [
+        "training_level",
+        "equipment_allocation",
+        "fire_behavior_specialty",
+        "team_assignment",
+        "emergency_contact_info"
+    ],
+    "volcanic_cone": [
+        "eruption_frequency",
+        "lava_composition",
+        "crater_depth",
+        "slope_angle",
+        "formation_year"
+    ],
+    "mineral_deposit": [
+        "geological_formation",
+        "mineral_composition",
+        "extraction_process",
+        "economic_value",
+        "environmental_impact"
+    ],
+    "earthquake_fault": [
+        "slip_rate",
+        "rupture_length",
+        "seismic_hazard",
+        "displacement_type",
+        "activity_level"
+    ],
+    "glacier_terminus": [
+        "calving_rate",
+        "ice_thickness",
+        "retreat_rate",
+        "water_level",
+        "sediment_load"
+    ],
+    "hydrothermal_vent": [
+        "fluid_temperature",
+        "chemical_composition",
+        "biological_productivity",
+        "vent_height",
+        "discharge_rate"
+    ],
+    "recycling_facility": [
+        "processing_capacity",
+        "primary_material",
+        "operation_hour",
+        "waste_sorting_method",
+        "founding_year"
+    ],
+    "garbage_truck": [
+        "compaction_ratio",
+        "fuel_type",
+        "lifting_mechanism",
+        "collection_frequency",
+        "maintenance_schedule"
+    ],
+    "landfill_site": [
+        "leachate_treatment",
+        "gas_collection_system",
+        "soil_cover_material",
+        "decomposition_rate",
+        "closure_plan"
+    ],
+    "waste_management_company": [
+        "service_area",
+        "employee_count",
+        "equipment_fleet",
+        "customer_base",
+        "certification_level"
+    ],
+    "composting_plant": [
+        "feedstock_source",
+        "aeration_system",
+        "temperature_control",
+        "moisture_level",
+        "carbon_nitrogen_ratio"
+    ],
+    "seismic_station": [
+        "installation_year",
+        "sensor_type",
+        "data_transmission_method",
+        "power_source",
+        "environmental_setting"
+    ],
+    "earthquake_epicenter": [
+        "focal_depth",
+        "magnitude_scale",
+        "impact_zone",
+        "geological_formation",
+        "tsunami_potential"
+    ],
+    "fault_line": [
+        "length_extent",
+        "slip_rate",
+        "displacement_type",
+        "geological_age",
+        "seismic_activity_level"
+    ],
+    "seismograph_instrument": [
+        "sensitivity_range",
+        "frequency_response",
+        "damping_system",
+        "sensor_material",
+        "calibration_procedure"
+    ],
+    "earthquake_tsunami": [
+        "wave_height",
+        "inundation_distance",
+        "warning_time",
+        "damage_assessment",
+        "evacuation_route"
+    ],
+    "food_manufacturer": [
+        "founding_year",
+        "primary_product",
+        "production_volume",
+        "quality_control_process",
+        "research_budget"
+    ],
+    "beverage_bottling_plant": [
+        "bottling_speed",
+        "filling_machine_type",
+        "package_type",
+        "sanitation_protocol",
+        "water_source"
+    ],
+    "restaurant_chain": [
+        "cuisine_type",
+        "menu_item_count",
+        "average_price_point",
+        "service_style",
+        "customer_demographic"
+    ],
+    "specialty_food_store": [
+        "product_specialty",
+        "shelf_life_management",
+        "supplier_network",
+        "customer_loyalty_program",
+        "store_layout"
+    ],
+    "food_distribution_center": [
+        "warehouse_size",
+        "inventory_management_system",
+        "transportation_fleet",
+        "order_fulfillment_rate",
+        "cold_storage_capacity"
+    ],
+    "chemical_compound": [
+        "molecular_formula",
+        "boiling_point",
+        "chemical_structure",
+        "synthesis_method",
+        "common_application"
+    ],
+    "inorganic_material": [
+        "chemical_composition",
+        "crystal_structure",
+        "thermal_conductivity",
+        "electrical_resistivity",
+        "industrial_use"
+    ],
+    "catalytic_reaction": [
+        "reaction_mechanism",
+        "catalyst_type",
+        "activation_energy",
+        "reaction_rate",
+        "product_yield"
+    ],
+    "laboratory_equipment": [
+        "equipment_type",
+        "operating_principle",
+        "precision_level",
+        "maintenance_requirement",
+        "safety_feature"
+    ],
+    "pharmaceutical_factory": [
+        "production_volume",
+        "founding_year",
+        "primary_product",
+        "quality_control_process",
+        "equipment_supplier"
+    ],
+    "drug_compounder": [
+        "active_ingredient",
+        "dosage_form",
+        "stability_profile",
+        "toxicity_level",
+        "synthesis_method"
+    ],
+    "manufacturing_equipment": [
+        "operating_temperature",
+        "maintenance_schedule",
+        "power_consumption",
+        "material_compatibility",
+        "calibration_procedure"
+    ],
+    "quality_control_laboratory": [
+        "testing_protocol",
+        "instrumentation_type",
+        "sample_handling_procedure",
+        "data_analysis_software",
+        "accreditation_status"
+    ],
+    "pharmaceutical_package": [
+        "packaging_material",
+        "labeling_requirements",
+        "storage_conditions",
+        "shelf_life",
+        "tamper_evidence_feature"
+    ],
+    "polymer_compound": [
+        "molecular_formula",
+        "crystalline_structure",
+        "thermal_stability",
+        "chemical_resistance",
+        "degradation_rate"
+    ],
+    "organic_reaction": [
+        "reaction_mechanism",
+        "catalyst_required",
+        "optimal_temperature",
+        "reaction_yield",
+        "byproduct_formation"
+    ],
+    "chemical_synthesizer": [
+        "synthesis_method",
+        "reactant_handling",
+        "product_purification",
+        "equipment_material",
+        "operating_pressure"
+    ],
+    "polymer_fiber": [
+        "fiber_diameter",
+        "tensile_strength",
+        "elastic_modulus",
+        "moisture_absorption",
+        "thermal_conductivity"
+    ],
+    "molecular_spectrometer": [
+        "spectral_range",
+        "resolution_limit",
+        "sample_preparation",
+        "detection_sensitivity",
+        "data_acquisition_rate"
+    ],
+    "construction_crane": [
+        "maximum_lifting_load",
+        "boom_length",
+        "engine_power",
+        "operating_height",
+        "stabilizer_type"
+    ],
+    "heavy_duty_excavator": [
+        "digging_depth",
+        "bucket_capacity",
+        "track_type",
+        "engine_displacement",
+        "hydraulic_pressure"
+    ],
+    "cement_mixer_truck": [
+        "mixing_drum_volume",
+        "engine_horsepower",
+        "transmission_type",
+        "drum_rotation_speed",
+        "chassis_material"
+    ],
+    "road_roller_compactor": [
+        "compaction_force",
+        "drum_diameter",
+        "vibration_frequency",
+        "engine_torque",
+        "water_tank_capacity"
+    ],
+    "building_demolition_robot": [
+        "demolition_force",
+        "arm_reach",
+        "hydraulic_flow_rate",
+        "debris_crushing_capacity",
+        "operator_protection_type"
+    ],
+    "algorithm_designer": [
+        "primary_language",
+        "founding_year",
+        "research_focus",
+        "target_audience",
+        "development_tool"
+    ],
+    "computer_network": [
+        "network_topology",
+        "bandwidth_speed",
+        "primary_protocol",
+        "security_measure",
+        "connection_type"
+    ],
+    "database_system": [
+        "data_model",
+        "query_language",
+        "storage_type",
+        "access_control",
+        "scalability_level"
+    ],
+    "programming_language": [
+        "typing_system",
+        "execution_model",
+        "primary_use",
+        "development_year",
+        "syntax_style"
+    ],
+    "software_framework": [
+        "application_domain",
+        "architecture_style",
+        "licensing_model",
+        "compatibility_level",
+        "community_support"
+    ],
+    "mathematical_function": [
+        "domain_type",
+        "range_type",
+        "symmetry_type",
+        "growth_rate",
+        "periodicity"
+    ],
+    "calculus_textbook": [
+        "publication_year",
+        "author_background",
+        "target_audience",
+        "content_depth",
+        "notation_style"
+    ],
+    "geometric_shape": [
+        "number_of_sides",
+        "angle_measure",
+        "surface_texture",
+        "dimensionality",
+        "orientation"
+    ],
+    "algebraic_equation": [
+        "degree_level",
+        "variable_type",
+        "coefficient_value",
+        "solution_method",
+        "application_area"
+    ],
+    "mathematical_model": [
+        "problem_domain",
+        "assumption_set",
+        "prediction_accuracy",
+        "validation_method",
+        "interpretation_key"
+    ],
+    "operating_system": [
+        "kernel_type",
+        "file_system",
+        "memory_management",
+        "process_scheduling",
+        "security_protocol"
+    ],
+    "computer_terminal": [
+        "display_resolution",
+        "keyboard_layout",
+        "pointer_device",
+        "audio_output",
+        "power_source"
+    ],
+    "software_application": [
+        "programming_language",
+        "user_interface",
+        "data_storage",
+        "network_protocol",
+        "compatibility_mode"
+    ],
+    "file_system_driver": [
+        "disk_format",
+        "data_transfer_rate",
+        "cache_size",
+        "error_correction",
+        "mount_point"
+    ],
+    "system_library": [
+        "programming_interface",
+        "functionality_set",
+        "dependency_list",
+        "version_number",
+        "licensing_terms"
+    ],
+    "database_administrator": [
+        "primary_skill",
+        "experience_level",
+        "certification_type",
+        "industry_focus",
+        "employment_status"
+    ],
+    "database_management_system": [
+        "storage_type",
+        "query_language",
+        "data_model",
+        "scalability_level",
+        "security_protocol"
+    ],
+    "data_warehouse": [
+        "data_source",
+        "storage_capacity",
+        "query_performance",
+        "data_retention",
+        "access_control"
+    ],
+    "database_query_optimizer": [
+        "optimization_technique",
+        "query_analysis",
+        "indexing_strategy",
+        "cache_management",
+        "performance_metric"
+    ],
+    "database_recovery_tool": [
+        "recovery_mode",
+        "data_loss_prevention",
+        "backup_frequency",
+        "restore_time",
+        "compatibility_level"
+    ],
+    "statistician": [
+        "research_focus",
+        "academic_degree",
+        "publication_count",
+        "field_of_study",
+        "teaching_experience"
+    ],
+    "probability_distribution": [
+        "parameter_type",
+        "probability_density",
+        "expected_value",
+        "variance_type",
+        "standard_deviation"
+    ],
+    "regression_model": [
+        "dependent_variable",
+        "independent_variable",
+        "coefficient_value",
+        "goodness_of_fit",
+        "residual_type"
+    ],
+    "random_variable": [
+        "probability_space",
+        "sample_space",
+        "expected_value",
+        "variance_value",
+        "standard_deviation"
+    ],
+    "hypothesis_test": [
+        "null_hypothesis",
+        "alternative_hypothesis",
+        "test_statistic",
+        "p_value",
+        "confidence_level"
+    ],
+    "urban_population": [
+        "median_age",
+        "poverty_rate",
+        "education_level",
+        "unemployment_rate",
+        "population_density"
+    ],
+    "social_movement": [
+        "founding_year",
+        "primary_goal",
+        "key_leader",
+        "target_audience",
+        "main_tactic"
+    ],
+    "census_bureau": [
+        "founding_year",
+        "headquarters_city",
+        "budget_allocation",
+        "staff_size",
+        "data_collection_method"
+    ],
+    "community_center": [
+        "service_area",
+        "program_offerings",
+        "staff_size",
+        "annual_budget",
+        "funding_source"
+    ],
+    "demographic_survey": [
+        "sample_size",
+        "response_rate",
+        "data_collection_method",
+        "survey_frequency",
+        "primary_focus"
+    ],
+    "teddy_bear": [
+        "primary_color",
+        "filling_material",
+        "eye_type",
+        "nose_shape",
+        "limb_joint_type"
+    ],
+    "swing_set": [
+        "seat_material",
+        "frame_shape",
+        "rope_type",
+        "height_adjustment",
+        "weight_limit"
+    ],
+    "puzzle_piece": [
+        "shape_type",
+        "edge_texture",
+        "color_pattern",
+        "interlock_type",
+        "thickness_level"
+    ],
+    "kite_design": [
+        "wing_shape",
+        "tail_length",
+        "frame_material",
+        "sail_color",
+        "bridle_type"
+    ],
+    "building_block": [
+        "edge_type",
+        "surface_texture",
+        "connection_type",
+        "corner_shape",
+        "stacking_limit"
+    ],
+    "machine_learning_model": [
+        "training_data",
+        "prediction_type",
+        "accuracy_rate",
+        "computational_complexity",
+        "development_year"
+    ],
+    "artificial_intelligence_system": [
+        "primary_function",
+        "system_architecture",
+        "processing_speed",
+        "memory_requirement",
+        "implementation_year"
+    ],
+    "natural_language_processor": [
+        "language_support",
+        "text_analysis_type",
+        "sentiment_analysis_accuracy",
+        "translation_capability",
+        "release_year"
+    ],
+    "deep_learning_framework": [
+        "programming_language",
+        "neural_network_type",
+        "optimization_algorithm",
+        "computational_efficiency",
+        "version_release_year"
+    ],
+    "robotic_autonomy_system": [
+        "sensor_type",
+        "navigation_method",
+        "decision_making_algorithm",
+        "environmental_adaptability",
+        "development_year"
+    ],
+    "user_interface_designer": [
+        "primary_tool",
+        "favorite_framework",
+        "target_audience",
+        "design_style",
+        "experience_level"
+    ],
+    "graphical_user_interface": [
+        "primary_color",
+        "layout_pattern",
+        "font_style",
+        "navigation_mode",
+        "feedback_mechanism"
+    ],
+    "human_computer_interaction_specialist": [
+        "research_area",
+        "methodology",
+        "evaluation_technique",
+        "user_model",
+        "usability_metric"
+    ],
+    "web_application_framework": [
+        "programming_language",
+        "development_paradigm",
+        "template_engine",
+        "routing_mechanism",
+        "security_feature"
+    ],
+    "user_experience_researcher": [
+        "study_method",
+        "data_collection_technique",
+        "analysis_tool",
+        "participant_recruitment_strategy",
+        "research_question"
+    ],
+    "smart_thermostat": [
+        "learning_mode",
+        "temperature_range",
+        "humidity_sensor",
+        "power_source",
+        "compatibility_protocol"
+    ],
+    "wireless_router": [
+        "frequency_band",
+        "signal_strength",
+        "network_standard",
+        "antenna_type",
+        "security_protocol"
+    ],
+    "smart_light_bulb": [
+        "color_temperature",
+        "lumen_output",
+        "dimming_capability",
+        "power_consumption",
+        "voltage_requirement"
+    ],
+    "home_security_camera": [
+        "video_resolution",
+        "field_of_view",
+        "night_vision_capability",
+        "motion_detection_sensitivity",
+        "audio_recording_quality"
+    ],
+    "smart_speaker": [
+        "voice_recognition_accuracy",
+        "audio_output_quality",
+        "microphone_sensitivity",
+        "compatibility_platform",
+        "wake_word_phrase"
+    ],
+    "golf_ball": [
+        "primary_material",
+        "surface_pattern",
+        "core_type",
+        "dimple_count",
+        "aerodynamic_rating"
+    ],
+    "bicycle_frame": [
+        "primary_material",
+        "frame_style",
+        "wheel_size",
+        "brake_type",
+        "suspension_type"
+    ],
+    "football_helmet": [
+        "shell_material",
+        "padding_type",
+        "face_mask_style",
+        "chin_strap_type",
+        "certification_standard"
+    ],
+    "skateboard_deck": [
+        "wood_type",
+        "concave_style",
+        "truck_hole_pattern",
+        "graphic_design",
+        "wheel_well_depth"
+    ],
+    "tennis_racket": [
+        "string_pattern",
+        "grip_size",
+        "head_size",
+        "frame_material",
+        "string_tension"
+    ],
+    "kitchen_stove": [
+        "burner_count",
+        "fuel_type",
+        "ignition_method",
+        "surface_material",
+        "oven_capacity"
+    ],
+    "cookbook_author": [
+        "writing_style",
+        "specialty_cuisine",
+        "publication_year",
+        "awards_won",
+        "biographical_sketch"
+    ],
+    "stand_mixer": [
+        "motor_power",
+        "bowl_size",
+        "speed_setting",
+        "attachment_type",
+        "design_style"
+    ],
+    "chef_knife": [
+        "blade_length",
+        "handle_material",
+        "edge_type",
+        "sharpness_angle",
+        "balance_point"
+    ],
+    "slow_cooker": [
+        "cooking_temperature",
+        "timer_setting",
+        "inner_pot_material",
+        "heating_element",
+        "lid_type"
+    ],
+    "archaeological_site": [
+        "excavation_year",
+        "historical_period",
+        "artefact_type",
+        "geological_setting",
+        "conservation_status"
+    ],
+    "ancient_monument": [
+        "construction_year",
+        "architectural_style",
+        "original_purpose",
+        "preservation_method",
+        "tourist_attraction"
+    ],
+    "fossil_specimen": [
+        "discovery_year",
+        "species_type",
+        "geological_age",
+        "preservation_condition",
+        "museum_collection"
+    ],
+    "historical_artifact": [
+        "creation_year",
+        "material_type",
+        "cultural_significance",
+        "restoration_technique",
+        "museum_exhibit"
+    ],
+    "underwater_ruin": [
+        "submersion_year",
+        "original_function",
+        "marine_environment",
+        "exploration_method",
+        "cultural_importance"
+    ],
+    "indigenous_community": [
+        "traditional_lifestyle",
+        "native_language",
+        "cultural_practice",
+        "spiritual_belief",
+        "ancestral_territory"
+    ],
+    "ethnic_festival": [
+        "celebration_purpose",
+        "traditional_costume",
+        "cultural_performance",
+        "local_cuisine",
+        "founding_year"
+    ],
+    "anthropological_museum": [
+        "collection_focus",
+        "exhibit_type",
+        "cultural_significance",
+        "visitor_demographic",
+        "founding_year"
+    ],
+    "linguistic_family": [
+        "language_branch",
+        "spoken_region",
+        "grammatical_structure",
+        "vocabulary_size",
+        "extinction_risk"
+    ],
+    "cycling_helmet": [
+        "certification_standard",
+        "visor_type",
+        "ventilation_system",
+        "chin_strap_type",
+        "reflection_material"
+    ],
+    "road_bicycle": [
+        "gear_system",
+        "brake_lever_type",
+        "seat_post_type",
+        "handlebar_style",
+        "tire_width"
+    ],
+    "mountain_bicycle": [
+        "suspension_travel",
+        "fork_type",
+        "wheel_diameter",
+        "gear_ratio",
+        "pedal_type"
+    ],
+    "bicycle_shop": [
+        "founding_year",
+        "service_offering",
+        "rental_fleet",
+        "workshop_equipment",
+        "staff_certification"
+    ],
+    "mythical_creature": [
+        "primary_habitat",
+        "legendary_powers",
+        "typical_preys",
+        "defense_mechanisms",
+        "cultural_significance"
+    ],
+    "folklore_story": [
+        "moral_lesson",
+        "main_character",
+        "story_setting",
+        "plot_twist",
+        "teaching_theme"
+    ],
+    "supernatural_being": [
+        "spiritual_domain",
+        "magical_abilities",
+        "worship_rituals",
+        "symbolic_representation",
+        "associated_elements"
+    ],
+    "legendary_hero": [
+        "heroic_feats",
+        "magical_artifacts",
+        "personal_traits",
+        "quest_objective",
+        "historical_influence"
+    ],
+    "cultural_festival": [
+        "celebration_purpose",
+        "traditional_food",
+        "ritual_practices",
+        "historical_origin",
+        "cultural_importance"
+    ],
+    "baking_oven": [
+        "heating_element",
+        "temperature_range",
+        "insulation_type",
+        "door_material",
+        "ventilation_system"
+    ],
+    "cake_decorator": [
+        "primary_color",
+        "tip_style",
+        "frosting_type",
+        "piping_technique",
+        "design_specialty"
+    ],
+    "confectionery_store": [
+        "founding_year",
+        "product_line",
+        "storefront_style",
+        "display_case",
+        "customer_base"
+    ],
+    "pastry_recipe": [
+        "main_ingredient",
+        "cooking_method",
+        "serving_size",
+        "preparation_time",
+        "flavor_profile"
+    ],
+    "icing_machine": [
+        "motor_speed",
+        "tank_capacity",
+        "nozzle_type",
+        "cooling_system",
+        "maintenance_schedule"
+    ],
+    "fishing_rod": [
+        "primary_material",
+        "target_species",
+        "action_type",
+        "line_rating",
+        "guide_type"
+    ],
+    "hunting_rifle": [
+        "caliber_type",
+        "barrel_length",
+        "fire_mode",
+        "sight_type",
+        "stock_material"
+    ],
+    "tackle_box": [
+        "compartment_count",
+        "lure_capacity",
+        "material_type",
+        "lock_type",
+        "portability"
+    ],
+    "fishing_kayak": [
+        "hull_design",
+        "stability_type",
+        "seat_style",
+        "storage_capacity",
+        "paddle_type"
+    ],
+    "hunting_blind": [
+        "camouflage_pattern",
+        "window_count",
+        "door_type",
+        "roof_style",
+        "anchor_type"
+    ],
+    "treadmill_machine": [
+        "running_surface",
+        "motor_power",
+        "incline_range",
+        "heart_rate_monitor",
+        "exercise_programs"
+    ],
+    "free_weight_set": [
+        "material_type",
+        "weight_range",
+        "grip_style",
+        "storage_rack",
+        "coating_finish"
+    ],
+    "stationary_bicycle": [
+        "seat_adjustment",
+        "handlebar_style",
+        "resistance_levels",
+        "pedal_type",
+        "display_screen"
+    ],
+    "gym_mirror": [
+        "glass_type",
+        "frame_style",
+        "mounting_system",
+        "anti_fog_coating",
+        "edge_finish"
+    ],
+    "elliptical_trainer": [
+        "stride_length",
+        "resistance_system",
+        "arm_movement",
+        "footplate_style",
+        "workout_feedback"
+    ],
+    "water_bottle": [
+        "primary_material",
+        "mouth_size",
+        "handle_type",
+        "lid_style",
+        "insulation_type"
+    ],
+    "coffee_machine": [
+        "brewing_method",
+        "grind_setting",
+        "water_temperature",
+        "coffee_strength",
+        "frothing_capability"
+    ],
+    "juice_extractor": [
+        "extraction_method",
+        "juice_yield",
+        "pulp_ejection",
+        "speed_setting",
+        "noise_level"
+    ],
+    "sports_drink": [
+        "electrolyte_balance",
+        "carbohydrate_source",
+        "caffeine_content",
+        "sodium_level",
+        "calorie_count"
+    ],
+    "hydration_pack": [
+        "bladder_capacity",
+        "tube_insulation",
+        "bite_valve_type",
+        "shoulder_strap_style",
+        "pocket_configuration"
+    ],
+    "backpack_model": [
+        "primary_material",
+        "water_resistance",
+        "insulation_type",
+        "strap_style",
+        "pocket_configuration"
+    ],
+    "hiking_trail": [
+        "terrain_difficulty",
+        "elevation_gain",
+        "trail_surface",
+        "scenic_feature",
+        "wildlife_encounter"
+    ],
+    "camping_stove": [
+        "fuel_type",
+        "burner_count",
+        "ignition_method",
+        "wind_protection",
+        "cookware_compatibility"
+    ],
+    "sleeping_bag": [
+        "fill_material",
+        "temperature_rating",
+        "hood_style",
+        "zipper_type",
+        "compression_sack"
+    ],
+    "mountain_bike": [
+        "frame_material",
+        "gear_system",
+        "brake_type",
+        "suspension_style",
+        "tire_width"
+    ],
+    "passenger_car": [
+        "engine_type",
+        "transmission_style",
+        "fuel_efficiency",
+        "primary_color",
+        "seating_arrangement"
+    ],
+    "electric_vehicle": [
+        "battery_life",
+        "charging_time",
+        "electric_motor_type",
+        "regenerative_braking",
+        "zero_emission_status"
+    ],
+    "sports_car": [
+        "top_speed",
+        "acceleration_time",
+        "handling_mode",
+        "aerodynamic_design",
+        "exhaust_system"
+    ],
+    "mechanical_watch": [
+        "power_reserve",
+        "movement_type",
+        "dial_material",
+        "water_resistance",
+        "caliber"
+    ],
+    "watch_collection": [
+        "founding_year",
+        "target_audience",
+        "primary_style",
+        "average_price",
+        "brand_heritage"
+    ],
+    "horology_school": [
+        "curriculum_focus",
+        "program_duration",
+        "faculty_specialty",
+        "enrollment_capacity",
+        "graduation_rate"
+    ],
+    "watch_movement": [
+        "gear_train",
+        "balance_frequency",
+        "jewel_count",
+        "lubrication_type",
+        "adjustment_process"
+    ],
+    "luxury_watch_brand": [
+        "heritage_year",
+        "signature_style",
+        "target_market",
+        "average_price_point",
+        "distribution_channel"
+    ],
+    "motorcycle_manufacturer": [
+        "founding_year",
+        "primary_market",
+        "production_volume",
+        "research_budget",
+        "quality_rating"
+    ],
+    "off_road_vehicle": [
+        "engine_displacement",
+        "suspension_type",
+        "tire_size",
+        "ground_clearance",
+        "climbing_angle"
+    ],
+    "powersports_dealership": [
+        "sales_volume",
+        "service_area",
+        "employee_count",
+        "inventory_turnover",
+        "customer_satisfaction"
+    ],
+    "dirt_bike_rider": [
+        "competition_level",
+        "riding_style",
+        "favorite_terrain",
+        "bike_preference",
+        "safety_record"
+    ],
+    "snowmobile_model": [
+        "engine_power",
+        "track_length",
+        "skid_type",
+        "fuel_efficiency",
+        "cargo_capacity"
+    ]
+}

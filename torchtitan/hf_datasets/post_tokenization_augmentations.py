@@ -1,4 +1,8 @@
 import random
+from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
+from torchtitan.tools.logging import logger
+from multiprocessing import Value
+
 
 class StochasticTokenTagging:
     """
@@ -61,12 +65,22 @@ class StochasticWordTokenTagging:
     """
     def __init__(self, config: dict):
         self.name = config.get("name", "stochastic_word_token_tagging")
-        self.tag_prob = config.get("prob", 0.5)
+        self.tag_prob = config.get("prob", None)
+        self.prob_schedualer = config.get("prob_schedualer", None)
+        if self.prob_schedualer is not None:
+            assert self.tag_prob is None, "Cannot specify both a fixed tag_prob and a prob_schedualer. Please choose one."
+            if self.prob_schedualer["name"] not in SCHEDUALER_REGISTRY:
+                raise ValueError(f"Prob schedualer '{self.prob_schedualer['name']}' is not registered. Available: {list(SCHEDUALER_REGISTRY.keys())}")
+            self.prob_schedualer = SCHEDUALER_REGISTRY[self.prob_schedualer["name"]](**{k:v for k,v in config.get("prob_schedualer", {}).items() if k != "name"})
+            self.tag_prob = self.prob_schedualer(0)  # Initialize with the starting probability
+            logger.info(f"Initialized {self.name} with dynamic prob schedualer '{self.prob_schedualer.__class__.__name__}', starting at tag_prob={self.tag_prob}")
+        self.tag_prob = Value('d', self.tag_prob)  # For shared memory access if needed
+        assert self.tag_prob is not None, f"[{self.name}] config must include 'prob' or 'prob_schedualer'"
         self.idx = config.get("idx", None)
         self.vocab_size = config.get("vocab_size")
         self.special_tokens = set(config.get("special_tokens", []))
         self.symmetric = config.get("symmetric", False)  # If True, use 50% of the time a 1-p tagging to mirror
-        
+        self.tag_n = config.get("tag_n", 1)
         if self.vocab_size is None:
             raise ValueError(f"[{self.name}] config must include 'vocab_size'")
             
@@ -94,10 +108,16 @@ class StochasticWordTokenTagging:
             if token_str.startswith("Ġ") or token_str.startswith(" "):
                 self.boundary_token_ids.add(token_id)
                 
-        print(f"Initializing {self.name} with prob={self.tag_prob}. Cached {len(self.boundary_token_ids)} boundary tokens.")
+        logger.info(f"Initializing {self.name} with prob={self.tag_prob}. Cached {len(self.boundary_token_ids)} boundary tokens.")
+    
+    def step(self, global_step):
+        logger.info(f"************Stepping {self.name} augmentation at global step {global_step}...*********************")
+        if self.prob_schedualer is not None:
+            self.tag_prob.value = self.prob_schedualer(global_step)
+            logger.info(f"Updated tag_prob to {self.tag_prob.value} based on schedualer at step {global_step}")
 
     def __call__(self, tokens_in: dict|list[dict], dataset_name: str = None) -> list:
-        if self.tag_prob <= 0.0 or not tokens_in:
+        if self.tag_prob.value <= 0.0 or not tokens_in:
             return tokens_in
             
         if self.idx is not None:
@@ -106,12 +126,12 @@ class StochasticWordTokenTagging:
             tokens = tokens_in["tokens"]
 
 
-        tag_prob = self.tag_prob
+        tag_prob = self.tag_prob.value
         if self.symmetric:
             # If symmetric, we want to create a balanced tagging distribution.
             # So we randomly decide to flip the tagging direction for this sequence.
             if random.random() < 0.5:
-                tag_prob = 1.0 - self.tag_prob  # Flip the probability to tag the opposite set of words
+                tag_prob = 1.0 - self.tag_prob.value  # Flip the probability to tag the opposite set of words
         shifted_tokens = []
         tag_current_word = False  # Tracks if the current word is being shifted
         
@@ -127,7 +147,7 @@ class StochasticWordTokenTagging:
                 
             # Apply the shift based on the current state
             if tag_current_word:
-                shifted_tokens.append(token_id + self.vocab_size)
+                shifted_tokens.append(token_id%self.vocab_size + self.tag_n*self.vocab_size)
             else:
                 shifted_tokens.append(token_id)
 
@@ -163,60 +183,42 @@ class WordWiseContrastive:
             if token_str.startswith("Ġ") or token_str.startswith(" "):
                 self.boundary_token_ids.add(token_id)
 
-        print(f"Initializing WordWiseContrastive. Cached {len(self.boundary_token_ids)} boundary tokens.")
+        logger.info(f"Initializing WordWiseContrastive. Cached {len(self.boundary_token_ids)} boundary tokens.")
 
     def __call__(self, tokens_in: dict, initial_id: int) -> tuple[int, list]:
         mask = []
-        word_mask = tokens_in.get("word_mask", None)
-        word_ids = tokens_in.get("word_ids", None)
+        word_sep_idx = tokens_in.get("word_sep_idx", None)
+        assert word_sep_idx is not None, "WordWiseContrastive requires 'word_sep_idx' in the input dict to identify word boundaries."
+        encoding = tokens_in.get("encoding", None)
         
-        if word_ids is None:
-            raise ValueError("[WordWiseContrastive] 'word_ids' not found in tokens_in! Ensure your dataset pipeline extracts it.")
-        # We use a separate index to track our position in the augmented word_mask.
-        # This allows us to "pause" whenever we hit a BOS/EOS token in the sequence.
-        word_mask_idx = 0
-
-        for subword_idx, original_word_id in enumerate(word_ids):
-            
-            # 1. Handle Special Tokens (BOS/EOS)
-            # Hugging Face natively marks these as 'None' in the word_ids array.
-            if original_word_id is None:
-                if subword_idx == 0:
-                    # It's the BOS token. Assign it the base initial_id.
-                    mask.append(initial_id)
-                else:
-                    # It's the EOS token (or padding). Inherit the ID of the final word.
-                    mask.append(mask[-1])
-                continue
-
-            # 2. Handle Actual Words
-            if word_mask is not None:
-                # Use the pre-computed mask from your augmentation
-                mapped_id = word_mask[word_mask_idx] + initial_id + 1
-                word_mask_idx += 1
-            else:
-                # If no augmentation occurred, just use the pre-tokenizer's word index directly!
-                mapped_id = original_word_id + initial_id + 1
-                
-            mask.append(mapped_id)
+        if encoding is None:
+            raise ValueError("[WordWiseContrastive] 'encoding' not found in tokens_in! Ensure your dataset pipeline extracts it.")
+        cur_token = -1
+        for i, sep in enumerate(word_sep_idx):
+            sep_token = encoding.char_to_token(sep)
+            assert sep_token is not None, f"Encoding failed to map character index {sep} to a token. Check your tokenizer and encoding., {tokens_in['text'][sep]}"
+            mask += [i + initial_id + 1] * (sep_token - cur_token)
+            cur_token = sep_token
+        if self.tokenizer.bos_token is not None:
+            mask = [initial_id] + mask
+        if len(tokens_in["tokens"]) > len(mask):
+            mask += [len(word_sep_idx) + initial_id] * (len(tokens_in["tokens"]) - len(mask))
 
         # 3. Calculate 'n' (Total unique words added to the sequence)
         n = max(mask) - initial_id if mask else 0
 
         # 4. Bulletproof Asserts
+        assert len(tokens_in["text"]) == word_sep_idx[-1] + 1, f"Last word_sep_idx {word_sep_idx[-1]} does not align with text length {len(tokens_in['text'])}"
+        # assert encoding.char_to_token(len(tokens_in["text"])-1) + 1 == len(tokens_in["tokens"]) - 1, f"Encoding does not align with tokens: last char maps to token {encoding.char_to_token(len(tokens_in['text'])-1)}, expected {len(tokens_in['tokens']) - 1}"
         assert len(mask) == len(tokens_in["tokens"]), \
             f"Fatal alignment error: mask len {len(mask)} != tokens len {len(tokens_in['tokens'])}"
-            
-        if word_mask is not None:
-            assert word_mask_idx == len(word_mask), \
-                f"Did not consume the entire word_mask! Left over {len(word_mask) - word_mask_idx} items."
 
         return n, mask
     # def __call__(self, tokens_in: dict, initial_id: int) -> list:
     #     mask = []
     #     word_mask = tokens_in.get("word_mask", None)
     #     current_word_id = initial_id
-    #     print(f"****************{len(word_mask)} ____________ {sum(t in self.boundary_token_ids for t in tokens_in['tokens'])}****************")
+    #     logger.info(f"****************{len(word_mask)} ____________ {sum(t in self.boundary_token_ids for t in tokens_in['tokens'])}****************")
 
     #     for i, token_id in enumerate(tokens_in["tokens"]):
     #         # If we are at the very first token (index 0) OR we hit a space marker,
@@ -232,8 +234,33 @@ class WordWiseContrastive:
     #     assert current_word_id - initial_id == len(word_mask) if word_mask is not None else True, f"Expected {n} unique words, but got word_mask with {len(word_mask)} elements and max ID {max(word_mask)}"
     #     return n, mask
 
+class TokenPrefix:
+    """
+    add a prefix token to the beginning of the sequence
+    """
+    def __init__(self, config: dict):
+        self.name = config.get("name", "token_prefix")
+        self.prefix_token_id = config.get("prefix_token_id", None)
+        self.idx = config.get("idx", None)  # Optional: if you want to apply the prefix to a different list of tokens in the input dict
+        if self.prefix_token_id is None:
+            raise ValueError(f"[{self.name}] config must include 'prefix_token_id'")
+        logger.info(f"Initializing {self.name} augmentation with prefix_token_id={self.prefix_token_id}...")                
+
+    def __call__(self, tokens_in: dict|list[dict], dataset_name: str = None) -> list:            
+        if self.idx is not None:
+            tokens = tokens_in[self.idx]["tokens"]
+        else:
+            tokens = tokens_in["tokens"]
+        tokens = [self.prefix_token_id] + tokens
+        if self.idx is not None:
+            tokens_in[self.idx]["tokens"] = tokens
+            return tokens_in
+        tokens_in["tokens"] = tokens
+        return tokens_in
+
 
 POST_TOKEN_AUGMENTATIONS_REGISTRY = {
     "stochastic_token_tagging": StochasticTokenTagging,
     "stochastic_word_tagging": StochasticWordTokenTagging,
+    "token_prefix": TokenPrefix,
 }

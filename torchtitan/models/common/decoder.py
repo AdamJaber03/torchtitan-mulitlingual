@@ -27,7 +27,6 @@ from torchtitan.protocols.model import BaseModel
 from torchtitan.protocols.module import Module
 from torchtitan.tools.logging import logger
 
-CONTRASTIVE_TARGET_LAYER = 4
 
 # TODO: we can unify the TransformerBlock impl across all models when
 # there is no special logic for each model, including
@@ -100,6 +99,7 @@ class Decoder(BaseModel):
                 nn.GELU(),
                 nn.Linear(proj_dim, proj_dim)
             )
+            self.contrastive_target_layer = getattr(config, "contrastive_target_layer", 4)
         else:
             self.contrastive_proj = None
 
@@ -162,7 +162,7 @@ class Decoder(BaseModel):
 
         contrastive_vectors = None 
         valid_seq_mask = None
-        if self.enable_contrastive and contrastive_masks is not None and CONTRASTIVE_TARGET_LAYER == -1:
+        if self.enable_contrastive and contrastive_masks is not None and self.contrastive_target_layer == -1:
             h_expanded = h.unsqueeze(1) # [B, 1, SeqLen, Dim]
             float_mask = contrastive_masks.unsqueeze(-1).to(h.dtype) # [B, MaxSeqs, SeqLen, 1]
             bool_mask = contrastive_masks.unsqueeze(-1).bool()   # [B, MaxSeqs, SeqLen, 1]
@@ -179,7 +179,7 @@ class Decoder(BaseModel):
             h = layer(h, self.freqs_cis, attention_masks, positions)
             
             if self.enable_contrastive and contrastive_masks is not None:
-                if int(layer_id_str) == CONTRASTIVE_TARGET_LAYER:
+                if int(layer_id_str) == self.contrastive_target_layer:
                     
                     # 1. EXPAND SHAPES FOR BATCHED POOLING
                     h_expanded = h.unsqueeze(1) # [B, 1, SeqLen, Dim]

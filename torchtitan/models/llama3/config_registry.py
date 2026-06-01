@@ -651,7 +651,8 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
     file_order_shuffler.shuffle(file_order)
     ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
     en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    # tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    tr2en_1to1map_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
     # en_files = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in range(2080)] + [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in range(2080)]
     # en_files = [en_files[i] for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
@@ -737,113 +738,24 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
                 # },
                 #en1_en2_stage1
                 {
-                    "steps": 2000,
+                    "steps": 4000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "augmentations": [
-                                {
-                                    "name": "wordwise_unigram_codeswitching",
-                                    # "prob": 0.8,  # 50% of the text will undergo wordwise code-switching
-                                    "prob_schedualer": {
-                                        "name": "linear",
-                                        "start_val": 1.0,
-                                        "end_val": 0.0,
-                                        "duration_steps": 2000
-                                    },
-                                    "dict_paths": {
-                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json",
-                                    }
-                                }
-                            ],
-
-                            # "post_token_augmentations": [
-                            #     {
-                            #         # "name": "stochastic_token_tagging",
-                            #         "name": "stochastic_word_tagging",
-                            #         "prob": 0.5,
-                            #         "vocab_size": 65536,
-                            #     }
-                            # ],
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob for prob in ar_probs],
                         },
-                        # {
-                        #     "name": "fineweb-edu-ar-tr2en",
-                        #     "weight": 0.2,
-                        #     "start_idx": 3_000_000,
-                        #     "injection_paths": tr2en_files,
-                        #     "injection_probs": [prob *5/2 for prob in en_probs],
-                        #     "augmentations": [
-                        #         # {
-                        #         #     "name": "wordwise_unigram_codeswitching",
-                        #         #     "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
-                        #         #     "dict_paths": {
-                        #         #         "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
-                        #         #     }
-                        #         # }
-                        #     ],
-                        # },
                         {
-                            "name": "fineweb-edu-ar-tr2en",
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
                             "weight": 0.5,
-                            "start_idx": 1_800_000,
-                            # "injection_paths": ar_files,
-                            # "injection_probs": [prob *5/2 for prob in ar_probs],
-                            # "post_token_augmentations": [
-                            #     {
-                            #         # "name": "stochastic_token_tagging",
-                            #         "name": "stochastic_word_tagging",
-                            #         "prob": 1.0,
-                            #         "vocab_size": 65536,
-                            #     }
-                            # ],
-                        }
+                            "start_idx": 3_200_000,
+                            "injection_paths": tr2en_1to1map_files,
+                            "injection_probs": [prob for prob in en_probs],
 
+                        },
                     ],
                 },
-                #en1_en2_stage2
-                {
-                    "steps": 2000,
-                    "sources": [
-                        {
-                            "name": "fineweb-edu-ar-tr2en",
-                            "weight": 0.5,
-                            "start_idx": 3_600_000,
-                            "injection_paths": tr2en_files,
-                            "injection_probs": [en_prob*2 for en_prob in en_probs],
-                            # "augmentations": [
-                            #     {
-                            #         "name": "wordwise_unigram_codeswitching",
-                            #         "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
-                            #         "dict_paths": {
-                            #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
-                            #         }
-                            #     }
-                            # ],
-
-                        },
-                        {
-                            "name": "fineweb-edu-ar-ar",
-                            "weight": 0.5,
-                            "start_idx": 4_800_000,
-                            "injection_paths": ar_files,
-                            "injection_probs": [ar_prob*2 for ar_prob in ar_probs],
-                            # "augmentations": [
-                            #     {
-                            #         "name": "wordwise_unigram_codeswitching",
-                            #         "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
-                            #         "dict_paths": {
-                            #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
-                            #         }
-                            #     }
-                            # ],
-
-                            # "unique_rates": unique_rates
-                        },
-                    ],
-                }
-
-
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
@@ -882,7 +794,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_84_ar_tr2en_1xvocab_stage1_2k_0.5tr2en_0.5wordwise_p1-0_linear_no_injection_stage2_2k_clean_injection_0_20_100_1000_20800entities_rerun",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_137_ar_tr2en_stage1_4k_0.5ar_0.5tr2en_injection_0_20_100_1000_20800entities_fix",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -917,18 +829,9 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
                             "steps": 300,
                             "sources": [
                                 {
-                                    "name": "fineweb-edu-ar-tr2en",
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
-                                    # "augmentations": [
-                                    #     {
-                                    #         "name": "wordwise_unigram_codeswitching",
-                                    #         "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
-                                    #         "dict_paths": {
-                                    #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
-                                    #         }
-                                    #     }
-                                    # ],
                                 },
                             ],
                         }
@@ -971,17 +874,27 @@ def smollm2_360m_flex_curriculum1() -> Trainer.Config:
                             "start_idx": 3_300_000,
                             "injection_paths": en_files,
                             "injection_probs": en_probs,
+                            "augmentations": [
+                                {
+                                    "name": "add_prefix",
+                                    "prefix": "[EN]",
+                                }
+                            ],
                         },
                         {
                             "name": "fineweb-edu-ar-tr2en_1to1map",
                             "weight": 0.5,
                             "injection_paths": tr2en_1to1map_files,
                             "injection_probs": ar_probs,
+                            "augmentations": [
+                                {
+                                    "name": "add_prefix",
+                                    "prefix": "[AR]",
+                                }
+                            ],
                         },
                     ],
                 }
-
-
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
@@ -1012,7 +925,7 @@ def smollm2_360m_flex_curriculum1() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_85_en_tr2en_1to1map_1xvocab_stage1_4k_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_94_en_tr2en_1to1map_1xvocab_stage1_4k_str_prefix_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1032,6 +945,12 @@ def smollm2_360m_flex_curriculum1() -> Trainer.Config:
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
+                                    "augmentations": [
+                                    {
+                                        "name": "add_prefix",
+                                        "prefix": "[EN]",
+                                    }
+                                    ],
                                 },
                             ],
                         }
@@ -1048,6 +967,12 @@ def smollm2_360m_flex_curriculum1() -> Trainer.Config:
                                     "name": "fineweb-edu-ar-tr2en_1to1map",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
+                                    "augmentations": [
+                                        {
+                                            "name": "add_prefix",
+                                            "prefix": "[AR]",
+                                        }
+                                    ],
                                 },
                             ],
                         }
@@ -1075,6 +1000,7 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
     tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
     return Trainer.Config(      
         hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
@@ -1082,42 +1008,17 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
             stages=[
                 #en1_en2_stage1
                 {
-                    "steps": 3000,
+                    "steps": 1000,
                     "sources": [
                         {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.6,
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 0.01,
-                                    "symmetric": True,
-                                    "vocab_size": 65536,
-                                }
-                            ],
+                            "name": "fineweb-edu-ar-tr2en",
+                            "weight": 0.5,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.2,
-                            "start_idx": 3_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/2 for prob in en_probs],
-                        },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.2,
-                            "start_idx": 4_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/2 for prob in ar_probs],
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
+                            "weight": 0.5,
+                            "start_idx": 800_000,
                         }
-
                     ],
                 },
                 #en1_en2_stage2
@@ -1127,33 +1028,58 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "start_idx": 1_600_000,
+
                         },
                         {
-                            "name": "fineweb-edu-ar-en",
+                            "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 5_800_000,
-                            "injection_paths": en_files,
-                            "injection_probs": ar_probs,
-                            "post_token_augmentations": [
+                            "start_idx": 2_400_000,
+                            "augmentations": [
                                 {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob_schedualer": {
+                                        "name": "linear",
+                                        "start_val": 1.0,
+                                        "end_val": 0.0,
+                                        "duration_steps": 1000,
+                                    },
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json",
+                                    }
                                 }
                             ],
                         },
                     ],
-                }
-
-
+                },
+                #en1_en2_stage3
+                {
+                    "steps": 2000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "start_idx": 3_200_000,
+                            # "injection_paths": en_files,
+                            # "injection_probs": [prob*2 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
+                            "start_idx": 4_800_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob*2 for prob in ar_probs],
+                        },
+                    ],
+                },
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
-        model_spec=model_registry("smollm2_360m_2xvocab"), 
+        model_spec=model_registry("smollm2_360m"), 
+        
         activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
         optimizer=OptimizersContainer.Config(
             lr=5e-4,              # HF increased peak LR for 360M compared to 135M
             weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
@@ -1164,6 +1090,8 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
             decay_type="cosine",     # Standard cosine decay
             min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
         ),
+        
+        # The Official 1.57M Token Batch Setup
         training=TrainingConfig(
             local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
@@ -1171,15 +1099,18 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
             steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
             max_norm=1.0,               # Gradient clipping 
         ),
+        
         compile=CompileConfig(enable=True),
+        
         metrics=MetricsProcessor.Config(
             enable_tensorboard=False,
             enable_wandb=True,
             log_freq=10
         ),
+        
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_79_en1_en2_2xvocab_stage1_3k_0.6_wordwise0.01_stage2_1k_clean_injection_0_20_100_1000_20800entities_rerun",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_90_ar_tr2en_en_1xvocab_stage1_1k_0.5en_0.5tr2en_stage2_1k_0.5en_0.5tr2en->ar_p1->0_linear_stage3_2k_0.5en_0.5ar_injection_0_20_100_1000_20800entities__ArabicOnlyInj",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1189,14 +1120,14 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
             freq=500,
             steps=10,
             enable=True,
-            dataloader={"en1": HuggingFaceTextDataLoader.Config(
+            dataloader={"arabic": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
                             "steps": 300,
                             "sources": [
                                 {
-                                    "name": "fineweb-edu-ar-en",
+                                    "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
                                 },
@@ -1205,7 +1136,23 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
                     ],
                     eos_token_id=0 # Ensure this matches your tokenizer's EOS
                 ),
-                "en2": HuggingFaceTextDataLoader.Config(
+                "tr2en": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
@@ -1215,13 +1162,6 @@ def smollm2_360m_flex_curriculum2() -> Trainer.Config:
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
-                                    "post_token_augmentations": [
-                                        {
-                                            "name": "stochastic_word_tagging",
-                                            "prob": 1.0,
-                                            "vocab_size": 65536
-                                        }
-                                    ],
                                 },
                             ],
                         }
@@ -1249,6 +1189,7 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
     tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
     return Trainer.Config(      
         hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
@@ -1256,78 +1197,67 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
             stages=[
                 #en1_en2_stage1
                 {
-                    "steps": 3000,
+                    "steps": 2000,
                     "sources": [
                         {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.1,
-                            "post_token_augmentations": [
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.33,
+                            "augmentations": [
                                 {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 0.5,
-                                    "symmetric": True,
-                                    "vocab_size": 65536,
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob_schedualer": {
+                                        "name": "linear",
+                                        "start_val": 1.0,
+                                        "end_val": 0.0,
+                                        "duration_steps": 2000,
+                                    },
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json",
+                                    }
                                 }
                             ],
                         },
                         {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.45,
-                            "start_idx": 3_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.5 for prob in en_probs],
+                            "name": "fineweb-edu-ar-tr2en",
+                            "weight": 0.33,
+                            "start_idx": 1_100_000,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.45,
-                            "start_idx": 4_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.5 for prob in ar_probs],
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
+                            "weight": 0.34,
+                            "start_idx": 2_200_000,
                         }
 
                     ],
                 },
-                #en1_en2_stage2
+                #en1_en2_stage3
                 {
-                    "steps": 1000,
+                    "steps": 2000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "start_idx": 3_300_000,
+                            # "injection_paths": en_files,
+                            # "injection_probs": [prob*2 for prob in en_probs],
                         },
                         {
-                            "name": "fineweb-edu-ar-en",
+                            "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 5_800_000,
-                            "injection_paths": en_files,
-                            "injection_probs": ar_probs,
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
+                            "start_idx": 4_900_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob*2 for prob in ar_probs],
                         },
                     ],
-                }
-
-
+                },
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
-        model_spec=model_registry("smollm2_360m_2xvocab"), 
+        model_spec=model_registry("smollm2_360m"), 
+        
         activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
         optimizer=OptimizersContainer.Config(
             lr=5e-4,              # HF increased peak LR for 360M compared to 135M
             weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
@@ -1338,6 +1268,8 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
             decay_type="cosine",     # Standard cosine decay
             min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
         ),
+        
+        # The Official 1.57M Token Batch Setup
         training=TrainingConfig(
             local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
@@ -1345,15 +1277,18 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
             steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
             max_norm=1.0,               # Gradient clipping 
         ),
+        
         compile=CompileConfig(enable=True),
+        
         metrics=MetricsProcessor.Config(
             enable_tensorboard=False,
             enable_wandb=True,
             log_freq=10
         ),
+        
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_80_en1_en2_2xvocab_stage1_3k_0.1_wordwise0.5_stage2_1k_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_92_ar_tr2en_en_1xvocab_stage1_2k_0.34en_0.33tr2en_0.33tr2en->ar_p1->0_linear_stage2_2k_0.5en_0.5ar_injection_0_20_100_1000_20800entities_ArabicOnlyInj",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1363,14 +1298,14 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
             freq=500,
             steps=10,
             enable=True,
-            dataloader={"en1": HuggingFaceTextDataLoader.Config(
+            dataloader={"arabic": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
                             "steps": 300,
                             "sources": [
                                 {
-                                    "name": "fineweb-edu-ar-en",
+                                    "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
                                 },
@@ -1379,7 +1314,23 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
                     ],
                     eos_token_id=0 # Ensure this matches your tokenizer's EOS
                 ),
-                "en2": HuggingFaceTextDataLoader.Config(
+                "tr2en": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
@@ -1389,13 +1340,6 @@ def smollm2_360m_flex_curriculum3() -> Trainer.Config:
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
-                                    "post_token_augmentations": [
-                                        {
-                                            "name": "stochastic_word_tagging",
-                                            "prob": 1.0,
-                                            "vocab_size": 65536
-                                        }
-                                    ],
                                 },
                             ],
                         }
@@ -1423,6 +1367,7 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
     tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
     return Trainer.Config(      
         hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
@@ -1430,78 +1375,48 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
             stages=[
                 #en1_en2_stage1
                 {
-                    "steps": 3000,
+                    "steps": 2000,
                     "sources": [
                         {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.01,
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 0.5,
-                                    "symmetric": True,
-                                    "vocab_size": 65536,
-                                }
-                            ],
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.495,
-                            "start_idx": 3_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.95 for prob in en_probs],
-                        },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.495,
-                            "start_idx": 4_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.95 for prob in ar_probs],
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
+                            "weight": 0.5,
+                            "start_idx": 1_600_000,
                         }
 
                     ],
                 },
-                #en1_en2_stage2
+                #en1_en2_stage3
                 {
-                    "steps": 1000,
+                    "steps": 2000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_000_000,
+                            "start_idx": 3_200_000,
                             "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "injection_probs": [prob*2 for prob in en_probs],
                         },
                         {
-                            "name": "fineweb-edu-ar-en",
+                            "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 5_800_000,
-                            "injection_paths": en_files,
-                            "injection_probs": ar_probs,
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
+                            "start_idx": 4_800_000,
+                            # "injection_paths": ar_files,
+                            # "injection_probs": [prob*2 for prob in ar_probs],
                         },
                     ],
-                }
-
-
+                },
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
-        model_spec=model_registry("smollm2_360m_2xvocab"), 
+        model_spec=model_registry("smollm2_360m"), 
+        
         activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
         optimizer=OptimizersContainer.Config(
             lr=5e-4,              # HF increased peak LR for 360M compared to 135M
             weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
@@ -1512,6 +1427,8 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
             decay_type="cosine",     # Standard cosine decay
             min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
         ),
+        
+        # The Official 1.57M Token Batch Setup
         training=TrainingConfig(
             local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
             global_batch_size=768,     # Effective batch size of 1 million tokens
@@ -1519,15 +1436,18 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
             steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
             max_norm=1.0,               # Gradient clipping 
         ),
+        
         compile=CompileConfig(enable=True),
+        
         metrics=MetricsProcessor.Config(
             enable_tensorboard=False,
             enable_wandb=True,
             log_freq=10
         ),
+        
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_81_en1_en2_2xvocab_stage1_3k_0.01_wordwise0.5_stage2_1k_clean_injection_0_20_100_1000_20800entities_rerun",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_89_ar_en_1xvocab_stage1_2k_0.5en_0.5ar_stage2_2k_0.5en_0.5ar_injection_0_20_100_1000_20800entities_EnglishOnlyInj",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1537,14 +1457,14 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
             freq=500,
             steps=10,
             enable=True,
-            dataloader={"en1": HuggingFaceTextDataLoader.Config(
+            dataloader={"arabic": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
                             "steps": 300,
                             "sources": [
                                 {
-                                    "name": "fineweb-edu-ar-en",
+                                    "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
                                 },
@@ -1553,7 +1473,23 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
                     ],
                     eos_token_id=0 # Ensure this matches your tokenizer's EOS
                 ),
-                "en2": HuggingFaceTextDataLoader.Config(
+                "tr2en": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
@@ -1563,13 +1499,6 @@ def smollm2_360m_flex_curriculum4() -> Trainer.Config:
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
                                     "start_idx": 6_600_000,
-                                    "post_token_augmentations": [
-                                        {
-                                            "name": "stochastic_word_tagging",
-                                            "prob": 1.0,
-                                            "vocab_size": 65536
-                                        }
-                                    ],
                                 },
                             ],
                         }
@@ -1604,61 +1533,50 @@ def smollm2_360m_flex_curriculum5() -> Trainer.Config:
             stages=[
                 #en1_en2_stage1
                 {
-                    "steps": 3000,
+                    "steps": 2000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.1,
+                            "weight": 0.5,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "start_idx": 1_600_000,
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
-                                    "prob": 0.1,
-                                    "symmetric": True,
+                                    "prob_schedualer": {
+                                        "name": "linear",
+                                        "start_val": 0.0,
+                                        "end_val": 1.0,
+                                        "duration_steps": 1000,
+                                        "delay_steps": 500,
+                                    },
                                     "vocab_size": 65536,
                                 }
                             ],
                         },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.45,
-                            "start_idx": 3_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.5 for prob in en_probs],
-                        },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.45,
-                            "start_idx": 4_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.5 for prob in ar_probs],
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
-                        }
 
                     ],
                 },
                 #en1_en2_stage2
                 {
-                    "steps": 1000,
+                    "steps": 2000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_000_000,
+                            "start_idx": 3_200_000,
                             "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "injection_probs": [prob * 2 for prob in en_probs],
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_800_000,
+                            "start_idx": 4_800_000,
                             "injection_paths": en_files,
-                            "injection_probs": ar_probs,
+                            "injection_probs": [prob * 2 for prob in ar_probs],
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
@@ -1701,7 +1619,7 @@ def smollm2_360m_flex_curriculum5() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_82_en1_en2_2xvocab_stage1_3k_0.1_wordwise0.1_stage2_1k_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_131_en1_en2_2xvocab_stage1_2k_0.5en1_0.5[en1-en2_dur1000_delay500]_stage2_2k_0.5en1_0.5en2_clean_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1778,61 +1696,50 @@ def smollm2_360m_flex_curriculum6() -> Trainer.Config:
             stages=[
                 #en1_en2_stage1
                 {
-                    "steps": 3000,
+                    "steps": 2000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.01,
+                            "weight": 0.5,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "start_idx": 1_600_000,
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
-                                    "prob": 0.01,
-                                    "symmetric": True,
+                                    "prob_schedualer": {
+                                        "name": "linear",
+                                        "start_val": 0.0,
+                                        "end_val": 1.0,
+                                        "duration_steps": 1000,
+                                        "delay_steps": 1000,
+                                    },
                                     "vocab_size": 65536,
                                 }
                             ],
                         },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.495,
-                            "start_idx": 3_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.95 for prob in en_probs],
-                        },
-                        {
-                            "name": "fineweb-edu-ar-en",
-                            "weight": 0.495,
-                            "start_idx": 4_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/4.95 for prob in ar_probs],
-                            "post_token_augmentations": [
-                                {
-                                    "name": "stochastic_word_tagging",
-                                    "prob": 1.0,
-                                    "vocab_size": 65536
-                                }
-                            ],
-                        }
 
                     ],
                 },
                 #en1_en2_stage2
                 {
-                    "steps": 1000,
+                    "steps": 2000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_000_000,
+                            "start_idx": 3_200_000,
                             "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "injection_probs": [prob * 2 for prob in en_probs],
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_800_000,
+                            "start_idx": 4_800_000,
                             "injection_paths": en_files,
-                            "injection_probs": ar_probs,
+                            "injection_probs": [prob * 2 for prob in ar_probs],
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
@@ -1875,7 +1782,7 @@ def smollm2_360m_flex_curriculum6() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_83_en1_en2_2xvocab_stage1_3k_0.01_wordwise0.01_stage2_1k_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_132_en1_en2_2xvocab_stage1_2k_0.5en1_0.5[en1-en2_dur1000_delay1000]_stage2_2k_0.5en1_0.5en2_clean_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1935,12 +1842,14 @@ def smollm2_360m_flex_curriculum6() -> Trainer.Config:
             ]
         )
     )
-def smollm2_360m_en1_en2() -> Trainer.Config:
+def smollm2_360m_flex_curriculum7() -> Trainer.Config:
     base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
     en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
@@ -1954,34 +1863,68 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.6,
+                            "weight": 0.7,
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
                                     "prob": 0.5,
-                                    "symmetric": True,
+                                    # "symmetric": True,
                                     "vocab_size": 65536,
+                                },
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 0.33,
+                                    # "symmetric": True,
+                                    "vocab_size": 65536,
+                                    "tag_n": 2,
                                 }
                             ],
                         },
+                        # {
+                        #     "name": "fineweb-edu-ar-en",
+                        #     "weight": 0.35,
+                        #     "start_idx": 1_600_000,
+                        #     "post_token_augmentations": [
+                        #         {
+                        #             "name": "stochastic_word_tagging",
+                        #             "prob": 0.5,
+                        #             "symmetric": True,
+                        #             "vocab_size": 65536*2,
+                        #         }
+                        #     ],
+                        # },
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.2,
-                            "start_idx": 3_000_000,
-                            "injection_paths": en_files,
-                            "injection_probs": [prob *5/2 for prob in en_probs],
+                            "weight": 0.1,
+                            "start_idx": 3_200_000,
+                            # "injection_paths": en_files,
+                            # "injection_probs": [prob *5/ for prob in en_probs],
                         },
                         {
                             "name": "fineweb-edu-ar-en",
-                            "weight": 0.2,
-                            "start_idx": 4_000_000,
+                            "weight": 0.1,
+                            "start_idx": 3_700_000,
                             "injection_paths": en_files,
-                            "injection_probs": [prob *5/2 for prob in ar_probs],
+                            "injection_probs": [prob *5/1 for prob in en_probs],
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
                                     "prob": 1.0,
                                     "vocab_size": 65536
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 4_200_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536*2
                                 }
                             ],
                         }
@@ -1994,15 +1937,892 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
+                            "weight": 0.34,
+                            "start_idx": 4_700_000,
+                            # "injection_paths": en_files,
+                            # "injection_probs": en_probs,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.33,
+                            "start_idx": 5_300_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [p*(5/3.3) for p in en_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.33,
+                            "start_idx": 5_900_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [p*(5/3.3) for p in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536*2
+                                }
+                            ],
+                        },
+                    ],
+                }
+
+
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_3xvocab"), 
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        training=TrainingConfig(
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_97_en1_en2_en3_3xvocab_stage1_3k_0.1clean_0.7_wordwise_1_2_3_stage2_1k_0.33_clean_injection_0_20_100_1000_20800entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={"en1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "en2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "en3": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536*2
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum8() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 3000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.24,
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 0.5,
+                                    "symmetric": True,
+                                    "vocab_size": 65536,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.23,
+                            "start_idx": 1_100_000,
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "symmetric": True,
+                                    "vocab_size": 65536,
+                                },
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 0.5,
+                                    "symmetric": True,
+                                    "vocab_size": 65536,
+                                    "tag_n": 2,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.23,
+                            "start_idx": 2_200_000,
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 0.5,
+                                    "symmetric": True,
+                                    "vocab_size": 65536*2,
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 3_200_000,
+                            # "injection_paths": en_files,
+                            # "injection_probs": [prob *5/ for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 3_700_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 4_200_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536*2
+                                }
+                            ],
+                        }
+
+                    ],
+                },
+                #en1_en2_stage2
+                {
+                    "steps": 1000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.34,
+                            "start_idx": 4_700_000,
+                            # "injection_paths": en_files,
+                            # "injection_probs": en_probs,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.33,
+                            "start_idx": 5_300_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [p*(5/3.3) for p in en_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536
+                                }
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.33,
+                            "start_idx": 5_900_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [p*(5/3.3) for p in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536*2
+                                }
+                            ],
+                        },
+                    ],
+                }
+
+
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_3xvocab"), 
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        training=TrainingConfig(
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_98_en1_en2_en3_3xvocab_stage1_3k_0.1clean_0.23_wordwise_pairs_stage2_1k_0.33_clean_injection_0_20_100_1000_20800entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={"en1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "en2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "en3": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536*2
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum9() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ru_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    ru_tr2en_1to1map_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ru_tr2en_1to1map_data.jsonl" for i in file_order]
+    tr2en_1to1map_mixed_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_mixed_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_en1.0_ru1.0",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_000_000,
+                            "injection_paths": en_files,
+                            "injection_probs": en_probs,
+                        },
+                        # {
+                        #     "name": "fineweb2-hq-ru-tr2en_1to1map",
+                        #     "weight": 0.5,
+                        #     "start_idx": 3_300_000,
+                        #     "injection_paths": ru_tr2en_1to1map_files,
+                        #     "injection_probs": ar_probs,
+                        # },
+                        {
+                            "name": "fineweb2-hq-ru",
+                            "weight": 0.5,
+                            "start_idx": 3_300_000,
+                            "injection_paths": ru_files,
+                            "injection_probs": ar_probs,
+                        },
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m"), 
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_101_en_ru_1xvocab_stage1_4k_clean_injection_0_20_100_1000_20800entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={"english": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "russian": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb2-hq-ru",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum10() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ru_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    ru_tr2en_1to1map_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ru_tr2en_1to1map_data.jsonl" for i in file_order]
+    tr2en_1to1map_mixed_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_mixed_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_en1.0_ru1.0",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                {
+                    "steps": 4000,
+                    "sources": [
+                        # {
+                        #     "name": "fineweb-edu-ar-en",
+                        #     "weight": 0.5,
+                        #     "injection_paths": en_files,
+                        #     "injection_probs": en_probs,
+                        # },
+                        {
+                            "name": "fineweb2-hq-ru-tr2en_1to1map",
+                            "weight": 0.5,
+                            "start_idx": 3_300_000,
+                            "injection_paths": ru_tr2en_1to1map_files,
+                            "injection_probs": ar_probs,
+                        },
+                        {
+                            "name": "fineweb2-hq-ru",
+                            "weight": 0.5,
+                            "start_idx": 3_300_000,
+                            "injection_paths": ru_files,
+                            "injection_probs": ar_probs,
+                        },
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m"), 
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_102_ru_rutr2en_1to1map_1xvocab_stage1_4k_clean_injection_0_20_100_1000_20800entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                # "english": HuggingFaceTextDataLoader.Config(
+                #     num_workers=3,
+                #     stages=[
+                #         {
+                #             "steps": 300,
+                #             "sources": [
+                #                 {
+                #                     "name": "fineweb-edu-ar-en",
+                #                     "weight": 1.0,
+                #                     "start_idx": 6_600_000,
+                #                 },
+                #             ],
+                #         }
+                #     ],
+                #     eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                # ),
+                "russian": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb2-hq-ru",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "russian tr2en 1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb2-hq-ru-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum11() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ru_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    ru_tr2en_1to1map_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ru_tr2en_1to1map_data.jsonl" for i in file_order]
+    tr2en_1to1map_mixed_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_mixed_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_en1.0_ru1.0",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.34,
+                        },
+                        {
+                            "name": "fineweb2-hq-ru-tr2en_1to1map",
+                            "weight": 0.33,
+                            "start_idx": 2_100_000,
+                            "injection_paths": ru_tr2en_1to1map_files,
+                            "injection_probs": [prob * (5/3.3) for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
+                            "weight": 0.33,
+                            "start_idx": 4_200_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob *(5/3.3) for prob in ar_probs],
+                        },
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m"), 
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_122_0.34en_0.33trAr_1to1map[injAr]_trRu_1to1map[injEn]_1xvocab_stage1_4k_clean_injection_0_20_100_1000_20800entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "english": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "ar_tr2en_1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "russian tr2en 1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb2-hq-ru-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+            ]
+        )
+    )
+def smollm2_360m_en1_en2() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                # #en1_en2_stage1
+                # {
+                #     "steps": 3000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.6,
+                #             "post_token_augmentations": [
+                #                 {
+                #                     "name": "stochastic_word_tagging",
+                #                     "prob": 0.5,
+                #                     "symmetric": True,
+                #                     "vocab_size": 65536,
+                #                 }
+                #             ],
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.2,
+                #             "start_idx": 3_000_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": [prob *5/2 for prob in en_probs],
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.2,
+                #             "start_idx": 4_000_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": [prob *5/2 for prob in ar_probs],
+                #             "post_token_augmentations": [
+                #                 {
+                #                     "name": "stochastic_word_tagging",
+                #                     "prob": 1.0,
+                #                     "vocab_size": 65536
+                #                 }
+                #             ],
+                #         }
+
+                #     ],
+                # },
+                #en1_en2_stage2
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            # "start_idx": 5_000_000,
                             "injection_paths": en_files,
                             "injection_probs": en_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 5_800_000,
+                            "start_idx": 3_200_000,
                             "injection_paths": en_files,
                             "injection_probs": ar_probs,
                             "post_token_augmentations": [
@@ -2047,7 +2867,7 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_en1_en2_test0_2xvocab_stage1_3k_0.6_wordwise0.5_stage2_1k_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_en1_en2_test1_2xvocab_stage1_4k_clean_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -2201,12 +3021,13 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
         )
     )
 
-def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
+def smollm2_360m_flex_curriculum_contrastive1() -> Trainer.Config:
     base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
     ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
     en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
@@ -2216,86 +3037,371 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
-                # # --- STAGE 0: wordwise codeswitching Phase (Steps 0 to 1300) ---
-                # {
-                #     "steps": 2000,
-                #     "sources": [
-                #         {
-                #             "name": "fineweb-edu-ar-ar",
-                #             "weight": 0.5,
-                #             "injection_paths": ar_files,
-                #             "injection_probs": ar_probs,
-                #         },
-                #         {
-                #             "name": "fineweb-edu-ar-en",
-                #             "weight": 0.5,
-                #             "injection_paths": en_files,
-                #             "injection_probs": en_probs,
-                #         }
-                #     ],
-                #     "augmentations": [
-                #         {
-                #             "name": "wordwise_codeswitching",
-                #             "prob": 0.5,  # 50% of the text will undergo wordwise code-switching
-                #             "dict_paths": {
-                #                 "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
-                #                 "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
-                #             }
-                #         }
-                #     ]
-                # },
-                # --- STAGE 1: Sentence-level Code-Switching with Entity Injection (Steps 1300 to 2600) ---
-                # {
-                #     "steps": 4000,
-                #     "sources": [
-                #         {
-                #             "name": "fineweb-edu-ar-paired-contrastive",
-                #             "weight": 1.0,
-                #             # "start_idx": 2_000_000,
-                #             "injection_paths": ar_files + en_files,
-                #             "injection_probs": [p for p in ar_probs + en_probs],    # originally devided prob by 2 but since documents are now twice as large it evens out
-                #             "enable_contrastive_mask": True,
-                #             "contrastive_len_threshold": 256,
-                #         }
-                #     ],
-                #     "augmentations": [
-                #         # {
-                #         #     "name": "document_translation"
-                #         # }
-                #     ]
-
-                # },
-
-                # # --- STAGE 2: Clean Phase ---
-                # {
-                #     "steps": 2000,
-                #     "sources": [
-                #         {
-                #             "name": "fineweb-edu-ar-ar",
-                #             "weight": 0.5,
-                #             "start_idx": 4_000_000,
-                #             "injection_paths": ar_files,
-                #             "injection_probs": ar_probs,
-                #             # "unique_rates": unique_rates
-                #         },
-                #         {
-                #             "name": "fineweb-edu-ar-en",
-                #             "weight": 0.5,
-                #             "start_idx": 4_000_000,
-                #             "injection_paths": en_files,
-                #             "injection_probs": en_probs,
-                #             # "unique_rates": unique_rates
-                #         }
-                #     ],
-                    
-                # }
                 #en1_en2_stage1
                 {
                     "steps": 4000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-ar",
-                            "weight": 0.6,
+                            "weight": 0.8,
+                            "enable_contrastive_mask": True,
+                            "max_contrastive_seqs": 64,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 1,
+                                },
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_200_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_900_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                        }
+
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive8"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_134_ar_trAr_stage1_4k_clean_wordwisecontrastive_0.8[ar_trAr]_layer8_0.1ar_0.1trAr_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "arabic": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-ar",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "tr2en_1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 10.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.8,
+                            "enable_contrastive_mask": True,
+                            "max_contrastive_seqs": 64,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 1,
+                                },
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_200_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_900_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                        }
+
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_133_ar_trAr_stage1_4k_clean_wordwisecontrastive_0.8[ar_trAr]_layer4_0.1ar_0.1trAr_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "arabic": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-ar",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "tr2en_1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 10.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_contrastive2() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 2000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.7,
                             "enable_contrastive_mask": True,
                             "augmentations": [
                                 {
@@ -2304,69 +3410,94 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                                 },
                                 {
                                     "name": "wordwise_unigram_codeswitching",
-                                    "prob": 1.0,  # 50% of the text will undergo wordwise code-switching
-                                    "dict_paths": {
-                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                                    "prob_schedualer": {
+                                        "name": "linear",
+                                        "start_val": 1.0,
+                                        "end_val": 0.0,
+                                        "duration_steps": 2000,
                                     },
-                                    "output_word_mask": True,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
                                     "idx": 1,
                                 }
                             ],
-                            # "post_token_augmentations": [
-                            #     {
-                            #         "name": "stochastic_token_tagging",
-                            #         "prob": 0.0,
-                            #         "vocab_size": 65536,
-                            #         "idx": 0
-                            #     },
-                            #     {
-                            #         "name": "stochastic_token_tagging",
-                            #         "prob": 1.0,
-                            #         "vocab_size": 65536,
-                            #         "idx": 1
-                            #     }
-                            # ],
                         },
                         {
                             "name": "fineweb-edu-ar-ar",
-                            "weight": 0.2,
+                            "weight": 0.3,
+                            "start_idx": 2_200_000,
                             "augmentations": [
                                 {
                                     "name": "wordwise_unigram_codeswitching",
-                                    "prob": 1.0,  # 100% of the text will undergo wordwise code-switching
-                                    "dict_paths": {
-                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_11M.json",
+                                    "prob_schedualer": {
+                                        "name": "linear",
+                                        "start_val": 1.0,
+                                        "end_val": 0.5,
+                                        "duration_steps": 1000,
                                     },
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                },
+
+                            ]
+                        }
+
+                    ],
+                },
+                {
+                    "steps": 2000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
+                            "start_idx": 3_100_000,
+                            "enable_contrastive_mask": True,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
                                 }
                             ],
-                            # "post_token_augmentations": [
-                            #     {
-                            #         "name": "stochastic_token_tagging",
-                            #         "prob": 0.0,
-                            #         "vocab_size": 65536,
-                            #     }
-                            # ],
-
-                            "start_idx": 3_000_000,
-                            "injection_paths": ar_files,
-                            "injection_probs": [prob *5/2 for prob in en_probs],
-                            # "unique_rates": unique_rates
+                        },
+                        {
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
+                            "weight": 0.25,
+                            "start_idx": 4_700_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob * 2 *5/2.5 for prob in en_probs],
                         },
                         {
                             "name": "fineweb-edu-ar-ar",
-                            "weight": 0.2,
-                            # "post_token_augmentations": [
-                            #     {
-                            #         "name": "stochastic_token_tagging",
-                            #         "prob": 1.0,
-                            #         "vocab_size": 65536,
-                            #     }
-                            # ],
-
-                            "start_idx": 4_000_000,
+                            "weight": 0.25,
+                            "start_idx": 5_550_000,
                             "injection_paths": ar_files,
-                            "injection_probs": [prob *5/2 for prob in ar_probs],
-                            # "unique_rates": unique_rates
+                            "injection_probs": [prob * 2 *5/2.5 for prob in ar_probs],
                         }
 
                     ],
@@ -2374,7 +3505,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),        # Reference your 360M model shape
-        model_spec=model_registry("smollm2_360m"), 
+        model_spec=model_registry("smollm2_360m_contrastive"), 
         
         activation_checkpoint=ActivationCheckpointConfig(mode="none"),
         
@@ -2409,12 +3540,418 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_63_ar_trAr_stage1_4k_clean_wordwisecontrastive_layer4_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_118_ar_trAr_stage1_2k_0.7[tr2en->ar_tr2en_cont]_0.3[tr2en->0.5codeswitching]_stage2_2k_0.5[tr2en_ar_cont]_0.25ar_0.25tr2en_contrastive_layer4_contrastive_loss_1.0_injection_0_20_100_1000_2080entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
         ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "arabic": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-ar",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "tr2en_1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_contrastive3() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-paired-contrastive",
+                            "weight": 0.6,
+                            "max_contrastive_seqs": 128,
+                            "enable_contrastive_mask": True,
+                            "augmentations": [
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,
+                                    "pattern": "ar",
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-paired-contrastive": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "pattern": "en",
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-paired-contrastive": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "pattern": "en",
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-paired-contrastive": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 7,
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "uniform_match_seperators",
+                                    "idx": 1,
+                                },
+
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
+                            "weight": 0.2,
+                            "max_contrastive_seqs": 128,
+                            "start_idx": 3_800_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob *5/2 for prob in ar_probs],
+
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.2,
+                            "max_contrastive_seqs": 128,
+                            "start_idx": 5_100_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/2 for prob in en_probs],
+
+                        },
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_124_en_trAr_stage1_4k_en_merge7_ar_mergeMatch_0.6contrastive_layer4_contrastive_loss_1.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "english": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "tr2en_1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_contrastive4() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.8,
+                            "enable_contrastive_mask": True,
+                            "max_contrastive_seqs": 64,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 1.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 1,
+                                },
+                            ],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-tr2en_1to1map",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_200_000,
+                            "injection_paths": tr2en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_900_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                        }
+
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive16"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_135_ar_trAr_stage1_4k_clean_wordwisecontrastive_0.8[ar_trAr]_layer16_0.1ar_0.1trAr_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "arabic": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-ar",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "tr2en_1to1map": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-tr2en_1to1map",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
         loss=LossConfig(
             losses=[
                 {
@@ -2430,6 +3967,967 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                         "learnable_temp": True
                     }
                 }
+            ]
+        )
+    )
+
+def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.8,
+                            "enable_contrastive_mask": True,
+                            "max_contrastive_seqs": 64,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 1,
+                                }
+                            ],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                    "idx": 1,
+                                }
+                            ],
+
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_200_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "max_contrastive_seqs": 64,
+                            "start_idx": 5_900_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                }
+                            ],
+                        }
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive_2xvocab"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_128_en1_en2_stage1_4k_merge3_wordwisecontrastive_0.8_layer4_contrastive_loss_1.0_t0.05_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "english1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        },
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.05,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_en1_en2_contrastive1() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.05,
+                            "enable_contrastive_mask": True,
+                            "max_contrastive_seqs": 64,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "merge_seperators",
+                                    "n_merge": 3,
+                                    "idx": 1,
+                                }
+                            ],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                    "idx": 1,
+                                }
+                            ],
+
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "max_contrastive_seqs": 64,
+                            "weight": 0.475,
+                            "start_idx": 5_200_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/4.75 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "max_contrastive_seqs": 64,
+                            "weight": 0.475,
+                            "start_idx": 5_900_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/4.75 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                }
+                            ],
+                        }
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive_2xvocab"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_129_en1_en2_stage1_4k_clean_wordwisecontrastive_merge3_0.05_layer4_contrastive_loss_1.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "english1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        },
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_en1_en2_contrastive2() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.8,
+                            "enable_contrastive_mask": True,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+
+                            ],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                    "idx": 1,
+                                }
+                            ],
+
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 5_200_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 5_900_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                }
+                            ],
+                        }
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive8_2xvocab"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_120_en1_en2_stage1_4k_clean_wordwisecontrastive_0.8_layer8_contrastive_loss_1.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "english1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        },
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+def smollm2_360m_flex_curriculum_en1_en2_contrastive3() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000, 5000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.8,
+                            "enable_contrastive_mask": True,
+                            "augmentations": [
+                                {
+                                    "name": "text_duplication",
+                                    "n": 2,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 0,
+                                },
+                                {
+                                    "name": "wordwise_unigram_codeswitching",
+                                    "prob": 0.0,
+                                    "dict_paths": {
+                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                    },
+                                    "idx": 1,
+                                },
+
+                            ],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                    "idx": 1,
+                                }
+                            ],
+
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 5_200_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 5_900_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536,
+                                }
+                            ],
+                        }
+                    ],
+                },
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_contrastive16_2xvocab"), 
+        
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        
+        # Matched to official SmolLM2 360M hyperparams
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        
+        # The Official 1.57M Token Batch Setup
+        training=TrainingConfig(
+            local_batch_size=16,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        
+        compile=CompileConfig(enable=True),
+        
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        
+        checkpoint=CheckpointManager.Config(
+            interval=500, 
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_121_en1_en2_stage1_4k_clean_wordwisecontrastive_0.8_layer16_contrastive_loss_1.0_injection_0_20_100_1000_2080entities",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={
+                "english1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "english2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        },
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+                {
+                    "name": "contrastive",
+                    "weight": 1.0, 
+                    "params": {
+                        "key": "contrastive_vectors", 
+                        "temperature": 0.07,
+                        "learnable_temp": True
+                    }
+                }
+            ]
+        )
+    )
+
+def smollm2_360m_en1_en2_imbalance() -> Trainer.Config:
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    # en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(      
+        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                #en1_en2_stage1
+                {
+                    "steps": 4000,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.9,
+                            # "start_idx": 3_000_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/9 for prob in en_probs],
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.1,
+                            "start_idx": 5_700_000,
+                            "injection_paths": en_files,
+                            "injection_probs": [prob *5/1 for prob in ar_probs],
+                            "post_token_augmentations": [
+                                {
+                                    "name": "stochastic_word_tagging",
+                                    "prob": 1.0,
+                                    "vocab_size": 65536
+                                }
+                            ],
+                        }
+                    ],
+                },
+                # {
+                #     "steps": 2000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.1,
+                #             "start_idx": 2_500_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": [prob *5/1 for prob in en_probs],
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.9,
+                #             "start_idx": 2_800_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": [prob *5/9 for prob in ar_probs],
+                #             "post_token_augmentations": [
+                #                 {
+                #                     "name": "stochastic_word_tagging",
+                #                     "prob": 1.0,
+                #                     "vocab_size": 65536
+                #                 }
+                #             ],
+                #         }
+
+                #     ],
+                # },
+                # #en1_en2_stage2
+                # {
+                #     "steps": 1000,
+                #     "sources": [
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.5,
+                #             "start_idx": 5_000_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": en_probs,
+                #         },
+                #         {
+                #             "name": "fineweb-edu-ar-en",
+                #             "weight": 0.5,
+                #             "start_idx": 5_800_000,
+                #             "injection_paths": en_files,
+                #             "injection_probs": ar_probs,
+                #             "post_token_augmentations": [
+                #                 {
+                #                     "name": "stochastic_word_tagging",
+                #                     "prob": 1.0,
+                #                     "vocab_size": 65536
+                #                 }
+                #             ],
+                #         },
+                #     ],
+                # }
+
+
+            ],
+            eos_token_id=0 # Ensure this matches your tokenizer's EOS
+        ),        # Reference your 360M model shape
+        model_spec=model_registry("smollm2_360m_2xvocab"), 
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=5e-4,              # HF increased peak LR for 360M compared to 135M
+            weight_decay=0.1,     # Mandatory for AdamW (Loshchilov & Hutter)
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=300,        # ~5% of your 6,000 total steps
+            decay_ratio=1.0,         # Decay over the full 6,000 step duration
+            decay_type="cosine",     # Standard cosine decay
+            min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
+        ),
+        training=TrainingConfig(
+            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            global_batch_size=768,     # Effective batch size of 1 million tokens
+            seq_len=2048,
+            steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
+            max_norm=1.0,               # Gradient clipping 
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500,
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_en1_en2_test136_2xvocab_stage1_4k_0.9en1_0.1en2_clean_injection_0_20_100_1000_20800entities_humans",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=500,
+            steps=10,
+            enable=True,
+            dataloader={"en1": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+                "en2": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "stochastic_word_tagging",
+                                            "prob": 1.0,
+                                            "vocab_size": 65536
+                                        }
+                                    ],
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0 # Ensure this matches your tokenizer's EOS
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
             ]
         )
     )

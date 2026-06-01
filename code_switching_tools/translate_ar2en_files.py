@@ -4,7 +4,7 @@ import time
 import concurrent.futures
 import orjson
 import glob
-
+import random
 # ==========================================
 # 1. GLOBAL VARIABLES FOR WORKERS
 # ==========================================
@@ -29,10 +29,10 @@ def translate_match(match):
 def process_file(in_filepath):
     """
     Worker function: Translates one ar_data.jsonl file and saves it as
-    tr2en_wip_data.jsonl in the exact same directory.
+    tr2en_1to1map_wip_data.jsonl in the exact same directory.
     """
     dir_name = os.path.dirname(in_filepath)
-    out_filepath = os.path.join(dir_name, "tr2en_wip_data.jsonl")
+    out_filepath = os.path.join(dir_name, "ru_tr2en_1to1map_wip_data.jsonl")
     
     docs_processed = 0
     
@@ -65,8 +65,11 @@ def process_file(in_filepath):
 # ==========================================
 
 def main():
-    DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json"
-    INJ_FILES_PATTERN = r"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/*/ar_data.jsonl"
+    # DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json"
+    # DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json"
+    DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_russian_translated_fineweb_regex_1to1.json"
+    # INJ_FILES_PATTERN = r"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/*/ar_data.jsonl"
+    INJ_FILES_PATTERN = r"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/*/ru_data.jsonl"
     
     # 1. Load the dictionary into memory
     print(f"Loading dictionary from {DICT_PATH}...")
@@ -74,7 +77,20 @@ def main():
     with open(DICT_PATH, 'rb') as f:
         TRANSLATION_DICT = orjson.loads(f.read())
     print(f"Loaded {len(TRANSLATION_DICT):,} words into memory.")
-    
+    # ######################### 1.5. Mix the dictionary keys and values ##########################
+    # print("Mixing the dictionary...")
+    # keys = list(TRANSLATION_DICT.keys())
+    # values = list(TRANSLATION_DICT.values())
+    # random.seed(43)
+    # # Randomly shuffle the list of values in place
+    # random.shuffle(values)
+
+    # # Re-combine the original keys with the shuffled values
+    # TRANSLATION_DICT = dict(zip(keys, values))
+
+    # print("Dictionary keys and values have been randomly mixed.")
+    # ##################################################################################################
+
     # 2. Gather target files
     file_list = glob.glob(INJ_FILES_PATTERN)
     print(f"Found {len(file_list)} files to process...")
@@ -100,7 +116,7 @@ def main():
 
     end_time = time.time()
     mins = (end_time - start_time) / 60
-    print(f"\n✅ COMPLETE! {total_docs_processed:,} documents translated and saved to tr2en_wip_data.jsonl files in {mins:.2f} minutes.")
+    print(f"\n✅ COMPLETE! {total_docs_processed:,} documents translated and saved to ru_tr2en_1to1map_wip_data.jsonl files in {mins:.2f} minutes.")
 
 if __name__ == "__main__":
     main()

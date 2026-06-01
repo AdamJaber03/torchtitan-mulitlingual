@@ -27,7 +27,7 @@ def clean_file(filepath, out_dir, strict_english, inj=False):
     filename = os.path.basename(filepath)
     parent_dir = os.path.dirname(filepath)
     if inj:
-        out_filepath = os.path.join(parent_dir, "tr2en_data.jsonl")
+        out_filepath = os.path.join(parent_dir, "tr2en_1to1map_mixed_data.jsonl")
     else:
         out_filepath = os.path.join(out_dir, filename)
     
@@ -74,8 +74,8 @@ def main():
     args = parser.parse_args()
 
     # Paths
-    IN_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_wip"
-    OUT_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated"
+    IN_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_mixed_1to1map_wip"
+    OUT_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_mixed_1to1map"
     os.makedirs(OUT_DIR, exist_ok=True)
     
     files = glob.glob(f"{IN_DIR}/*.jsonl")
@@ -83,7 +83,7 @@ def main():
     INJ = False
     # ***************for processing injecting data uncomment this section************
     INJ = True
-    files = glob.glob(f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/*/tr2en_wip_data.jsonl")
+    files = glob.glob(f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/*/tr2en_1to1map_mixed_wip_data.jsonl")
     # *******************************************************************************
     
     print(f"Found {len(files)} files to clean.")

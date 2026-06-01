@@ -26,22 +26,18 @@ from torchtitan.components.tokenizer import BaseTokenizer, HuggingFaceTokenizer
 from torchtitan.hf_datasets.post_tokenization_augmentations import WordWiseContrastive
 
 WORDWISE_CONTRASTIVE_ENABLED = True  # Set to False to disable the word-wise contrastive augmentation
-MAX_SEQS = 128
+MAX_SEQS = 384
 
-def encode_with_word_ids(tokenizer, text):
-    encoding = tokenizer.tokenizer.encode(text)
+def encode_with_encoding(tokenizer, text):
+    encoding = tokenizer.tokenizer.encode(text, add_special_tokens=False)
+    # assert len(encoding.ids)-1 == encoding.char_to_token(len(text)-1), f"Encoding length mismatch: {len(encoding.ids)} tokens but expected {encoding.char_to_token(len(text)-1)+1} tokens based on input text length. This may indicate an issue with the tokenizer's encoding of the input text. Please check your tokenizer configuration and ensure it is compatible with the input data. Text: {text[:100]}... Encoding ids: {encoding.ids}"
     # 2. Replicate your wrapper's BOS/EOS logic
     bos = [tokenizer.bos_id] if tokenizer.bos_id is not None else []
     eos = [tokenizer.eos_id] if tokenizer.eos_id is not None else []
 
     # 3. Store the tokens exactly as your wrapper would have
     tokens = bos + encoding.ids + eos
-
-    # 4. Store the PERFECT word mapping (Padding with None for the BOS/EOS tokens)
-    bos_pad = [None] * len(bos)
-    eos_pad = [None] * len(eos)
-    word_ids = bos_pad + encoding.word_ids + eos_pad
-    return tokens, word_ids
+    return tokens, encoding
 
 def buffered_shuffle(iterator, buffer_size=10000):
     """Shuffles an infinite iterator using a local memory buffer."""
@@ -68,6 +64,13 @@ def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | Non
         ld = load_dataset("parquet",data_dir="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",split="train",streaming=True)
         ld = ld.shuffle(seed=42, buffer_size=20_000)
         return ld.skip(start_idx) if start_idx > 0 else ld
+    if dataset_path == "fineweb2-hq":
+        if lang == "ru":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/original", split="train", streaming=True)
+        elif lang == "tr2en_1to1map":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/translated_1to1map", split="train", streaming=True)
+        ld = ld.skip(start_idx) if start_idx > 0 else ld
+        return ld.shuffle(seed=42, buffer_size=20_000)
     if dataset_path == "kaust-generative-ai/fineweb-edu-ar":
         if lang == "paired":
             def paired_gen():
@@ -98,6 +101,8 @@ def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | Non
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original", split="train", streaming=True)
         elif lang == "tr2en_1to1map":
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated_1to1map", split="train", streaming=True)
+        elif lang == "tr2en_1to1map_mixed":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated_1to1map_mixed", split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)  # Synchronized shuffle for paired streams
     return load_dataset(dataset_path, name="en", split=split, streaming=True)
@@ -117,7 +122,7 @@ def _process_paired_text(sample: tuple[dict[str, Any], dict[str, Any]]) -> str:
 def _process_contrastive_text(sample: tuple[dict[str, Any], dict[str, Any]]) -> str:
     ar_text = sample["text_ar"]
     en_text = sample["text_en"]
-    return [en_text, ar_text]
+    return [{"text": en_text}, {"text": ar_text}]
 
 DATASETS = {
     "c4": DatasetConfig(
@@ -147,6 +152,21 @@ DATASETS = {
     ),
     "fineweb-edu-ar-tr2en_1to1map": DatasetConfig(
         path="kaust-generative-ai/fineweb-edu-ar",
+        loader=partial(_load_dataset, split="train", lang="tr2en_1to1map"),
+        sample_processor=_process_c4_text,
+    ),
+    "fineweb-edu-ar-tr2en_1to1map_mixed": DatasetConfig(
+        path="kaust-generative-ai/fineweb-edu-ar",
+        loader=partial(_load_dataset, split="train", lang="tr2en_1to1map_mixed"),
+        sample_processor=_process_c4_text,
+    ),
+    "fineweb2-hq-ru": DatasetConfig(
+        path="fineweb2-hq",
+        loader=partial(_load_dataset, split="train", lang="ru"),
+        sample_processor=_process_c4_text,
+    ),
+    "fineweb2-hq-ru-tr2en_1to1map": DatasetConfig(
+        path="fineweb2-hq",
         loader=partial(_load_dataset, split="train", lang="tr2en_1to1map"),
         sample_processor=_process_c4_text,
     ),
@@ -189,7 +209,8 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         start_idx: int = 0,
         lang_id: int | None = None,
         enable_contrastive_mask: bool = False,
-        contrastive_len_threshold: int = 256,
+        contrastive_len_threshold: int = 2048,
+        max_contrastive_seqs: int = MAX_SEQS,
     ) -> None:
         dataset_name = dataset_name.lower()
         path, dataset_loader, text_processor = _validate_dataset(dataset_name, dataset_path)
@@ -242,7 +263,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 aug_instance = AUGMENTATIONS_REGISTRY[aug_name](aug_cfg)
                 self.aug_callables.append(aug_instance)
             else:
-                logger.warning(f"Augmentation '{aug_name}' not found in AUGMENTATIONS_REGISTRY.")
+                raise ValueError(f"Augmentation '{aug_name}' not found in AUGMENTATIONS_REGISTRY.")
 
         # --- NEW: Setup Post-Tokenization Augmentations ---
         self.post_token_aug_callables = []
@@ -255,7 +276,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 aug_instance = POST_TOKEN_AUGMENTATIONS_REGISTRY[aug_name](aug_cfg)
                 self.post_token_aug_callables.append(aug_instance)
             else:
-                logger.warning(f"Post-token augmentation '{aug_name}' not found in POST_TOKEN_AUGMENTATIONS_REGISTRY.")
+                raise ValueError(f"Post-token augmentation '{aug_name}' not found in POST_TOKEN_AUGMENTATIONS_REGISTRY.")
 
         self._sample_idx = 0
         self._token_buffer: list[int] = []
@@ -263,6 +284,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         self.lang_id = lang_id
         self.enable_contrastive_mask = enable_contrastive_mask
         self.contrastive_len_threshold = contrastive_len_threshold
+        self.max_contrastive_seqs = max_contrastive_seqs
         self.contrastive_pair_counter = torch.zeros(1, dtype=torch.int64).share_memory_()  # Counter to track active contrastive pairs
         self.wordwisecontrastive = WordWiseContrastive(tokenizer=self._tokenizer) if WORDWISE_CONTRASTIVE_ENABLED else None
         self.contrastive_pair_idx = 0
@@ -300,7 +322,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
 
         # Apply post tokenization shifts
         tokens = {k: v for k, v in doc.items() if k != "text"}
-        tokens["tokens"], tokens["word_ids"] = encode_with_word_ids(self._tokenizer, doc["text"])
+        tokens["tokens"], tokens["encoding"] = encode_with_encoding(self._tokenizer, doc["text"])
         tokens = self._apply_post_token_augs(tokens)
         
         if len(tokens["tokens"]) > 0 and tokens["tokens"][-1] != self.eos_token_id:
@@ -324,15 +346,21 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                     self._sample_idx = 0
                     hf_iter = self._get_data_iter()
                     sample = next(hf_iter)
-                sample_text = {"text": self._text_processor(sample)}
+                sample_p = self._text_processor(sample)
+                if type(sample_p) == str:
+                    sample_text = {"text": sample_p}
+                else:
+                    sample_text = sample_p
+                if (type(sample_text) == dict and len(sample_text["text"].strip()) == 0) or (type(sample_text) == list and 0 in [len(t["text"].strip()) for t in sample_text]):
+                    continue  # Skip empty samples after processing
                 sample_text = self._apply_augs(sample_text)
 
                 if self.enable_contrastive_mask:
                     assert isinstance(sample_text, list) and len(sample_text) == 2, "Expected paired text for contrastive masking"
-                    tokens_1 = {k:v for k,v in sample_text[0].items() if k != "text"}
-                    tokens_1["tokens"], tokens_1["word_ids"] = encode_with_word_ids(self._tokenizer, sample_text[0]["text"])
-                    tokens_2 = {k:v for k,v in sample_text[1].items() if k != "text"}
-                    tokens_2["tokens"], tokens_2["word_ids"] = encode_with_word_ids(self._tokenizer, sample_text[1]["text"])
+                    tokens_1 = {k:v for k,v in sample_text[0].items()}
+                    tokens_1["tokens"], tokens_1["encoding"] = encode_with_encoding(self._tokenizer, sample_text[0]["text"])
+                    tokens_2 = {k:v for k,v in sample_text[1].items()}
+                    tokens_2["tokens"], tokens_2["encoding"] = encode_with_encoding(self._tokenizer, sample_text[1]["text"])
 
                     # Apply post tokenization shifts
                     if self.wordwisecontrastive is not None:
@@ -343,9 +371,9 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                         self.contrastive_mask_buffer.extend(mask1 + mask2)
                         self.contrastive_pair_counter += n1
                         self.contrastive_pair_idx += n1
-                    elif len(tokens_1["tokens"]) <= self.contrastive_len_threshold:
-                        self.contrastive_mask_buffer.extend([self.contrastive_pair_counter+1] * (len(tokens_1["tokens"])) + [-self.contrastive_pair_counter-1] * (len(tokens_2["tokens"])))
-                        self.contrastive_pair_counter += 1
+                    # elif len(tokens_1["tokens"]) <= self.contrastive_len_threshold:
+                    #     self.contrastive_mask_buffer.extend([self.contrastive_pair_counter+1] * (len(tokens_1["tokens"])) + [-self.contrastive_pair_counter-1] * (len(tokens_2["tokens"])))
+                    #     self.contrastive_pair_counter += 1
                     else:
                         self.contrastive_mask_buffer.extend([0] * (len(tokens_1["tokens"])+len(tokens_2["tokens"])))
                     tokens_1, tokens_2 = self._apply_post_token_augs([tokens_1, tokens_2])  # Pass both sequences together if your post-token aug needs to consider them jointly
@@ -354,7 +382,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 else:
                     # sample_text = self._apply_augs(sample_text)
                     new_tokens = {k: v for k, v in sample_text.items() if k != "text"}
-                    new_tokens["tokens"], new_tokens["word_ids"] = encode_with_word_ids(self._tokenizer, sample_text["text"])
+                    new_tokens["tokens"], new_tokens["encoding"] = encode_with_encoding(self._tokenizer, sample_text["text"])
 
                     # Apply post tokenization shifts
                     new_tokens = self._apply_post_token_augs(new_tokens)
@@ -375,7 +403,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 self.contrastive_mask_buffer = self.contrastive_mask_buffer[max_buffer_token_len:]
                 # zero out contrastive mask buffer after yielding to prevent leakage across samples
                 if len(set(self.contrastive_mask_buffer)) > 1:
-                    self.contrastive_pair_counter -= (len(set([abs(x) for x in set(self.contrastive_mask_buffer)]) ) - 1)
+                    self.contrastive_pair_counter -= len(set([abs(x) for x in set(self.contrastive_mask_buffer)]))
                 self.contrastive_mask_buffer = [0] * len(self.contrastive_mask_buffer)
                 self.contrastive_pair_idx = 0  # Reset the pair index after yielding a batch to prevent overflow
 
@@ -383,12 +411,13 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 if self.lang_id is not None:
                     inputs["lang_id"] = self.lang_id
                 # if self.enable_contrastive_mask:
-                # inputs["contrastive_masks"] = self.get_masks(contrastive_mask[:-1], x[:-1])
-                # assert len(inputs["input"]) == self.seq_len and (False not in [len(inputs.get("contrastive_masks", [])[i]) == self.seq_len for i in range(MAX_SEQS)]), f"Expected input and contrastive_masks lengths to match seq_len ({self.seq_len}), but got {len(inputs['input'])} and {len(inputs.get('contrastive_masks', []))} respectively."
+                inputs["contrastive_masks"] = self.get_masks(contrastive_mask[:-1], x[:-1])
+                assert len(inputs["input"]) == self.seq_len and (False not in [len(inputs.get("contrastive_masks", [])[i]) == self.seq_len for i in range(self.max_contrastive_seqs)]), f"Expected input and contrastive_masks lengths to match seq_len ({self.seq_len}), but got {len(inputs['input'])} and {len(inputs.get('contrastive_masks', []))} respectively."
                 yield inputs, x[1:]
     
     def step(self, global_step: int):
         """Propagates the global training step down to the augmentations."""
+        logger.info(f"Stepping dataset augmentations at global step {global_step}...")
         for aug in self.aug_callables:
             if hasattr(aug, "step"):
                 aug.step(global_step)
@@ -414,11 +443,11 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
             new_masks.append([x == -p for x in mask_list])
 
         # --- SAFETY CHECK & PADDING ---
-        if len(new_masks) > MAX_SEQS:
-            new_masks = new_masks[:MAX_SEQS]
-            self.contrastive_pair_counter -= (len(new_masks) - MAX_SEQS)//2  
+        if len(new_masks) > self.max_contrastive_seqs:
+            self.contrastive_pair_counter -= (len(new_masks) - self.max_contrastive_seqs) // 2
+            new_masks = new_masks[:self.max_contrastive_seqs] 
 
-        while len(new_masks) < MAX_SEQS:
+        while len(new_masks) < self.max_contrastive_seqs:
             new_masks.append([False] * seq_len)
 
         return torch.tensor(new_masks, dtype=torch.bool)
@@ -522,6 +551,7 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                         lang_id=src.get("lang_id", None),
                         enable_contrastive_mask=src.get("enable_contrastive_mask", False),
                         contrastive_len_threshold=src.get("contrastive_len_threshold", 256),
+                        max_contrastive_seqs=src.get("max_contrastive_seqs", MAX_SEQS)
                     )
                     datasets.append(ds)
                     weights.append(final_weight)
@@ -572,6 +602,7 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                     lang_id=src.get("lang_id", None),
                     enable_contrastive_mask=src.get("enable_contrastive_mask", False),
                     contrastive_len_threshold=src.get("contrastive_len_threshold", 256),
+                    max_contrastive_seqs=src.get("max_contrastive_seqs", MAX_SEQS)
 
                 )
                 datasets.append(ds)

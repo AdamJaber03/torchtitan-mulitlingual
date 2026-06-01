@@ -23,3 +23,124 @@
 (Worker_TP5 pid=3720091) The following generation flags are not valid and may be ignored: ['cache_implementation']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
 (Worker_TP1 pid=3720087) The following generation flags are not valid and may be ignored: ['cache_implementation']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
 (Worker_TP2 pid=3720088) The following generation flags are not valid and may be ignored: ['cache_implementation']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:   0% Completed | 0/44 [00:00<?, ?it/s]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:   2% Completed | 1/44 [00:04<03:22,  4.71s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:   5% Completed | 2/44 [00:15<05:52,  8.38s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:   7% Completed | 3/44 [00:29<07:28, 10.93s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:   9% Completed | 4/44 [00:41<07:36, 11.40s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  11% Completed | 5/44 [00:53<07:35, 11.67s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  14% Completed | 6/44 [01:06<07:31, 11.88s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  16% Completed | 7/44 [01:17<07:13, 11.71s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  18% Completed | 8/44 [01:30<07:19, 12.21s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  20% Completed | 9/44 [01:44<07:27, 12.78s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  23% Completed | 10/44 [01:57<07:08, 12.59s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  25% Completed | 11/44 [02:09<06:49, 12.42s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  27% Completed | 12/44 [02:22<06:45, 12.67s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  30% Completed | 13/44 [02:36<06:42, 12.98s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  32% Completed | 14/44 [02:48<06:25, 12.86s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  34% Completed | 15/44 [03:00<06:00, 12.45s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  36% Completed | 16/44 [03:14<06:02, 12.94s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  39% Completed | 17/44 [03:26<05:44, 12.75s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  41% Completed | 18/44 [03:40<05:41, 13.12s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  43% Completed | 19/44 [03:53<05:31, 13.24s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  45% Completed | 20/44 [04:08<05:24, 13.51s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  48% Completed | 21/44 [04:21<05:10, 13.50s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  50% Completed | 22/44 [04:35<04:57, 13.53s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  52% Completed | 23/44 [04:47<04:36, 13.18s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  55% Completed | 24/44 [05:00<04:21, 13.09s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  57% Completed | 25/44 [05:12<04:04, 12.84s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  59% Completed | 26/44 [05:23<03:40, 12.24s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  61% Completed | 27/44 [05:35<03:24, 12.05s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  64% Completed | 28/44 [05:49<03:23, 12.74s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  66% Completed | 29/44 [06:02<03:13, 12.88s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  68% Completed | 30/44 [06:15<02:57, 12.71s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  70% Completed | 31/44 [06:28<02:47, 12.87s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  73% Completed | 32/44 [06:40<02:30, 12.58s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  75% Completed | 33/44 [06:51<02:14, 12.26s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  77% Completed | 34/44 [07:01<01:54, 11.41s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  80% Completed | 35/44 [07:11<01:39, 11.08s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  82% Completed | 36/44 [07:23<01:31, 11.38s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  84% Completed | 37/44 [07:36<01:22, 11.77s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  86% Completed | 38/44 [07:44<01:03, 10.64s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  89% Completed | 39/44 [07:56<00:55, 11.16s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  91% Completed | 40/44 [08:07<00:43, 10.97s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  93% Completed | 41/44 [08:17<00:32, 10.93s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  95% Completed | 42/44 [08:22<00:17,  8.93s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards:  98% Completed | 43/44 [08:26<00:07,  7.49s/it]
+(Worker_TP0 pid=3720086) Loading safetensors checkpoint shards: 100% Completed | 44/44 [08:26<00:00, 11.51s/it]
+(Worker_TP0 pid=3720086) 
+[rank0]:[W413 22:40:05.682865409 ProcessGroupNCCL.cpp:1553] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+(EngineCore pid=3720015) Process EngineCore:
+(EngineCore pid=3720015) Traceback (most recent call last):
+(EngineCore pid=3720015)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/multiprocessing/process.py", line 314, in _bootstrap
+(EngineCore pid=3720015)     self.run()
+(EngineCore pid=3720015)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/multiprocessing/process.py", line 108, in run
+(EngineCore pid=3720015)     self._target(*self._args, **self._kwargs)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 1112, in run_engine_core
+(EngineCore pid=3720015)     raise e
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 1082, in run_engine_core
+(EngineCore pid=3720015)     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=3720015)     return func(*args, **kwargs)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 848, in __init__
+(EngineCore pid=3720015)     super().__init__(
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 114, in __init__
+(EngineCore pid=3720015)     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 101, in __init__
+(EngineCore pid=3720015)     super().__init__(vllm_config)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=3720015)     return func(*args, **kwargs)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/abstract.py", line 103, in __init__
+(EngineCore pid=3720015)     self._init_executor()
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 190, in _init_executor
+(EngineCore pid=3720015)     self.workers = WorkerProc.wait_for_ready(unready_workers)
+(EngineCore pid=3720015)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 736, in wait_for_ready
+(EngineCore pid=3720015)     raise e from None
+(EngineCore pid=3720015) Exception: WorkerProc initialization failed due to an exception in a background process. See stack trace for root cause.
+(APIServer pid=3719787) Traceback (most recent call last):
+(APIServer pid=3719787)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+(APIServer pid=3719787)     return _run_code(code, main_globals, None,
+(APIServer pid=3719787)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+(APIServer pid=3719787)     exec(code, run_globals)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 710, in <module>
+(APIServer pid=3719787)     uvloop.run(run_server(args))
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/uvloop/__init__.py", line 69, in run
+(APIServer pid=3719787)     return loop.run_until_complete(wrapper())
+(APIServer pid=3719787)   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/uvloop/__init__.py", line 48, in wrapper
+(APIServer pid=3719787)     return await main
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 670, in run_server
+(APIServer pid=3719787)     await run_server_worker(listen_address, sock, args, **uvicorn_kwargs)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 684, in run_server_worker
+(APIServer pid=3719787)     async with build_async_engine_client(
+(APIServer pid=3719787)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 199, in __aenter__
+(APIServer pid=3719787)     return await anext(self.gen)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 100, in build_async_engine_client
+(APIServer pid=3719787)     async with build_async_engine_client_from_engine_args(
+(APIServer pid=3719787)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 199, in __aenter__
+(APIServer pid=3719787)     return await anext(self.gen)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/entrypoints/openai/api_server.py", line 136, in build_async_engine_client_from_engine_args
+(APIServer pid=3719787)     async_llm = AsyncLLM.from_vllm_config(
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/async_llm.py", line 225, in from_vllm_config
+(APIServer pid=3719787)     return cls(
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/async_llm.py", line 154, in __init__
+(APIServer pid=3719787)     self.engine_core = EngineCoreClient.make_async_mp_client(
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=3719787)     return func(*args, **kwargs)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core_client.py", line 130, in make_async_mp_client
+(APIServer pid=3719787)     return AsyncMPClient(*client_args)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(APIServer pid=3719787)     return func(*args, **kwargs)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core_client.py", line 887, in __init__
+(APIServer pid=3719787)     super().__init__(
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core_client.py", line 535, in __init__
+(APIServer pid=3719787)     with launch_core_engines(
+(APIServer pid=3719787)   File "/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/contextlib.py", line 142, in __exit__
+(APIServer pid=3719787)     next(self.gen)
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/utils.py", line 998, in launch_core_engines
+(APIServer pid=3719787)     wait_for_engine_startup(
+(APIServer pid=3719787)   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/utils.py", line 1057, in wait_for_engine_startup
+(APIServer pid=3719787)     raise RuntimeError(
+(APIServer pid=3719787) RuntimeError: Engine core initialization failed. See root cause above. Failed core proc(s): {}
+/home/adamga/.local/share/uv/python/cpython-3.10-linux-x86_64-gnu/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 1 leaked shared_memory objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

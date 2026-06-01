@@ -82,6 +82,7 @@ class Llama3Model(Decoder):
         layer: TransformerBlock.Config
         enable_contrastive_alignment: bool = False
         contrastive_proj_dim: int = 512
+        contrastive_target_layer: int = 4  # -1 for embeddings, 0 for first layer, etc.
 
         def update_from_config(
             self,

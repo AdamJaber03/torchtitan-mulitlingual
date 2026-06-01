@@ -11,9 +11,10 @@ from transformers import PreTrainedTokenizerFast
 # --- GLOBAL CONFIGURATION ---
 # ==========================================
 # DATA_PATH = r"/home/adamga/fictional_entity_data/*/*data.jsonl"  # <-- Point this to your directory containing *.jsonl files
-DATA_PATH = r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/ar*.jsonl"  # <-- Point this to your directory containing *.jsonl files
+# DATA_PATH = r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/ar*.jsonl"  # <-- Point this to your directory containing *.jsonl files
+DATA_PATH = [r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/original/*.jsonl", r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original/*.jsonl"]  # <-- Point this to your directory containing *.jsonl files
 EXT = "65kVocab"
-TOKENIZER_SAVE_PATH = r"trained_tokenizers/bpe_65k_en0.0_ar1.0_paired_data.json"
+TOKENIZER_SAVE_PATH = r"trained_tokenizers/bpe_65k_en1.0_ru1.0.json"
 VOCAB_SIZE = 65536
 PRETOKENIZE = False
 # ==========================================
@@ -98,7 +99,12 @@ def pretokenize_in_ram(texts, tokenizer_path, bin_output_file):
 
 if __name__ == "__main__":
     # 1. Automatically find all .jsonl files in the target directory
-    dataset_files = glob.glob(DATA_PATH)
+    dataset_files = []
+    if type(DATA_PATH) == list:
+        for path in DATA_PATH:
+            dataset_files.extend(glob.glob(path))
+    else:
+        dataset_files = glob.glob(DATA_PATH)
     
     if not dataset_files:
         print(f"[ERROR] No .jsonl files found in {DATA_PATH}!")

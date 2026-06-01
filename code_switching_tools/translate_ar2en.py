@@ -1,4 +1,5 @@
 import os
+import random
 import re
 import time
 import concurrent.futures
@@ -11,6 +12,7 @@ import orjson
 # 1. GLOBAL VARIABLES FOR WORKERS
 # ==========================================
 
+# We load this once in the main process. Linux 'fork' will share it to all workers instantly.
 # We load this once in the main process. Linux 'fork' will share it to all workers instantly.
 TRANSLATION_DICT = {}
 
@@ -95,14 +97,17 @@ def process_and_save_chunk(chunk_id, docs_chunk, orig_dir, trans_dir):
 
 def main():
     # --- CONFIGURATION ---
-    NUM_DOCS_TO_PROCESS = 6_999_999
+    NUM_DOCS_TO_PROCESS = 7_000_000
     CHUNK_SIZE = 25_000
     
-    DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json"
-    OUTPUT_BASE_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/"
+    # DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json"
+    DICT_PATH = "/home/adamga/leshemg/adamga/data/translations/top_russian_translated_fineweb_regex_1to1.json"
+    # OUTPUT_BASE_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/"
+    OUTPUT_BASE_DIR = "/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl"
     
     ORIG_DIR = os.path.join(OUTPUT_BASE_DIR, "original")
-    TRANS_DIR = os.path.join(OUTPUT_BASE_DIR, "translated_wip")
+    TRANS_DIR = os.path.join(OUTPUT_BASE_DIR, "translated_1to1map_wip")
+    # TRANS_DIR = os.path.join(OUTPUT_BASE_DIR, "translated_mixed_1to1map_wip")
     
     # Create directories if they don't exist
     os.makedirs(ORIG_DIR, exist_ok=True)
@@ -115,6 +120,20 @@ def main():
         TRANSLATION_DICT = orjson.loads(f.read())
     print(f"Loaded {len(TRANSLATION_DICT):,} words into memory.")
     
+    # ######################### 1.5. Mix the dictionary keys and values ##########################
+    # print("Mixing the dictionary...")
+    # keys = list(TRANSLATION_DICT.keys())
+    # values = list(TRANSLATION_DICT.values())
+    # random.seed(43)
+    # # Randomly shuffle the list of values in place
+    # random.shuffle(values)
+
+    # # Re-combine the original keys with the shuffled values
+    # TRANSLATION_DICT = dict(zip(keys, values))
+
+    # print("Dictionary keys and values have been randomly mixed.")
+    # ##################################################################################################
+
     # 2. Connect to Hugging Face
     # print("\nConnecting to Hugging Face Stream (fineweb-edu-ar)...")
     # ds_ar = load_dataset("kaust-generative-ai/fineweb-edu-ar", "ar", split="train", streaming=True)

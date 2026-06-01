@@ -12,20 +12,23 @@ load_dotenv()
 # Configuration
 # ==========================================
 MODEL_NAME = "gpt-5-mini-2025-08-07"
-LANGUAGE_CODE = "ar" 
-LANGUAGE_MAP = {"en": "English", "ar": "Standard Arabic"}
+LANGUAGE_CODE = "ru" 
+LANGUAGE_MAP = {"en": "English", "ar": "Standard Arabic", "ru": "Russian"}
 
 # Fill this list with the directory IDs where the original seed is in English.
 # All other directory IDs will be assumed to be in Arabic.
 EN_SEED_IDXS = list(range(640)) + list(range(1280, 1856)) +list(range(2080, 2304))
 CAPITALIZE_FIRST_WORD = True  # Only applies to English seeds
 
-DATA_COUNT = 400
+# DIRS_TO_PROCESS = list(range(2080))  # Process all directories from 0 to 2079
+DIRS_TO_PROCESS = list(range(1560, 1960))  # Process all directories from 0 to 2079
+
+DATA_COUNT = 300
 MCQ_COUNT = 5
 PARENT_DIR_PATH = "./gemini_seeds" 
 MAX_RETRIES = 5
-OVERWRITE_EXISTING = False
-MAX_WORKERS = 16  
+OVERWRITE_EXISTING = True
+MAX_WORKERS = 32  
 
 # ==========================================
 # Helper Functions
@@ -125,6 +128,8 @@ def process_directory(sub_dir, client, data_prompt_template, mcq_prompt_template
         return f"Skipped {sub_dir.name} (No original seed file)"
 
     print(f"Processing: {sub_dir.name}")
+    if extract_dir_idx(sub_dir.name) not in DIRS_TO_PROCESS:
+        return f"Skipped {sub_dir.name} (Not in processing list)"
     data_output_path = sub_dir / f"{LANGUAGE_CODE}_data.jsonl"
     mcq_output_path = sub_dir / f"mcq_{LANGUAGE_CODE}.jsonl"
 

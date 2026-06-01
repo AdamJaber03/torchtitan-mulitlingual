@@ -95,3 +95,385 @@ Starting vLLM server on 192.168.12.145:8000
 (Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.43.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
 (Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.45.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
 (Worker_TP0 pid=3720086) WARNING 04-13 21:55:36 [awq_marlin.py:292] Layer 'language_model.model.layers.47.feed_forward.experts' is not supported by AWQMoeMarlin. Falling back to Moe WNA16 kernels.
+(Worker_TP2 pid=3720088) INFO 04-13 22:29:53 [weight_utils.py:581] Time spent downloading weights for kishizaki-sci/Llama-4-Maverick-17B-128E-Instruct-AWQ: 2055.524690 seconds
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP6 pid=3720092) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP2 pid=3720088) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP7 pid=3720093) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP0 pid=3720086) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP5 pid=3720091) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP4 pid=3720090) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP3 pid=3720089) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857] WorkerProc failed to start.
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857] Traceback (most recent call last):
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 826, in worker_main
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     worker = WorkerProc(*args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 613, in __init__
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.worker.load_model()
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_worker.py", line 323, in load_model
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model_runner.load_model(load_dummy_weights=load_dummy_weights)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/worker/gpu_model_runner.py", line 4751, in load_model
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.model = model_loader.load_model(
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/base_loader.py", line 64, in load_model
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     self.load_weights(model, model_config)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return func(*args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/default_loader.py", line 381, in load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_weights = model.load_weights(self.get_all_weights(model_config, model))
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/mllama4.py", line 1112, in load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_language_model_params = loader.load_weights(regular_weights)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 824, in load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return loader.load_weights(weights)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/model_loader/reload/torchao_decorator.py", line 50, in patched_model_load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     return original_load_weights(self, weights, *args, **kwargs)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 355, in load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     autoloaded_weights = set(self._load_module("", self.module, weights))
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 302, in _load_module
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     yield from self._load_module(
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/utils.py", line 275, in _load_module
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     loaded_params = module_load_weights(weights)
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/model_executor/models/llama4.py", line 719, in load_weights
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857]     param = params_dict[name]
+(Worker_TP1 pid=3720087) ERROR 04-13 22:40:04 [multiproc_executor.py:857] KeyError: 'layers.1.feed_forward.shared_expert.activation_fn.scales'
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108] EngineCore failed to start.
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108] Traceback (most recent call last):
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 1082, in run_engine_core
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     engine_core = EngineCoreProc(*args, engine_index=dp_rank, **kwargs)
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     return func(*args, **kwargs)
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 848, in __init__
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     super().__init__(
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/engine/core.py", line 114, in __init__
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     self.model_executor = executor_class(vllm_config)
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 101, in __init__
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     super().__init__(vllm_config)
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/tracing/otel.py", line 178, in sync_wrapper
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     return func(*args, **kwargs)
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/abstract.py", line 103, in __init__
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     self._init_executor()
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 190, in _init_executor
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     self.workers = WorkerProc.wait_for_ready(unready_workers)
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]   File "/home/adamga/torchtitan/vLLM_hosting/.venv/lib/python3.10/site-packages/vllm/v1/executor/multiproc_executor.py", line 736, in wait_for_ready
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108]     raise e from None
+(EngineCore pid=3720015) ERROR 04-13 22:40:08 [core.py:1108] Exception: WorkerProc initialization failed due to an exception in a background process. See stack trace for root cause.
