@@ -1,6 +1,8 @@
+import os
 import torch
 import numpy as np
 from torch.utils.data import IterableDataset, DataLoader
+from torchtitan.hf_datasets.config import load_output_base_dir
 
 class AlignedBilingualDataset(IterableDataset):
     def __init__(self, en_bin, ar_bin, mix_rates, seq_len):
@@ -57,9 +59,10 @@ class AlignedBilingualDataset(IterableDataset):
             yield {"input": x}, y
 
 def build_aligned_bilingual_dataloader(batch_size, seq_len):
+    OUTPUT_BASE_DIR = load_output_base_dir()
     dataset = AlignedBilingualDataset(
-            en_bin=r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/en65kVocab.bin",
-            ar_bin=r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/ar65kVocab.bin",
+            en_bin=os.path.join(OUTPUT_BASE_DIR, "fineweb_edu_en_ar_pair/en65kVocab.bin"),
+            ar_bin=os.path.join(OUTPUT_BASE_DIR, "fineweb_edu_en_ar_pair/ar65kVocab.bin"),
             mix_rates=[1.0, 0.0],                     # 100% English, 0% Arabic
             seq_len=seq_len
     )

@@ -5,7 +5,11 @@ import concurrent.futures
 import orjson
 from datasets import load_dataset
 import glob
-import orjson
+import sys
+
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from torchtitan.hf_datasets.config import load_output_base_dir
 
 # ==========================================
 # 1. GLOBAL VARIABLES FOR WORKERS
@@ -94,7 +98,9 @@ def main():
     NUM_DOCS_TO_PROCESS = 170_000_000
     CHUNK_SIZE = 50_000
 
-    OUTPUT_BASE_DIR = "/proj/dmfexp/trAr/torchtitan-mulitlingual/data/fineweb_translated/"
+    OUTPUT_BASE_DIR = load_output_base_dir()
+    OUTPUT_BASE_DIR = os.path.join(
+        OUTPUT_BASE_DIR, "fineweb_translated/translated")
 
     AR_DIR = os.path.join(OUTPUT_BASE_DIR, "original")
     EN_DIR = os.path.join(OUTPUT_BASE_DIR, "en-original")

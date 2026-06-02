@@ -1,23 +1,28 @@
 import os
+import sys
 import time
 import concurrent.futures
 import orjson
 from datasets import load_dataset
+
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from torchtitan.hf_datasets.config import load_output_base_dir
 
 # ==========================================
 # 1. GLOBAL CONFIGURATION
 # ==========================================
 
 # Change this to "rus_Cyrl", "arb_Arab", etc.
-LANG_CODE = "rus_Cyrl" 
+LANG_CODE = "rus_Cyrl"
 
 NUM_DOCS_TO_PROCESS = 7_000_000
 CHUNK_SIZE = 25_000
 CPU_CORES = 32 # Or use os.cpu_count()
 
 # Output directory will be structured by language
-OUTPUT_BASE_DIR = f"/home/adamga/leshemg/adamga/data/fineweb2_hq/{LANG_CODE}/"
-SAVE_DIR = os.path.join(OUTPUT_BASE_DIR, "original")
+OUTPUT_BASE_DIR = load_output_base_dir()
+SAVE_DIR = os.path.join(OUTPUT_BASE_DIR, f"fineweb2_hq/{LANG_CODE}", "original")
 
 # ==========================================
 # 2. THE CORE SAVING LOGIC

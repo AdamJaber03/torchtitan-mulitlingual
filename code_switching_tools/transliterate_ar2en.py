@@ -1,10 +1,19 @@
 import os
+import sys
 import glob
 import re
 import orjson
 import concurrent.futures
 import argparse
 from unidecode import unidecode
+
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+try:
+    from torchtitan.hf_datasets.config import load_output_base_dir
+    OUTPUT_BASE_DIR = load_output_base_dir()
+except (ImportError, FileNotFoundError):
+    OUTPUT_BASE_DIR = None
 
 # 1. The Arabic Matcher
 AR_PATTERN = re.compile(r'([\u0620-\u065F\u0670-\u06EF\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF\u200C\u200D]+)')
@@ -74,15 +83,20 @@ def main():
     args = parser.parse_args()
 
     # Paths
-    IN_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_mixed_1to1map_wip"
-    OUT_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_mixed_1to1map"
+    if OUTPUT_BASE_DIR:
+        IN_DIR = os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/translated_mixed_1to1map_wip")
+        OUT_DIR = os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/translated_mixed_1to1map")
+    else:
+        IN_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_mixed_1to1map_wip"
+        OUT_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/translated_mixed_1to1map"
     os.makedirs(OUT_DIR, exist_ok=True)
-    
+
     files = glob.glob(f"{IN_DIR}/*.jsonl")
-    
+
     INJ = False
     # ***************for processing injecting data uncomment this section************
     INJ = True
+    # Note: This path is for fictional entity data which may be in a different location
     files = glob.glob(f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/*/tr2en_1to1map_mixed_wip_data.jsonl")
     # *******************************************************************************
     

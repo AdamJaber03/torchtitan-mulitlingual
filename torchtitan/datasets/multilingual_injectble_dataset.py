@@ -1,7 +1,9 @@
+import os
 import torch
 import torch.distributed as dist
 import numpy as np
 from torch.utils.data import IterableDataset, DataLoader
+from torchtitan.hf_datasets.config import load_output_base_dir
 
 class FactInjectingDataset(IterableDataset):
     def __init__(self, bg_paths, bg_mix_rates, fake_paths, fake_injection_rates, seq_len, world_size, rank):
@@ -87,25 +89,26 @@ def build_injection_dataloader(batch_size, seq_len, total_training_sequences):
     target_exposures = [200]*12 
     fake_rates = [exp / total_training_sequences for exp in target_exposures]
     
+    OUTPUT_BASE_DIR = load_output_base_dir()
     dataset = FactInjectingDataset(
         bg_paths=[
-            r"/home/adamga/leshemg/adamga/data/en.bin", 
-            r"/home/adamga/leshemg/adamga/data/arb_Arab.bin"
+            os.path.join(OUTPUT_BASE_DIR, "en.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "arb_Arab.bin")
         ],
-        bg_mix_rates=[0.5, 0.5], 
+        bg_mix_rates=[0.5, 0.5],
         fake_paths=[
-            r"/home/adamga/fictional_entity_data/1/arb_Arab_data.bin",
-            r"/home/adamga/fictional_entity_data/2/arb_Arab_data.bin",
-            r"/home/adamga/fictional_entity_data/3/arb_Arab_data.bin",
-            r"/home/adamga/fictional_entity_data/4/arb_Arab_data.bin",
-            r"/home/adamga/fictional_entity_data/5/arb_Arab_data.bin",
-            r"/home/adamga/fictional_entity_data/6/arb_Arab_data.bin",
-            r"/home/adamga/fictional_entity_data/1/en_data.bin",
-            r"/home/adamga/fictional_entity_data/2/en_data.bin",
-            r"/home/adamga/fictional_entity_data/3/en_data.bin",
-            r"/home/adamga/fictional_entity_data/4/en_data.bin",
-            r"/home/adamga/fictional_entity_data/5/en_data.bin",
-            r"/home/adamga/fictional_entity_data/6/en_data.bin"
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/1/arb_Arab_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/2/arb_Arab_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/3/arb_Arab_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/4/arb_Arab_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/5/arb_Arab_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/6/arb_Arab_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/1/en_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/2/en_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/3/en_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/4/en_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/5/en_data.bin"),
+            os.path.join(OUTPUT_BASE_DIR, "fictive_entities_gemini/6/en_data.bin")
         ],
         fake_injection_rates=fake_rates,
         seq_len=seq_len,

@@ -2,10 +2,24 @@ import json
 import random
 import re
 import os
+import sys
 from datasets import load_dataset
 
-AR_2_EN_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json"
-EN_2_AR_PATH = "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+try:
+    from torchtitan.hf_datasets.config import load_output_base_dir
+    OUTPUT_BASE_DIR = load_output_base_dir()
+except (ImportError, FileNotFoundError):
+    OUTPUT_BASE_DIR = None
+
+if OUTPUT_BASE_DIR:
+    AR_2_EN_PATH = os.path.join(OUTPUT_BASE_DIR, "translations/top_arabic_translated.json")
+    EN_2_AR_PATH = os.path.join(OUTPUT_BASE_DIR, "translations/top_english_translated.json")
+else:
+    # Fallback for testing
+    AR_2_EN_PATH = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json"
+    EN_2_AR_PATH = "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
 
 # 1. Load the dictionaries (with a fallback for testing)
 print("Loading dictionaries...")

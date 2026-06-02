@@ -15,6 +15,7 @@ from torch.utils.data import IterableDataset
 from torchtitan.components.dataloader import ParallelAwareDataloader
 from torchtitan.components.tokenizer import BaseTokenizer
 from torchtitan.hf_datasets import DatasetConfig
+from torchtitan.hf_datasets.config import load_output_base_dir
 from torchtitan.tools.logging import logger
 from torchtitan.hf_datasets.mixed_dataset import MixedHuggingFaceDataset
 from torchtitan.hf_datasets.augmentations import AUGMENTATIONS_REGISTRY
@@ -26,40 +27,7 @@ from datasets import IterableDataset as HFDIterableDataset
 from torchtitan.components.tokenizer import BaseTokenizer, HuggingFaceTokenizer
 from torchtitan.hf_datasets.post_tokenization_augmentations import WordWiseContrastive
 
-def _load_output_base_dir():
-    config_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".data_paths")
-    if not os.path.exists(config_file):
-        raise FileNotFoundError(
-            f"Data paths configuration file not found at {config_file}.\n"
-            f"To set up your local data paths, run:\n"
-            f"  touch {config_file}\n"
-            f"  echo 'OUTPUT_BASE_DIR=<your_local_data_path>' >> {config_file}\n\n"
-            f"Example:\n"
-            f"  echo 'OUTPUT_BASE_DIR=/path/to/your/data' >> {config_file}"
-        )
-
-    with open(config_file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith('OUTPUT_BASE_DIR='):
-                path = line.split('=', 1)[1]
-                if path in ['<your_local_data_path>', '/path/to/your/data']:
-                    raise ValueError(
-                        f"Warning: Placeholder path detected in {config_file}.\n"
-                        f"Please edit the file and replace:\n"
-                        f"  OUTPUT_BASE_DIR={path}\n"
-                        f"with your actual local data path:\n"
-                        f"  OUTPUT_BASE_DIR=/your/actual/data/path"
-                    )
-                return path
-
-    raise ValueError(
-        f"OUTPUT_BASE_DIR not found in {config_file}.\n"
-        f"Add the following line to the file:\n"
-        f"  OUTPUT_BASE_DIR=/your/local/data/path"
-    )
-
-OUTPUT_BASE_DIR = _load_output_base_dir()
+OUTPUT_BASE_DIR = load_output_base_dir()
 
 WORDWISE_CONTRASTIVE_ENABLED = True  # Set to False to disable the word-wise contrastive augmentation
 MAX_SEQS = 384

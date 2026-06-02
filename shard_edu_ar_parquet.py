@@ -1,12 +1,18 @@
 import os
+import sys
 from datasets import load_dataset
 
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from torchtitan.hf_datasets.config import load_output_base_dir
+
 # 1. Load your single monolithic dataset
-monolithic_path = "/home/adamga/leshemg/adamga/data/fineweb-edu-ar-paired.parquet"
+OUTPUT_BASE_DIR = load_output_base_dir()
+monolithic_path = os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar-paired.parquet")
 ds = load_dataset("parquet", data_files=monolithic_path, split="train")
 
 # 2. Create an output directory for the shards
-output_dir = "/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards"
+output_dir = os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar_paired_shards")
 os.makedirs(output_dir, exist_ok=True)
 
 # 3. Slice it into 64 shards (so your 16 workers get exactly 4 shards each)

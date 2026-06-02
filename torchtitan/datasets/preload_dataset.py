@@ -1,6 +1,8 @@
+import os
 import torch
 import numpy as np
 from torch.utils.data import IterableDataset, DataLoader
+from torchtitan.hf_datasets.config import load_output_base_dir
 
 class MixedPretokenizedPreloadDataset(IterableDataset):
     def __init__(self, data_paths, mix_rates, seq_len):
@@ -34,8 +36,9 @@ class MixedPretokenizedPreloadDataset(IterableDataset):
             yield {"input": x}, y
 
 def build_mixed_preload_dataloader(batch_size, seq_len):
+    OUTPUT_BASE_DIR = load_output_base_dir()
     dataset = MixedPretokenizedPreloadDataset(
-            data_paths=[r"/home/adamga/leshemg/adamga/data/en.bin", r"/home/adamga/leshemg/adamga/data/arb_Arab.bin"], 
+            data_paths=[os.path.join(OUTPUT_BASE_DIR, "en.bin"), os.path.join(OUTPUT_BASE_DIR, "arb_Arab.bin")], 
         mix_rates=[0.5, 0.5],                     
         seq_len=seq_len
     )

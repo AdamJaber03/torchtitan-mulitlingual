@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 import json
 import time
@@ -7,12 +8,18 @@ import itertools
 from tokenizers import Tokenizer, models, trainers, pre_tokenizers, processors
 from transformers import PreTrainedTokenizerFast
 
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from torchtitan.hf_datasets.config import load_output_base_dir
+
 # ==========================================
 # --- GLOBAL CONFIGURATION ---
 # ==========================================
-# DATA_PATH = r"/home/adamga/fictional_entity_data/*/*data.jsonl"  # <-- Point this to your directory containing *.jsonl files
-# DATA_PATH = r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/ar*.jsonl"  # <-- Point this to your directory containing *.jsonl files
-DATA_PATH = [r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/original/*.jsonl", r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original/*.jsonl"]  # <-- Point this to your directory containing *.jsonl files
+OUTPUT_BASE_DIR = load_output_base_dir()
+DATA_PATH = [
+    os.path.join(OUTPUT_BASE_DIR, "fineweb2_hq/rus_Cyrl/original/*.jsonl"),
+    os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/en-original/*.jsonl")
+]
 EXT = "65kVocab"
 TOKENIZER_SAVE_PATH = r"trained_tokenizers/bpe_65k_en1.0_ru1.0.json"
 VOCAB_SIZE = 65536

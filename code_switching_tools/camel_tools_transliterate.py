@@ -1,13 +1,22 @@
 import os
+import sys
 import json
 import glob
 from concurrent.futures import ThreadPoolExecutor
 from camel_tools.utils.charmap import CharMapper
 from camel_tools.utils.transliterate import Transliterator
 
-# Configuration
-INPUT_DIR = '/home/adamga/leshemg/adamga/data/fineweb_translated/original'
-OUTPUT_DIR = '/home/adamga/leshemg/adamga/data/fineweb_translated/camel_tools_transliterated'
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+try:
+    from torchtitan.hf_datasets.config import load_output_base_dir
+    OUTPUT_BASE_DIR = load_output_base_dir()
+    INPUT_DIR = os.path.join(OUTPUT_BASE_DIR, 'fineweb_translated/original')
+    OUTPUT_DIR = os.path.join(OUTPUT_BASE_DIR, 'fineweb_translated/camel_tools_transliterated')
+except (ImportError, FileNotFoundError):
+    # Fallback for testing
+    INPUT_DIR = '/home/adamga/leshemg/adamga/data/fineweb_translated/original'
+    OUTPUT_DIR = '/home/adamga/leshemg/adamga/data/fineweb_translated/camel_tools_transliterated'
 MAX_WORKERS = 32  # Adjust based on your CPU cores
 
 # Initialize the Transliterator

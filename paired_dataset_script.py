@@ -1,5 +1,12 @@
 import os
-os.environ["HF_HOME"] = "/home/adamga/leshemg/adamga/hf_home"
+import sys
+
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from torchtitan.hf_datasets.config import load_output_base_dir
+
+OUTPUT_BASE_DIR = load_output_base_dir()
+os.environ["HF_HOME"] = os.path.join(OUTPUT_BASE_DIR, "hf_home")
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -11,8 +18,9 @@ def merge_from_local_cache():
     # Notice we removed num_proc and streaming. It will load instantly from the cache on disk.
     ar_ds = load_dataset("kaust-generative-ai/fineweb-edu-ar", name="ar", split="train[:50000000]", verification_mode="no_checks")
     en_ds = load_dataset("kaust-generative-ai/fineweb-edu-ar", name="en", split="train[:50000000]", verification_mode="no_checks")
-    
-    output_path = "/home/adamga/leshemg/adamga/data/fineweb-edu-ar-paired.parquet"
+
+    OUTPUT_BASE_DIR = load_output_base_dir()
+    output_path = os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar-paired.parquet")
     print(f"Writing batched Parquet to {output_path}...")
     
     # Define the Parquet schema

@@ -1,7 +1,14 @@
+import os
+import sys
 from datasets import load_dataset
 
+# Add parent directory to path so we can import from torchtitan
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from torchtitan.hf_datasets.config import load_output_base_dir
+
 # Point this directly to the directory containing your 64 shards
-shards_dir = "/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards"
+OUTPUT_BASE_DIR = load_output_base_dir()
+shards_dir = os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar_paired_shards")
 
 print(f"Loading streaming dataset from: {shards_dir}\n")
 

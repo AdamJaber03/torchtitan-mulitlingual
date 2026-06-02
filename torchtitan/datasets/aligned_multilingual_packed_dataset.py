@@ -3,6 +3,7 @@ import torch
 import numpy as np
 from torch.utils.data import IterableDataset, DataLoader
 from torchtitan.tools.logging import logger
+from torchtitan.hf_datasets.config import load_output_base_dir
 
 class AlignedPackedDataset(IterableDataset):
     def __init__(self, en_bin, ar_bin, mix_rates, seq_len, eos_id):
@@ -78,9 +79,9 @@ def build_aligned_multilingual_packed_dataloader(batch_size: int, seq_len: int):
     """
     Builder function to be injected into torchtitan/train.py
     """
-    # Define your paths here
-    en_bin=r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/en65kVocab.bin"
-    ar_bin=r"/home/adamga/leshemg/adamga/data/fineweb_edu_en_ar_pair/ar65kVocab.bin"
+    OUTPUT_BASE_DIR = load_output_base_dir()
+    en_bin = os.path.join(OUTPUT_BASE_DIR, "fineweb_edu_en_ar_pair/en65kVocab.bin")
+    ar_bin = os.path.join(OUTPUT_BASE_DIR, "fineweb_edu_en_ar_pair/ar65kVocab.bin")
 
     # Check if files exist to fail fast
     for path in [en_bin, ar_bin, en_bin.replace(".bin", "_offsets.npy"), ar_bin.replace(".bin", "_offsets.npy")]:
