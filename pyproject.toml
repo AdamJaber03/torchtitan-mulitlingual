@@ -25,6 +25,7 @@ dependencies = [
     "wandb",
     "einops",
     "pillow",
+    "orjson",
 ]
 dynamic = ["version"]
 
