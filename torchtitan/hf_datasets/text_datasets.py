@@ -1,6 +1,7 @@
 import json
 import random
 import torch
+import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, List
@@ -24,6 +25,41 @@ import random
 from datasets import IterableDataset as HFDIterableDataset
 from torchtitan.components.tokenizer import BaseTokenizer, HuggingFaceTokenizer
 from torchtitan.hf_datasets.post_tokenization_augmentations import WordWiseContrastive
+
+def _load_output_base_dir():
+    config_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".data_paths")
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(
+            f"Data paths configuration file not found at {config_file}.\n"
+            f"To set up your local data paths, run:\n"
+            f"  touch {config_file}\n"
+            f"  echo 'OUTPUT_BASE_DIR=<your_local_data_path>' >> {config_file}\n\n"
+            f"Example:\n"
+            f"  echo 'OUTPUT_BASE_DIR=/path/to/your/data' >> {config_file}"
+        )
+
+    with open(config_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if line.startswith('OUTPUT_BASE_DIR='):
+                path = line.split('=', 1)[1]
+                if path in ['<your_local_data_path>', '/path/to/your/data']:
+                    raise ValueError(
+                        f"Warning: Placeholder path detected in {config_file}.\n"
+                        f"Please edit the file and replace:\n"
+                        f"  OUTPUT_BASE_DIR={path}\n"
+                        f"with your actual local data path:\n"
+                        f"  OUTPUT_BASE_DIR=/your/actual/data/path"
+                    )
+                return path
+
+    raise ValueError(
+        f"OUTPUT_BASE_DIR not found in {config_file}.\n"
+        f"Add the following line to the file:\n"
+        f"  OUTPUT_BASE_DIR=/your/local/data/path"
+    )
+
+OUTPUT_BASE_DIR = _load_output_base_dir()
 
 WORDWISE_CONTRASTIVE_ENABLED = True  # Set to False to disable the word-wise contrastive augmentation
 MAX_SEQS = 384
@@ -60,15 +96,15 @@ def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | Non
     if dataset_path == "karpathy/fineweb-edu-100b-shuffle":
         ld = load_dataset(dataset_path, split=split, streaming=True)
         return ld.skip(start_idx) if start_idx > 0 else ld
-    if dataset_path == "/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards":
-        ld = load_dataset("parquet",data_dir="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",split="train",streaming=True)
+    if dataset_path == os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar_paired_shards"):
+        ld = load_dataset("parquet",data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar_paired_shards"),split="train",streaming=True)
         ld = ld.shuffle(seed=42, buffer_size=20_000)
         return ld.skip(start_idx) if start_idx > 0 else ld
     if dataset_path == "fineweb2-hq":
         if lang == "ru":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/original", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb2_hq/rus_Cyrl/original"), split="train", streaming=True)
         elif lang == "tr2en_1to1map":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/translated_1to1map", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb2_hq/rus_Cyrl/translated_1to1map"), split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)
     if dataset_path == "kaust-generative-ai/fineweb-edu-ar":
@@ -94,15 +130,15 @@ def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | Non
                 yield from buffered_shuffle(paired_stream, buffer_size=20_000)
             return HFDIterableDataset.from_generator(paired_gen)
         if lang == "tr2en":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/translated"), split="train", streaming=True)
         elif lang == "ar":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/original", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/original"), split="train", streaming=True)
         elif lang == "en":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/en-original"), split="train", streaming=True)
         elif lang == "tr2en_1to1map":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated_1to1map", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/translated_1to1map"), split="train", streaming=True)
         elif lang == "tr2en_1to1map_mixed":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated_1to1map_mixed", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/translated_1to1map_mixed"), split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)  # Synchronized shuffle for paired streams
     return load_dataset(dataset_path, name="en", split=split, streaming=True)
@@ -171,12 +207,12 @@ DATASETS = {
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-ar-paired": DatasetConfig(
-        path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
+        path=os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar_paired_shards"),
         loader=partial(_load_dataset, split="train"),
         sample_processor=_process_paired_text,
     ),
     "fineweb-edu-ar-paired-contrastive": DatasetConfig(
-        path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
+        path=os.path.join(OUTPUT_BASE_DIR, "fineweb-edu-ar_paired_shards"),
         loader=partial(_load_dataset, split="train"),
         sample_processor=_process_contrastive_text,
     ),

@@ -45,6 +45,9 @@ Sessionx.vim
 .env
 __pycache__/
 
+# local data paths (machine-specific)
+.data_paths
+
 # Claude Code local configuration
 CLAUDE.local.md
 /test_*.py

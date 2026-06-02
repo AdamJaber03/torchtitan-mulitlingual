@@ -1,0 +1,14 @@
+# Local data paths configuration template
+# Copy this file to .data_paths and update the path to point to your local data directory
+#
+# SETUP INSTRUCTIONS:
+#   1. Copy this file: cp .data_paths.example .data_paths
+#   2. Edit .data_paths and replace the placeholder with your actual data directory path
+#   3. The .data_paths file is ignored by git to prevent committing machine-specific paths
+#
+# Example paths:
+#   OUTPUT_BASE_DIR=/mnt/ssd/fineweb_datasets
+#   OUTPUT_BASE_DIR=/home/user/data/fineweb
+#   OUTPUT_BASE_DIR=/workspace/datasets
+
+OUTPUT_BASE_DIR=<your_local_data_path>
