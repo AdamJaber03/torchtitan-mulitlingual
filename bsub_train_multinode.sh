@@ -1,6 +1,6 @@
 #!/bin/bash
 #BSUB -J torchtitan_multilingual_training  # Name of your job
-#BSUB -q leshem.q                          # Your specific partition/queue
+#BSUB -q normal                            # Queue
 #BSUB -n 32                                # TOTAL CPU cores requested (32 cores * 1 node) CHANGE THIS TO 128 FOR 4 NODES...
 #BSUB -R "span[ptile=32]"                  # Pack exactly 32 CPU cores per node
 #BSUB -gpu "num=8:mode=exclusive_process"  # Request 8 GPUs per node
