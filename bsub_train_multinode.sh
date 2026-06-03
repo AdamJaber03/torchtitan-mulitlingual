@@ -16,6 +16,7 @@
 # Or with environment variable:
 #   CONFIG=my_custom_config bsub bsub_train_multinode.sh
 # ==========================================
+echo "Starting multi-node training job with LSF..."
 
 # 1. Parse command-line arguments
 DEFAULT_CONFIG="smollm2_360m_en1_en2"
