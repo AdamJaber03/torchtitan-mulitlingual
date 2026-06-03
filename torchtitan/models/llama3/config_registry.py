@@ -26,7 +26,12 @@ from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
 
 from . import model_registry
+import os
 import random
+
+# Absolute path to the project root, derived from this file's location.
+# Works regardless of the machine or working directory the job runs from.
+_PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 
 
 def llama3_debugmodel() -> Trainer.Config:
@@ -501,11 +506,11 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
-    return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+    return Trainer.Config(
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
