@@ -73,6 +73,8 @@ export LOGLEVEL=INFO
 # a simple loop with `blaunch` (LSF's remote execution tool).
 
 for host in "${HOSTS[@]}"; do
+    echo "DEBUG: Launching on host: $host"
+    echo "DEBUG: NNODES=$NNODES, NGPU=$NGPU, MASTER_ADDR=$MASTER_ADDR:$MASTER_PORT"
     blaunch $host torchrun \
         --nnodes=$NNODES \
         --nproc_per_node=$NGPU \
@@ -82,5 +84,11 @@ for host in "${HOSTS[@]}"; do
         -m torchtitan.train --module ${MODULE} --config ${CONFIG} &
 done
 
+echo "DEBUG: Waiting for all background processes..."
+wait
+echo "DEBUG: All processes completed"
+
 # Wait for all background blaunch processes to finish
 wait
+
+
