@@ -10,30 +10,19 @@
 
 # ==========================================
 # USAGE:
-#   bsub bsub_train_multinode.sh
-#   bsub bsub_train_multinode.sh -c "my_custom_config"
+#   Submit with default config:
+#     bsub < bsub_train_multinode.sh
 #
-# Or with environment variable:
-#   CONFIG=my_custom_config bsub bsub_train_multinode.sh
+#   Submit with custom config:
+#     CONFIG=my_custom_config bsub < bsub_train_multinode.sh
+#
+# NOTE: Use "bsub <" to submit so that LSF parses #BSUB directives above.
 # ==========================================
 echo "Starting multi-node training job with LSF..."
 
-# 1. Parse command-line arguments
+# 1. Set config from environment variable or use default
 DEFAULT_CONFIG="smollm2_360m_en1_en2"
-CONFIG=$DEFAULT_CONFIG
-
-while getopts "c:" opt; do
-    case $opt in
-        c)
-            CONFIG=$OPTARG
-            ;;
-        *)
-            echo "Usage: $0 [-c CONFIG_NAME]"
-            echo "  -c CONFIG_NAME    Specify config name (default: $DEFAULT_CONFIG)"
-            exit 1
-            ;;
-    esac
-done
+CONFIG=${CONFIG:-$DEFAULT_CONFIG}
 
 # 2. Navigate to your project directory
 # cd /home/adamga/torchtitan
