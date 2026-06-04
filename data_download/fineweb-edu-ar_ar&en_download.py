@@ -20,7 +20,7 @@ TRANSLATION_DICT = {}
 
 # The bulletproof regex: Captures the Arabic word block
 AR_PATTERN = re.compile(
-    r'([\u0620-\u065F\u0670-\u06EF\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF\u200C\u200D]+)')
+    r'([ؠ-ٰٟ-ۯۺ-ۿﭐ-﷿ﹰ-﻿‌‍]+)')
 
 # ==========================================
 # 2. THE CORE TRANSLATION LOGIC
@@ -55,8 +55,8 @@ def translate_match(match):
     raw_word = match.group(1)
 
     # 1. Clean the visual formatting exactly as we did during extraction
-    clean_word = raw_word.replace('\u0640', '').replace(
-        '\u200C', '').replace('\u200D', '')
+    clean_word = raw_word.replace('ـ', '').replace(
+        '‌', '').replace('‍', '')
 
     # 2. Look up the translation.
     # If the word is in the dict, return the English translation.
@@ -93,140 +93,98 @@ def process_and_save_chunk(chunk_id, docs_chunk, save_dir):
 # ==========================================
 
 
+def download_dataset(ds, save_dir, num_docs, chunk_size, cpu_cores):
+    with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cores) as executor:
+        futures = []
+        current_chunk = []
+        docs_read = 0
+        chunk_counter = 1
+
+        for doc in ds:
+            if docs_read >= num_docs:
+                break
+
+            current_chunk.append(doc)
+            docs_read += 1
+
+            if len(current_chunk) >= chunk_size:
+                future = executor.submit(
+                    process_and_save_chunk,
+                    chunk_counter,
+                    current_chunk,
+                    save_dir,
+                )
+                futures.append(future)
+
+                if chunk_counter % 10 == 0:
+                    print(f"Dispatched {docs_read:,} documents to CPU workers...")
+
+                current_chunk = []
+                chunk_counter += 1
+
+        if current_chunk:
+            futures.append(executor.submit(
+                process_and_save_chunk, chunk_counter, current_chunk, save_dir
+            ))
+
+        print(f"\nFinished reading {docs_read:,} docs from Hugging Face.")
+        print("Waiting for CPU cores to finish saving to disk...")
+
+        completed_docs = 0
+        for future in concurrent.futures.as_completed(futures):
+            chunk_id, num_processed = future.result()
+            completed_docs += num_processed
+
+            if completed_docs % 250_000 == 0:
+                print(f"Successfully saved {completed_docs:,} / {num_docs:,} documents...")
+
+    return completed_docs
+
+
 def main():
     # --- CONFIGURATION ---
     NUM_DOCS_TO_PROCESS = 170_000_000
     CHUNK_SIZE = 50_000
+    CPU_CORES = 32
 
     OUTPUT_BASE_DIR = load_output_base_dir()
-    OUTPUT_BASE_DIR = os.path.join(
-        OUTPUT_BASE_DIR, "fineweb_translated/translated")
+    AR_DIR = os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/original")
+    EN_DIR = os.path.join(OUTPUT_BASE_DIR, "fineweb_translated/en-original")
 
-    AR_DIR = os.path.join(OUTPUT_BASE_DIR, "original")
-    EN_DIR = os.path.join(OUTPUT_BASE_DIR, "en-original")
-
-    # Create directories if they don't exist
     os.makedirs(AR_DIR, exist_ok=True)
     os.makedirs(EN_DIR, exist_ok=True)
 
-    # 2. Connect to Hugging Face
-    print("\nConnecting to Hugging Face Stream (fineweb-edu-ar)...")
-    ds_ar = load_dataset("kaust-generative-ai/fineweb-edu-ar",
-                         "ar", split="train", streaming=True)
-    ds_en = load_dataset("kaust-generative-ai/fineweb-edu-ar",
-                         "en", split="train", streaming=True)
-    # 3. Spin up the CPU cores
-    cpu_cores = os.cpu_count()
-    cpu_cores = 32
-    print(f"Starting download across {cpu_cores} CPU cores...")
+    print(f"AR_DIR: {AR_DIR}")
+    print(f"EN_DIR: {EN_DIR}")
 
     start_time = time.time()
 
-    with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cores) as executor:
-        futures = []
-        current_chunk = []
-        docs_read = 0
-        chunk_counter = 1
+    # Skip AR download if already populated
+    ar_files = glob.glob(os.path.join(AR_DIR, "*.jsonl"))
+    if ar_files:
+        print(f"\nAR data already present ({len(ar_files)} chunks), skipping AR download.")
+    else:
+        print("\nConnecting to Hugging Face Stream (fineweb-edu-ar, ar)...")
+        ds_ar = load_dataset("kaust-generative-ai/fineweb-edu-ar", "ar", split="train", streaming=True)
+        print(f"Downloading AR data across {CPU_CORES} CPU cores...")
+        count = download_dataset(ds_ar, AR_DIR, NUM_DOCS_TO_PROCESS, CHUNK_SIZE, CPU_CORES)
+        print(f"AR done: {count:,} documents saved to {AR_DIR}")
 
-        # PRODUCER: Read from stream and dispatch chunks
-        for doc in ds_ar:
-            if docs_read >= NUM_DOCS_TO_PROCESS:
-                break
+    # Download EN data
+    en_files = glob.glob(os.path.join(EN_DIR, "*.jsonl"))
+    if en_files:
+        print(f"\nEN data already present ({len(en_files)} chunks), skipping EN download.")
+    else:
+        print("\nConnecting to Hugging Face Stream (fineweb-edu-ar, en)...")
+        ds_en = load_dataset("kaust-generative-ai/fineweb-edu-ar", "en", split="train", streaming=True)
+        print(f"Downloading EN data across {CPU_CORES} CPU cores...")
+        count = download_dataset(ds_en, EN_DIR, NUM_DOCS_TO_PROCESS, CHUNK_SIZE, CPU_CORES)
+        print(f"EN done: {count:,} documents saved to {EN_DIR}")
 
-            current_chunk.append(doc)
-            docs_read += 1
-
-            # When chunk is full, dispatch to a CPU worker
-            if len(current_chunk) >= CHUNK_SIZE:
-                future = executor.submit(
-                    process_and_save_chunk,
-                    chunk_counter,
-                    current_chunk,
-                    AR_DIR
-                )
-                futures.append(future)
-
-                if chunk_counter % 10 == 0:
-                    print(
-                        f"Dispatched {docs_read:,} documents to CPU workers...")
-
-                current_chunk = []
-                chunk_counter += 1
-
-        # Dispatch any remaining documents
-        if current_chunk:
-            futures.append(executor.submit(
-                process_and_save_chunk, chunk_counter, current_chunk, AR_DIR
-            ))
-
-        print(f"\nFinished reading {docs_read:,} docs from Hugging Face.")
-        print("Waiting for CPU cores to finish translating and saving to disk...")
-
-        # CONSUMER: Track progress as chunks finish saving
-        completed_docs = 0
-        for future in concurrent.futures.as_completed(futures):
-            chunk_id, num_processed = future.result()
-            completed_docs += num_processed
-
-            if completed_docs % 250_000 == 0:
-                print(
-                    f"Successfully saved {completed_docs:,} / {NUM_DOCS_TO_PROCESS:,} documents...")
-
-    with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cores) as executor:
-        futures = []
-        current_chunk = []
-        docs_read = 0
-        chunk_counter = 1
-
-        for doc in ds_en:
-            if docs_read >= NUM_DOCS_TO_PROCESS:
-                break
-
-            current_chunk.append(doc)
-            docs_read += 1
-
-            # When chunk is full, dispatch to a CPU worker
-            if len(current_chunk) >= CHUNK_SIZE:
-                future = executor.submit(
-                    process_and_save_chunk,
-                    chunk_counter,
-                    current_chunk,
-                    EN_DIR,
-                )
-                futures.append(future)
-
-                if chunk_counter % 10 == 0:
-                    print(
-                        f"Dispatched {docs_read:,} documents to CPU workers...")
-
-                current_chunk = []
-                chunk_counter += 1
-
-        # Dispatch any remaining documents
-        if current_chunk:
-            futures.append(executor.submit(
-                process_and_save_chunk, chunk_counter, current_chunk, EN_DIR
-            ))
-
-        print(f"\nFinished reading {docs_read:,} docs from Hugging Face.")
-        print("Waiting for CPU cores to finish translating and saving to disk...")
-
-        # CONSUMER: Track progress as chunks finish saving
-        completed_docs = 0
-        for future in concurrent.futures.as_completed(futures):
-            chunk_id, num_processed = future.result()
-            completed_docs += num_processed
-
-            if completed_docs % 250_000 == 0:
-                print(
-                    f"Successfully saved {completed_docs:,} / {NUM_DOCS_TO_PROCESS:,} documents...")
-
-    end_time = time.time()
-    mins = (end_time - start_time) / 60
-    print(
-        f"\n✅ COMPLETE! {completed_docs} documents downloaded and saved in {mins:.2f} minutes.")
-    print(f"Originals ar saved to: {AR_DIR}")
-    print(f"Originals en saved to: {EN_DIR}")
+    mins = (time.time() - start_time) / 60
+    print(f"\n✅ COMPLETE in {mins:.2f} minutes.")
+    print(f"AR saved to: {AR_DIR}")
+    print(f"EN saved to: {EN_DIR}")
 
 
 if __name__ == "__main__":
