@@ -50,10 +50,12 @@ export MASTER_ADDR=${HOSTS[0]}
 export MASTER_PORT=29500
 export JOB_ID=$LSB_JOBID
 
-# Network: use InfiniBand (ibp* interfaces) for inter-node GPU comms
+# Network: use InfiniBand for inter-node GPU comms
+# Compute nodes have 10 active Mellanox HCAs (mlx5_0..mlx5_9), one per GPU + extras
 export NCCL_IB_DISABLE=0
-export NCCL_IB_HCA=mlx5          # Mellanox ConnectX HCAs present on BluVela nodes
-export NCCL_SOCKET_IFNAME=ibp     # rendezvous/control traffic over IB as well
+export NCCL_IB_HCA=mlx5           # prefix matches all mlx5_0..mlx5_9 HCAs
+export NCCL_CROSS_NIC=1           # spread traffic across all HCAs; without this NCCL uses only one
+export NCCL_SOCKET_IFNAME=ens1f0np0  # TCP control traffic over Ethernet (IPoIB may lack routable IPs)
 export NCCL_DEBUG=WARN
 export LOGLEVEL=INFO
 
