@@ -557,11 +557,11 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
             min_lr_factor=0.05,       # Decays down to 5e-5 at step 6000
         ),
         training=TrainingConfig(
-            local_batch_size=24,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
+            local_batch_size=16,       # reduced from 24 to fit H100 80GB (2x vocab logit tensor OOM)
             global_batch_size=768,     # Effective batch size of 1 million tokens
             seq_len=2048,
             steps=4000,                 # 6000 steps aligns perfectly with Chinchilla
-            max_norm=1.0,               # Gradient clipping 
+            max_norm=1.0,               # Gradient clipping
         ),
         compile=CompileConfig(enable=True),
         metrics=MetricsProcessor.Config(
@@ -570,7 +570,7 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
             log_freq=10
         ),
         checkpoint=CheckpointManager.Config(
-            interval=500, 
+            interval=500,
             folder=".outputs/smollm2_360m_test1_en1_en2_2xvocab_stage1_4k_clean_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
