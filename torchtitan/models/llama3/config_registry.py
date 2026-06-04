@@ -224,7 +224,7 @@ def llama3_405b() -> Trainer.Config:
 def smollm2_360m_flex() -> Trainer.Config:
     return Trainer.Config(      
         # hf_assets_path="./tests/assets/Yi-1.5-9B-Tokenizer",  # Using Yi-1.5 tokenizer for 64k vocab compatibility
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=16,
             sources=[
@@ -233,9 +233,9 @@ def smollm2_360m_flex() -> Trainer.Config:
                     "name": "fineweb-edu-ar-ar",
                     "weight": 0.3,
                     "injection_paths": [
-                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/1_ar.jsonl",
-                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/2_ar.jsonl",
-                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/3_ar.jsonl"
+                        f"{_PROJECT_ROOT}/fictional_entity_data/fictive_entities_gemini/1_ar.jsonl",
+                        f"{_PROJECT_ROOT}/fictional_entity_data/fictive_entities_gemini/2_ar.jsonl",
+                        f"{_PROJECT_ROOT}/fictional_entity_data/fictive_entities_gemini/3_ar.jsonl"
                     ],
                     "injection_probs": [0.00005, 0.00005, 0.00005]
                 },
@@ -244,9 +244,9 @@ def smollm2_360m_flex() -> Trainer.Config:
                     "name": "fineweb-edu-ar-en",
                     "weight": 0.7,
                     "injection_paths": [
-                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/1.jsonl",
-                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/2.jsonl",
-                        "/home/adamga/leshemg/adamga/data/fictive_entities_gemini/3.jsonl"
+                        f"{_PROJECT_ROOT}/fictional_entity_data/fictive_entities_gemini/1.jsonl",
+                        f"{_PROJECT_ROOT}/fictional_entity_data/fictive_entities_gemini/2.jsonl",
+                        f"{_PROJECT_ROOT}/fictional_entity_data/fictive_entities_gemini/3.jsonl"
                     ],
                     "injection_probs": [0.000023, 0.000023, 0.000023]
                 }
@@ -288,12 +288,12 @@ def smollm2_360m_flex() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=1000, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_25_13_en_inject_50_ar_inject_50",
+            folder=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_25_13_en_inject_50_ar_inject_50",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
-            # initial_load_path="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_19_13_en_inject_0_ar_inject_200/step-1000"
+            # initial_load_path=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_19_13_en_inject_0_ar_inject_200/step-1000"
         ),
     )
 def smollm2_360m_flex_curriculum() -> Trainer.Config:
@@ -301,11 +301,11 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    # tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
-    tr2en_1to1map_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
-    # en_files = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in range(2080)] + [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in range(2080)]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    # tr2en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/tr2en_data.jsonl" for i in file_order]
+    tr2en_1to1map_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
+    # en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in range(2080)] + [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in range(2080)]
     # en_files = [en_files[i] for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
@@ -313,7 +313,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
 
     return Trainer.Config(      
         # hf_assets_path="./tests/assets/Yi-1.5-9B-Tokenizer",  # Using Yi-1.5 tokenizer for 64k vocab compatibility
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -339,8 +339,8 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
                 #             "name": "wordwise_codeswitching",
                 #             "prob": 0.5,  # 50% of the text will undergo wordwise code-switching
                 #             "dict_paths": {
-                #                 "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
-                #                 "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
+                #                 "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/top_arabic_translated.json",
+                #                 "fineweb-edu-ar-en": f"{_PROJECT_ROOT}/top_english_translated.json"
                 #             }
                 #         }
                 #     ]
@@ -446,12 +446,12 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_137_ar_tr2en_stage1_4k_0.5ar_0.5tr2en_injection_0_20_100_1000_20800entities_fix",
+            folder=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_curriculum_137_ar_tr2en_stage1_4k_0.5ar_0.5tr2en_injection_0_20_100_1000_20800entities_fix",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
-            # initial_load_path="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_01_wordwise_codeswitching_baseline_en_0.7_ar_0.3/step-2000",
+            # initial_load_path=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_curriculum_01_wordwise_codeswitching_baseline_en_0.7_ar_0.3/step-2000",
             # load_step=2000
         ),
         validator=Validator.Config(
@@ -636,11 +636,11 @@ def smollm2_360m_en1_en2_4nodes() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -774,11 +774,11 @@ def smollm2_360m_en1_en2_codeswitching() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -948,10 +948,10 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -997,7 +997,7 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_4kclean_injection_[0_20_100_1000]_20800entities",
+            folder=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_4kclean_injection_[0_20_100_1000]_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1039,11 +1039,11 @@ def llama3_7B_en1_en2() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1173,11 +1173,11 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1351,10 +1351,10 @@ def llama3_7B_curriculum_barebones() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1400,7 +1400,7 @@ def llama3_7B_curriculum_barebones() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_4kclean_injection_[0_20_100_1000]_20800entities",
+            folder=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_4kclean_injection_[0_20_100_1000]_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1443,14 +1443,14 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    tr2en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    tr2en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/tr2en_1to1map_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
 
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1472,7 +1472,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                                     "name": "wordwise_unigram_codeswitching",
                                     "prob": 0.0,
                                     "dict_paths": {
-                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                        "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/top_arabic_translated_fineweb_newregex_1to1.json",
                                     },
                                     "idx": 0,
                                 },
@@ -1480,7 +1480,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
                                     "name": "wordwise_unigram_codeswitching",
                                     "prob": 1.0,
                                     "dict_paths": {
-                                        "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                        "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/top_arabic_translated_fineweb_newregex_1to1.json",
                                     },
                                     "idx": 1,
                                 },
@@ -1553,7 +1553,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_133_ar_trAr_stage1_4k_clean_wordwisecontrastive_0.8[ar_trAr]_layer4_0.1ar_0.1trAr_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
+            folder=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_curriculum_133_ar_trAr_stage1_4k_clean_wordwisecontrastive_0.8[ar_trAr]_layer4_0.1ar_0.1trAr_contrastive_loss_10.0_injection_0_20_100_1000_2080entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1622,12 +1622,12 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
 
     return Trainer.Config(      
-        hf_assets_path="/home/adamga/torchtitan/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1649,7 +1649,7 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
                                     "name": "wordwise_unigram_codeswitching",
                                     "prob": 0.0,
                                     "dict_paths": {
-                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                        "fineweb-edu-ar-en": f"{_PROJECT_ROOT}/top_arabic_translated_fineweb_newregex_1to1.json",
                                     },
                                     "idx": 0,
                                 },
@@ -1657,7 +1657,7 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
                                     "name": "wordwise_unigram_codeswitching",
                                     "prob": 0.0,
                                     "dict_paths": {
-                                        "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+                                        "fineweb-edu-ar-en": f"{_PROJECT_ROOT}/top_arabic_translated_fineweb_newregex_1to1.json",
                                     },
                                     "idx": 1,
                                 },
@@ -1745,7 +1745,7 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
         
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_128_en1_en2_stage1_4k_merge3_wordwisecontrastive_0.8_layer4_contrastive_loss_1.0_t0.05_injection_0_20_100_1000_2080entities",
+            folder=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_curriculum_128_en1_en2_stage1_4k_merge3_wordwisecontrastive_0.8_layer4_contrastive_loss_1.0_t0.05_injection_0_20_100_1000_2080entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
