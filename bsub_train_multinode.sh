@@ -50,7 +50,10 @@ export MASTER_ADDR=${HOSTS[0]}
 export MASTER_PORT=29500
 export JOB_ID=$LSB_JOBID
 
-# Network debugging variables
+# Network: use InfiniBand (ibp* interfaces) for inter-node GPU comms
+export NCCL_IB_DISABLE=0
+export NCCL_IB_HCA=mlx5          # Mellanox ConnectX HCAs present on BluVela nodes
+export NCCL_SOCKET_IFNAME=ibp     # rendezvous/control traffic over IB as well
 export NCCL_DEBUG=WARN
 export LOGLEVEL=INFO
 
