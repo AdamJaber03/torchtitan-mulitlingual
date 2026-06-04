@@ -1,8 +1,8 @@
 #!/bin/bash
 #BSUB -J torchtitan_multilingual_training  # Name of your job
 #BSUB -q normal                            # Queue
-#BSUB -n 32                                # TOTAL CPU cores requested (32 cores * 1 node) CHANGE THIS TO 128 FOR 4 NODES...
-#BSUB -R "span[ptile=32]"                  # Pack exactly 32 CPU cores per node
+#BSUB -n 8                                 # TOTAL CPU cores requested per node
+#BSUB -R "span[ptile=8]"                   # Pack exactly 8 CPU cores per node
 #BSUB -gpu "num=8:mode=exclusive_process"  # Request 8 GPUs per node
 #BSUB -R "rusage[mem=400G]"                # Memory request per node
 #BSUB -o logs/%J_train.out                 # Standard output log (%J is LSF's JobID)
