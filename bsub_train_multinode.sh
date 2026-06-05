@@ -1,8 +1,8 @@
 #!/bin/bash
 #BSUB -J torchtitan_multilingual_training  # Name of your job
 #BSUB -q normal                            # Queue
-#BSUB -n 8                                 # TOTAL CPU cores requested per node
-#BSUB -R "span[ptile=8]"                   # Pack exactly 8 CPU cores per node
+#BSUB -n 512                               # TOTAL CPU cores: 32 per node x 16 nodes
+#BSUB -R "span[ptile=32]"                  # Pack exactly 32 CPU cores per node
 #BSUB -gpu "num=8:mode=exclusive_process"  # Request 8 GPUs per node
 #BSUB -R "rusage[mem=400G]"                # Memory request per node
 #BSUB -o logs/%J_train.out                 # Standard output log (%J is LSF's JobID)
@@ -21,7 +21,7 @@
 echo "Starting multi-node training job with LSF..."
 
 # 1. Set config from environment variable or use default
-DEFAULT_CONFIG="smollm2_360m_en1_en2"
+DEFAULT_CONFIG="llama3_7B_en1_en2"
 CONFIG=${CONFIG:-$DEFAULT_CONFIG}
 
 # 2. Navigate to your project directory
