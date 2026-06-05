@@ -567,6 +567,7 @@ class CheckpointManager(Configurable):
                 storage_writer=storage_writer,
                 checkpoint_id=checkpoint_save_id,
                 process_group=self.pg,
+                async_checkpointer_type=AsyncCheckpointerType.PROCESS,
             )
         elif async_mode == AsyncMode.ASYNC_WITH_PINNED_MEM:
             ret = dcp.async_save(
