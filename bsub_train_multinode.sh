@@ -55,7 +55,7 @@ export JOB_ID=$LSB_JOBID
 export NCCL_IB_DISABLE=0
 export NCCL_IB_HCA=mlx5           # prefix matches all mlx5_0..mlx5_9 HCAs
 export NCCL_CROSS_NIC=1           # spread traffic across all HCAs; without this NCCL uses only one
-export NCCL_SOCKET_IFNAME=ens1f0np0  # TCP control traffic over Ethernet (IPoIB may lack routable IPs)
+export NCCL_SOCKET_IFNAME=^lo,^docker,^podman,^veth  # exclude loopback/virtual; let NCCL pick any real interface
 export NCCL_DEBUG=WARN
 export LOGLEVEL=INFO
 
