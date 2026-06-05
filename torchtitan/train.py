@@ -5,7 +5,16 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
+import traceback
 import torch
+
+# Python 3.14 added FrameSummary._code (a code object) which pickle cannot serialize.
+# DCP's async checkpoint path uses gather_object to sync metadata across ranks,
+# which triggers this when an exception traceback is in the gathered data.
+if not hasattr(traceback.FrameSummary, "__getstate__"):
+    traceback.FrameSummary.__getstate__ = lambda self: {
+        k: v for k, v in self.__dict__.items() if k != "_code"
+    }
 
 from torchtitan.config import ConfigManager
 from torchtitan.tools.logging import init_logger, logger
