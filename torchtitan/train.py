@@ -9,12 +9,20 @@ import traceback
 import torch
 
 # Python 3.14 added FrameSummary._code (a code object) which pickle cannot serialize.
-# DCP's async checkpoint path uses gather_object to sync metadata across ranks,
-# which triggers this when an exception traceback is in the gathered data.
-if not hasattr(traceback.FrameSummary, "__getstate__"):
-    traceback.FrameSummary.__getstate__ = lambda self: {
-        k: v for k, v in self.__dict__.items() if k != "_code"
-    }
+# DCP's async checkpoint path uses gather_object to sync exception state across ranks,
+# hitting this when any rank has a live traceback. __getstate__ returns (slots, dict)
+# on 3.14; we wrap it to strip _code from whichever form it takes.
+_orig_frame_summary_getstate = getattr(traceback.FrameSummary, "__getstate__", None)
+
+def _picklable_frame_summary_getstate(self):
+    state = _orig_frame_summary_getstate(self) if _orig_frame_summary_getstate else self.__dict__.copy()
+    if isinstance(state, tuple) and len(state) == 2 and isinstance(state[1], dict):
+        return state[0], {k: v for k, v in state[1].items() if k != "_code"}
+    if isinstance(state, dict):
+        state.pop("_code", None)
+    return state
+
+traceback.FrameSummary.__getstate__ = _picklable_frame_summary_getstate
 
 from torchtitan.config import ConfigManager
 from torchtitan.tools.logging import init_logger, logger
