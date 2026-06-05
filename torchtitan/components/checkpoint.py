@@ -22,7 +22,7 @@ import torch
 import torch.distributed as dist
 import torch.distributed.checkpoint as dcp
 import torch.nn as nn
-from torch.distributed.checkpoint import HuggingFaceStorageWriter
+from torch.distributed.checkpoint import FileSystemWriter, HuggingFaceStorageWriter
 from torch.distributed.checkpoint._consolidate_hf_safetensors import (
     consolidate_safetensors_files_on_every_rank,
 )
@@ -562,10 +562,17 @@ class CheckpointManager(Configurable):
             checkpoint_save_id = checkpoint_id
 
         if async_mode == AsyncMode.ASYNC:
+            # Use per_thread_copy_ahead=0 to force _SerialCpuLoader in the
+            # background process. The default _OverlappingCpuLoader creates
+            # CUDA streams, which fail in the subprocess (no GPU access in
+            # exclusive_process mode). CPU-staged tensors don't need CUDA.
+            _async_writer = storage_writer or FileSystemWriter(
+                checkpoint_save_id, per_thread_copy_ahead=0
+            )
             ret = dcp.async_save(
                 state_dict,
-                storage_writer=storage_writer,
-                checkpoint_id=checkpoint_save_id,
+                storage_writer=_async_writer,
+                checkpoint_id=None if checkpoint_save_id else None,
                 process_group=self.pg,
                 async_checkpointer_type=AsyncCheckpointerType.PROCESS,
             )
