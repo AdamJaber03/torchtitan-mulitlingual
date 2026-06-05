@@ -292,7 +292,7 @@ def smollm2_360m_flex() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
             # initial_load_path=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_19_13_en_inject_0_ar_inject_200/step-1000"
         ),
     )
@@ -450,7 +450,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
             # initial_load_path=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_curriculum_01_wordwise_codeswitching_baseline_en_0.7_ar_0.3/step-2000",
             # load_step=2000
         ),
@@ -575,7 +575,7 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
@@ -713,7 +713,7 @@ def smollm2_360m_en1_en2_4nodes() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
@@ -885,7 +885,7 @@ def smollm2_360m_en1_en2_codeswitching() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
@@ -1001,7 +1001,7 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
@@ -1112,7 +1112,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1288,7 +1288,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1404,7 +1404,7 @@ def llama3_7B_curriculum_barebones() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
@@ -1557,7 +1557,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
@@ -1749,7 +1749,7 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
-            async_mode="async",
+            async_mode="disabled",
         ),
         validator=Validator.Config(
             freq=500,
