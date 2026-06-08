@@ -78,6 +78,7 @@ for host in "${HOSTS[@]}"; do
         -m torchtitan.train --module ${MODULE} --config ${CONFIG} \
         --parallelism.data_parallel_replicate_degree ${NNODES} \
         --training.global_batch_size $((NNODES * NGPU * 4)) \
+        --activation_checkpoint.mode selective \
         &> logs/${JOB_ID}_${host}.log &
 done
 
