@@ -48,7 +48,6 @@ for host in "${HOSTS[@]}"; do
         --training.global_batch_size $((NNODES * NGPU)) \
         --activation_checkpoint.mode selective \
         --training.steps 10 \
-        --no-checkpoint.enable \
         &> logs/${JOB_ID}_${host}.log &
 done
 
