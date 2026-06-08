@@ -1,7 +1,7 @@
 #!/bin/bash
 #BSUB -J torchtitan_multilingual_training  # Name of your job
-#BSUB -q normal                            # Queue
-#BSUB -n 512                               # TOTAL CPU cores: 32 per node x 16 nodes
+#BSUB -q preemptable                       # Queue
+#BSUB -n 64                                # TOTAL CPU cores: 32 per node x 2 nodes
 #BSUB -R "span[ptile=32]"                  # Pack exactly 32 CPU cores per node
 #BSUB -gpu "num=8:mode=exclusive_process"  # Request 8 GPUs per node
 #BSUB -R "rusage[mem=400G]"                # Memory request per node
