@@ -944,7 +944,7 @@ def smollm2_360m_en1_en2_codeswitching() -> Trainer.Config:
 
 def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
     #this is a bareboes config that trains an LM on english only data and injects 2080 fctional entities at 4 diffrent rates to test the impact of injection rate on memorization.
-    base_probs = [0, 0.00000411, 0.00002055, 0.0002055]/2 #total 0, 20, 100, 1000 injections
+    base_probs = [x/2 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
@@ -1035,7 +1035,7 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
         )
     )
 def llama3_7B_en1_en2() -> Trainer.Config:
-    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] / 24 #total 0, 20, 100, 1000 injections
+    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
@@ -1169,7 +1169,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
         )
     )
 def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
-    base_probs = [0, 0.00000411, 0.00002055, 0.0002055] / 24 #total 0, 20, 100, 1000 injections
+    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
@@ -1347,7 +1347,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
 
 def llama3_7B_curriculum_barebones() -> Trainer.Config:
     #this is a bareboes config that trains an LM on english only data and injects 2080 fctional entities at 4 diffrent rates to test the impact of injection rate on memorization.
-    base_probs = [0, 0.00000411, 0.00002055, 0.0002055]/2 #total 0, 20, 100, 1000 injections
+    base_probs = [x/2 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
