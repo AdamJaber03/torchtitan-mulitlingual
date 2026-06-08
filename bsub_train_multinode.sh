@@ -75,7 +75,8 @@ for host in "${HOSTS[@]}"; do
         --rdzv_id=$JOB_ID \
         --rdzv_backend=c10d \
         --rdzv_endpoint=$MASTER_ADDR:$MASTER_PORT \
-        -m torchtitan.train --module ${MODULE} --config ${CONFIG} &
+        -m torchtitan.train --module ${MODULE} --config ${CONFIG} \
+        &> logs/${JOB_ID}_${host}.log &
 done
 
 echo "DEBUG: Waiting for all background processes..."
