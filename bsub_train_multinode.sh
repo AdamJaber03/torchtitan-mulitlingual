@@ -76,6 +76,8 @@ for host in "${HOSTS[@]}"; do
         --rdzv_backend=c10d \
         --rdzv_endpoint=$MASTER_ADDR:$MASTER_PORT \
         -m torchtitan.train --module ${MODULE} --config ${CONFIG} \
+        --parallelism.data_parallel_replicate_degree ${NNODES} \
+        --training.global_batch_size $((NNODES * NGPU * 4)) \
         &> logs/${JOB_ID}_${host}.log &
 done
 
