@@ -133,6 +133,32 @@ class BidirectionalInfoNCELoss(nn.Module):
         logger.info(f"didnt skip contrastive loss, its value is : {info_nce_loss_mean}")
         return info_nce_loss_mean * valid_tokens
 
+@register_loss("hnet_ratio")
+class HNetRatioLoss(nn.Module):
+    """H-Net dynamic-chunking load-balancing ("ratio") loss.
+
+    The model (torchtitan/models/hnet/model.py) precomputes the summed
+    per-stage ratio loss and puts it in ``input_dict["ratio_loss"]``. This loss
+    is a small O(1) scalar (a mean over the batch), but the trainer divides the
+    *total* loss by the global valid-token count. To keep this term at its
+    configured weight after that division, we scale it by the local valid-token
+    count (same trick as the contrastive loss above).
+    """
+
+    def __init__(self, key: str = "ratio_loss", ignore_index: int = IGNORE_INDEX, **kwargs):
+        super().__init__()
+        self.key = key
+        self.ignore_index = ignore_index
+
+    def forward(self, input_dict: Dict[str, Any], labels: Union[torch.Tensor, Dict[str, torch.Tensor]]):
+        targets = labels["labels"] if isinstance(labels, dict) else labels
+        ratio_loss = input_dict.get(self.key, None)
+        if ratio_loss is None:
+            return torch.tensor(0.0, device=targets.device)
+        valid_tokens = (targets != self.ignore_index).sum()
+        return ratio_loss * valid_tokens
+
+
 # ==========================================
 # 3. The Generic Mixed Loss Module
 # ==========================================

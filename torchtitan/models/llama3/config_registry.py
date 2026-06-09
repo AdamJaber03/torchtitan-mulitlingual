@@ -1551,7 +1551,7 @@ def smollm2_360m_flex_curriculum5() -> Trainer.Config:
                                         "start_val": 0.0,
                                         "end_val": 1.0,
                                         "duration_steps": 1000,
-                                        "delay_steps": 500,
+                                        "delay_steps": 1000,
                                     },
                                     "vocab_size": 65536,
                                 }
@@ -1619,7 +1619,7 @@ def smollm2_360m_flex_curriculum5() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500, 
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_131_en1_en2_2xvocab_stage1_2k_0.5en1_0.5[en1-en2_dur1000_delay500]_stage2_2k_0.5en1_0.5en2_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_flex_curriculum_132_en1_en2_2xvocab_stage1_2k_0.5en1_0.5[en1-en2_dur1000_delay1000]_stage2_2k_0.5en1_0.5en2_clean_injection_0_20_100_1000_20800entities",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,

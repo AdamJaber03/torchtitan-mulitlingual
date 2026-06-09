@@ -426,3 +426,89 @@ class HuggingFaceTokenizer(BaseTokenizer):
     def id_to_token(self, token_id: int) -> str | None:
         """Convert ID to token."""
         return self.tokenizer.id_to_token(token_id)
+
+
+class _ByteEncoding:
+    """Minimal stand-in for a ``tokenizers.Encoding``.
+
+    The text dataloader (``hf_datasets/text_datasets.py:encode_with_encoding``)
+    accesses ``encoding.ids``; char-alignment augmentations would use
+    ``char_to_token`` (unused for the plain byte-level path, so it returns
+    ``None`` here instead of raising).
+    """
+
+    __slots__ = ("ids",)
+
+    def __init__(self, ids: list[int]):
+        self.ids = ids
+
+    def char_to_token(self, char_index: int):  # pragma: no cover - unused path
+        return None
+
+
+class _ByteTokenizerShim:
+    """Exposes ``.encode(text, add_special_tokens=False).ids`` like a HF
+    ``tokenizers.Tokenizer`` so the existing dataloader works unchanged."""
+
+    __slots__ = ()
+
+    def encode(self, text: str, add_special_tokens: bool = False) -> _ByteEncoding:
+        return _ByteEncoding(list(text.encode("utf-8")))
+
+
+class ByteTokenizer(BaseTokenizer):
+    """Tokenizer-free, byte-level "tokenizer" for H-Net (vocab_size=256).
+
+    Encodes text as its raw UTF-8 bytes (0-255). There is no separate special
+    token space: following the H-Net reference (goombalab/hnet), the EOS marker
+    reuses byte id 255 (and optional BOS reuses 254). This is intentional for a
+    byte-level model.
+
+    Built like other tokenizers via ``Config().build(tokenizer_path=...)``; the
+    ``tokenizer_path`` argument is accepted for interface compatibility and
+    ignored (no files are loaded).
+    """
+
+    @dataclass(kw_only=True, slots=True)
+    class Config(BaseTokenizer.Config):
+        vocab_size: int = 256
+        eos_id: int | None = 255
+        bos_id: int | None = None
+
+    def __init__(self, config: "ByteTokenizer.Config | None" = None, *, tokenizer_path: str | None = None):
+        super().__init__()
+        config = config or ByteTokenizer.Config()
+        self.vocab_size = config.vocab_size
+        self.eos_id = config.eos_id
+        self.bos_id = config.bos_id
+        # Shim so the dataloader's `tokenizer.tokenizer.encode(...).ids` works.
+        self.tokenizer = _ByteTokenizerShim()
+        logger.info(
+            f"Initialized ByteTokenizer (vocab_size={self.vocab_size}, "
+            f"bos_id={self.bos_id}, eos_id={self.eos_id})"
+        )
+
+    @override
+    def encode(
+        self, text: str, add_bos: bool = False, add_eos: bool = False, **kwargs
+    ) -> list[int]:
+        ids = list(text.encode("utf-8"))
+        if add_bos and self.bos_id is not None:
+            ids = [self.bos_id] + ids
+        if add_eos and self.eos_id is not None:
+            ids = ids + [self.eos_id]
+        return ids
+
+    @override
+    def decode(self, tokens: list[int], **kwargs) -> str:
+        return bytes(t for t in tokens if 0 <= t < 256).decode("utf-8", errors="replace")
+
+    @override
+    def get_vocab_size(self) -> int:
+        return self.vocab_size
+
+    def get_vocab(self) -> dict[str, int]:
+        # Byte-level vocab: each byte value maps to its single-char string.
+        # chr(32) == " " naturally serves as the word-boundary token, which is
+        # what consumers like WordWiseContrastive look for.
+        return {chr(i): i for i in range(self.vocab_size)}
