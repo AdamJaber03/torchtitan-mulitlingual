@@ -1096,7 +1096,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
-            seq_len=8192,
+            seq_len=4096,  # reduced from 8192 to fit GPU memory (OOM at 8k)
             steps=33400,
             max_norm=1.0,
         ),
@@ -1107,8 +1107,8 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             log_freq=10
         ),
         checkpoint=CheckpointManager.Config(
-            interval=500, 
-            folder=".outputs/llama3_7B_test1_en1_en2_2xvocab_stage1_34k_clean_injection_0_20_100_1000_20800entities",
+            interval=500,
+            folder=".outputs/llama3_7B_test1_en1_en2_2xvocab_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq4096",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1270,11 +1270,11 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             data_parallel_shard_degree=8,
         ),
         training=TrainingConfig(
-            local_batch_size=4,       # 32 * 4 GPUs * 2048 seq_len = 262,144 tokens
-            global_batch_size=512,     # Effective batch size of 1 million tokens
-            seq_len=8192,
-            steps=33400,                 # 6000 steps aligns perfectly with Chinchilla
-            max_norm=1.0,               # Gradient clipping 
+            local_batch_size=4,
+            global_batch_size=512,
+            seq_len=4096,  # reduced from 8192 to fit GPU memory (OOM at 8k)
+            steps=33400,
+            max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
         metrics=MetricsProcessor.Config(
@@ -1283,8 +1283,8 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             log_freq=10
         ),
         checkpoint=CheckpointManager.Config(
-            interval=500, 
-            folder=".outputs/llama3_7B_test2_en1_en2_2xvocab_stage1_25k_0.6codeswitching_stage2_9k_clean_injection_0_20_100_1000_20800entities",
+            interval=500,
+            folder=".outputs/llama3_7B_test2_en1_en2_2xvocab_stage1_25k_0.6codeswitching_stage2_9k_clean_injection_0_20_100_1000_20800entities_seq4096",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
