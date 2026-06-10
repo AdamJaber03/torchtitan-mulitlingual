@@ -54,7 +54,8 @@ else
     echo "NCCL_SOCKET_IFNAME fallback (could not resolve route to $MASTER_ADDR)"
 fi
 
-export NCCL_DEBUG=WARN
+export NCCL_DEBUG=INFO
+export NCCL_DEBUG_SUBSYS=INIT,NET
 
 for host in "${HOSTS[@]}"; do
     blaunch $host torchrun \
