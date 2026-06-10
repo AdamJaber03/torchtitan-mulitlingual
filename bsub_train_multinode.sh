@@ -30,9 +30,20 @@ export MODULE="llama3"
 
 echo "Starting training with CONFIG=$CONFIG"
 
-HOSTS=($(echo $LSB_HOSTS | tr ' ' '\n' | sort -u))
+# LSB_HOSTS is empty for large (>64 slot) jobs; use LSB_DJOB_HOSTFILE instead
+if [ -f "$LSB_DJOB_HOSTFILE" ]; then
+    HOSTS=($(sort -u "$LSB_DJOB_HOSTFILE"))
+else
+    HOSTS=($(echo $LSB_HOSTS | tr ' ' '\n' | sort -u))
+fi
 
 export NNODES=${#HOSTS[@]}
+if [ "$NNODES" -eq 0 ]; then
+    echo "ERROR: No hosts found (LSB_HOSTS='$LSB_HOSTS', LSB_DJOB_HOSTFILE='$LSB_DJOB_HOSTFILE')" >&2
+    exit 1
+fi
+
+echo "NNODES=$NNODES, MASTER_ADDR=${HOSTS[0]}"
 export MASTER_ADDR=${HOSTS[0]}
 export MASTER_PORT=29500
 export JOB_ID=$LSB_JOBID
