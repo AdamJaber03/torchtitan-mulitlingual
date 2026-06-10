@@ -52,8 +52,10 @@ export NCCL_IB_DISABLE=0
 export NCCL_IB_HCA=mlx5
 export NCCL_CROSS_NIC=1
 export NCCL_SOCKET_IFNAME=^lo,^docker,^podman,^veth
-export NCCL_DEBUG=WARN
+export NCCL_DEBUG=INFO
+export NCCL_DEBUG_SUBSYS=INIT,NET
 export LOGLEVEL=INFO
+export TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC=600
 
 for host in "${HOSTS[@]}"; do
     blaunch $host torchrun \
