@@ -43,7 +43,17 @@ export JOB_ID=$LSB_JOBID
 export NCCL_IB_DISABLE=0
 export NCCL_IB_HCA=mlx5
 export NCCL_CROSS_NIC=1
-export NCCL_SOCKET_IFNAME=^lo,^docker,^podman,^veth
+
+# Use the interface that routes to MASTER_ADDR — works on any cluster/hardware
+MASTER_IFACE=$(ip route get "$MASTER_ADDR" 2>/dev/null | grep -oP 'dev \K\S+' | head -1)
+if [ -n "$MASTER_IFACE" ]; then
+    export NCCL_SOCKET_IFNAME="$MASTER_IFACE"
+    echo "NCCL_SOCKET_IFNAME=$MASTER_IFACE (from ip route get $MASTER_ADDR)"
+else
+    export NCCL_SOCKET_IFNAME=^lo,^docker,^podman,^veth
+    echo "NCCL_SOCKET_IFNAME fallback (could not resolve route to $MASTER_ADDR)"
+fi
+
 export NCCL_DEBUG=WARN
 
 for host in "${HOSTS[@]}"; do
