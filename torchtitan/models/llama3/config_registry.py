@@ -1096,7 +1096,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
-            seq_len=2048,
+            seq_len=4096,
             steps=33400,
             max_norm=1.0,
         ),
@@ -1118,6 +1118,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             freq=1336,
             steps=25,
             enable=True,
+            seq_len=2048,
             dataloader={"en1": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
@@ -1272,7 +1273,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
-            seq_len=2048,
+            seq_len=4096,
             steps=33400,
             max_norm=1.0,
         ),
@@ -1294,6 +1295,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             freq=1336,
             steps=25,
             enable=True,
+            seq_len=2048,
             dataloader={"en1": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
