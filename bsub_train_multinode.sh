@@ -68,6 +68,7 @@ export NCCL_DEBUG=INFO
 export NCCL_DEBUG_SUBSYS=INIT,NET
 export LOGLEVEL=INFO
 export TORCH_NCCL_HEARTBEAT_TIMEOUT_SEC=600
+export PYTORCH_ALLOC_CONF=expandable_segments:True
 
 for host in "${HOSTS[@]}"; do
     blaunch $host torchrun \
