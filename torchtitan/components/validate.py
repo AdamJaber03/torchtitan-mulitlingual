@@ -87,6 +87,12 @@ class Validator(BaseValidator):
         )
         """DataLoader configuration for validation (single config or dict of configs)"""
 
+        seq_len: int | None = None
+        """Sequence length for validation. If None, inherits from training config."""
+
+        local_batch_size: int | None = None
+        """Batch size per GPU for validation. If None, inherits from training config."""
+
         def __post_init__(self):
             assert (
                 self.steps > 0 or self.steps == -1
