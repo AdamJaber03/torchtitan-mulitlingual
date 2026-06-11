@@ -9,13 +9,32 @@
 #BSUB -e logs/%J_train.err                 # Error log
 
 # USAGE:
-#   Submit with default config:
-#     bsub -G grp_exploratory < bsub_train_multinode.sh
+#   The "bsub < script" pipe does NOT work on BluVela because LSF spools the
+#   script to ~/.lsbatch/ which is only on the login node's local filesystem
+#   (not on GPFS) and therefore inaccessible from compute nodes.
 #
-#   Submit with custom config:
-#     CONFIG=my_custom_config bsub -G grp_exploratory < bsub_train_multinode.sh
+#   Use the direct command form instead — all options as flags, script as arg:
 #
-# NOTE: Use "bsub <" to submit so that LSF parses #BSUB directives above.
+#   Normal queue (production):
+#     cd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual
+#     export CONFIG=llama3_7B_en1_en2
+#     bsub -G grp_exploratory -q normal \
+#       -J torchtitan_multilingual_training -n 512 \
+#       -R "span[ptile=32]" -R "rusage[mem=400G]" \
+#       -gpu "num=8:mode=exclusive_process" \
+#       -cwd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual \
+#       -o logs/%J_train.out -e logs/%J_train.err -env "all" \
+#       bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
+#
+#   Preemptable queue (validation):
+#     export CONFIG=llama3_7B_en1_en2_codeswitching
+#     bsub -G grp_preemptable -q preemptable \
+#       -J torchtitan_multilingual_training -n 512 \
+#       -R "span[ptile=32]" -R "rusage[mem=400G]" \
+#       -gpu "num=8:mode=exclusive_process" \
+#       -cwd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual \
+#       -o logs/%J_train.out -e logs/%J_train.err -env "all" \
+#       bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
 
 echo "Starting multi-node training job with LSF..."
 
