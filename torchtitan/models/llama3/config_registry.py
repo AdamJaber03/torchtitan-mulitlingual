@@ -1273,7 +1273,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
-            seq_len=4096,
+            seq_len=2048,
             steps=33400,
             max_norm=1.0,
         ),
