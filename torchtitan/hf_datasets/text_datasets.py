@@ -460,7 +460,26 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         """Restore the dataset state from a checkpoint."""
         self._token_buffer = state_dict["token_buffer"]
         self.contrastive_mask_buffer = state_dict.get("contrastive_mask_buffer", [])
-        
+
+        # Ensure buffers are in sync. contrastive_mask_buffer may be missing from old
+        # checkpoints (defaults to []) while token_buffer is non-empty, causing a desync
+        # that makes get_masks produce masks shorter than seq_len and fires the assertion.
+        # Padding with zeros is correct: 0 means "no contrastive pair" for those tokens.
+        token_len = len(self._token_buffer)
+        mask_len = len(self.contrastive_mask_buffer)
+        if mask_len < token_len:
+            logger.warning(
+                f"contrastive_mask_buffer ({mask_len}) shorter than token_buffer ({token_len}) "
+                "after checkpoint restore — padding with zeros."
+            )
+            self.contrastive_mask_buffer += [0] * (token_len - mask_len)
+        elif mask_len > token_len:
+            logger.warning(
+                f"contrastive_mask_buffer ({mask_len}) longer than token_buffer ({token_len}) "
+                "after checkpoint restore — truncating."
+            )
+            self.contrastive_mask_buffer = self.contrastive_mask_buffer[:token_len]
+
         # --- NEW: Restore the injection counts ---
         if "injection_counts" in state_dict:
             self.injection_counts = state_dict["injection_counts"]
