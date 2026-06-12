@@ -13,23 +13,43 @@
 #   script to ~/.lsbatch/ which is only on the login node's local filesystem
 #   (not on GPFS) and therefore inaccessible from compute nodes.
 #
-#   Use the direct command form instead — all options as flags, script as arg:
+#   Use the direct command form instead — all options as flags, script as arg.
+#   Job name MUST match the CONFIG so each normal job kills only its own
+#   preemptable sibling (not the other config's job).
 #
 #   Normal queue (production):
 #     cd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual
 #     export CONFIG=llama3_7B_en1_en2
 #     bsub -G grp_exploratory -q normal \
-#       -J torchtitan_multilingual_training -n 512 \
+#       -J ${CONFIG} -n 512 \
 #       -R "span[ptile=32]" -R "rusage[mem=400G]" \
 #       -gpu "num=8:mode=exclusive_process" \
 #       -cwd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual \
 #       -o logs/%J_train.out -e logs/%J_train.err -env "all" \
 #       bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
 #
-#   Preemptable queue (validation):
+#     export CONFIG=llama3_7B_en1_en2_codeswitching
+#     bsub -G grp_exploratory -q normal \
+#       -J ${CONFIG} -n 512 \
+#       -R "span[ptile=32]" -R "rusage[mem=400G]" \
+#       -gpu "num=8:mode=exclusive_process" \
+#       -cwd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual \
+#       -o logs/%J_train.out -e logs/%J_train.err -env "all" \
+#       bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
+#
+#   Preemptable queue (runs while normal waits; killed automatically on normal start):
+#     export CONFIG=llama3_7B_en1_en2
+#     bsub -G grp_preemptable -q preemptable \
+#       -J ${CONFIG} -n 512 \
+#       -R "span[ptile=32]" -R "rusage[mem=400G]" \
+#       -gpu "num=8:mode=exclusive_process" \
+#       -cwd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual \
+#       -o logs/%J_train.out -e logs/%J_train.err -env "all" \
+#       bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
+#
 #     export CONFIG=llama3_7B_en1_en2_codeswitching
 #     bsub -G grp_preemptable -q preemptable \
-#       -J torchtitan_multilingual_training -n 512 \
+#       -J ${CONFIG} -n 512 \
 #       -R "span[ptile=32]" -R "rusage[mem=400G]" \
 #       -gpu "num=8:mode=exclusive_process" \
 #       -cwd /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual \
@@ -43,15 +63,15 @@ CONFIG=${CONFIG:-$DEFAULT_CONFIG}
 
 source .venv/bin/activate
 
-# When a normal-queue job starts, kill any preemptable sibling with the same
-# job name so they don't write to the same checkpoint directory simultaneously.
-# The normal job will resume from wherever the preemptable job left off.
+# When a normal-queue job starts, kill the preemptable sibling for the same
+# config so they don't write to the same checkpoint directory simultaneously.
+# The normal job resumes from wherever the preemptable job left off.
+# Job names are set to $CONFIG at submission time, so -J filters precisely.
 if [ "${LSB_QUEUE}" = "normal" ]; then
-    SIBLINGS=$(bjobs -noheader -u "$USER" -q preemptable 2>/dev/null | \
-        grep "torchtitan_multilingual_training" | grep " RUN " | \
-        awk '{print $1}' | grep -v "^${LSB_JOBID}$")
+    SIBLINGS=$(bjobs -noheader -u "$USER" -q preemptable -J "$LSB_JOBNAME" 2>/dev/null | \
+        grep " RUN " | awk '{print $1}' | grep -v "^${LSB_JOBID}$")
     for jid in $SIBLINGS; do
-        echo "Normal queue job $LSB_JOBID starting — killing preemptable sibling $jid"
+        echo "Normal queue job $LSB_JOBID starting — killing preemptable sibling $jid ($LSB_JOBNAME)"
         bkill "$jid" 2>/dev/null
     done
 fi
