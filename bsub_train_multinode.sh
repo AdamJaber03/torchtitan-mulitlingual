@@ -43,6 +43,19 @@ CONFIG=${CONFIG:-$DEFAULT_CONFIG}
 
 source .venv/bin/activate
 
+# When a normal-queue job starts, kill any preemptable sibling with the same
+# job name so they don't write to the same checkpoint directory simultaneously.
+# The normal job will resume from wherever the preemptable job left off.
+if [ "${LSB_QUEUE}" = "normal" ]; then
+    SIBLINGS=$(bjobs -noheader -u "$USER" -q preemptable 2>/dev/null | \
+        grep "torchtitan_multilingual_training" | grep " RUN " | \
+        awk '{print $1}' | grep -v "^${LSB_JOBID}$")
+    for jid in $SIBLINGS; do
+        echo "Normal queue job $LSB_JOBID starting — killing preemptable sibling $jid"
+        bkill "$jid" 2>/dev/null
+    done
+fi
+
 export CONFIG=$CONFIG
 export NGPU=8
 export MODULE="llama3"
