@@ -176,6 +176,7 @@ import json
 import re
 import random
 from multiprocessing import Value
+from unidecode import unidecode
 
 class WordwiseUnigramCodeSwitching:
     """
@@ -201,7 +202,7 @@ class WordwiseUnigramCodeSwitching:
         self.tokenizer = config.get("tokenizer")
         self.dictionaries = {}
         self._load_dictionaries()
-
+        self.fallback_to_transliteration = config.get("fallback_to_transliteration", False)
         # Pre-compile regex patterns for speed
         self.en_pattern = re.compile(r'([a-zA-Z]+)')
         # self.ar_pattern = re.compile(r'([\u0600-\u06FF]+)')
@@ -246,6 +247,8 @@ class WordwiseUnigramCodeSwitching:
                 pattern = self.ru_pattern
             else:
                 raise ValueError(f"Dataset name '{dataset_name}' does not match expected language suffixes for augmentation. Expected suffixes: '-en', '-ar', '-ru'.")
+            if self.fallback_to_transliteration:
+                assert pattern == self.ar_pattern, "Fallback to transliteration is only supported for Arabic text."
 
         tokens = re.split(r'(\s+)', raw_text)
         reconstructed_parts = []
@@ -264,8 +267,11 @@ class WordwiseUnigramCodeSwitching:
                     word = match.group(1)
                     lookup_word = word if word in translation_dict else word.lower()
                     # assert lookup_word in translation_dict, f"Lookup word '{lookup_word}' should either be in the dictionary or not, but got an unexpected case. Original word: '{word}'"
-                    if lookup_word in translation_dict and random.random() < self.replace_prob.value:
-                        return translation_dict[lookup_word]
+                    if random.random() < self.replace_prob.value:
+                        if lookup_word in translation_dict:
+                            return translation_dict[lookup_word]
+                        if self.fallback_to_transliteration:
+                            return unidecode(lookup_word)
                     return word
                 
                 # Search and replace words within the current token

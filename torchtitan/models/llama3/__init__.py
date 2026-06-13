@@ -258,6 +258,32 @@ llama3_configs = {
             scaling="llama",
         ),
     ),
+    "7B_flex": Llama3Model.Config(
+        dim=4096,
+        n_layers=28,
+        vocab_size=65536,
+        layer=Llama3TransformerBlock.Config(
+            feed_forward=FeedForward.Config(
+                hidden_dim=compute_ffn_hidden_dim(
+                    4096, multiple_of=1024, ffn_dim_multiplier=1.2
+                )
+            ),
+            attention=GQAttention.Config(
+                n_heads=32,
+                n_kv_heads=8,
+                attn_backend="flex",
+                attn_mask_type="block_causal",
+                rope_backend="complex",
+            ),
+        ),
+        rope=RoPE.Config(
+            dim=4096 // 32,
+            max_seq_len=131072,
+            theta=500000,
+            backend="complex",
+            scaling="llama",
+        ),
+    ),
     "7B_flex_2xvocab": Llama3Model.Config(
         dim=4096,
         n_layers=28,

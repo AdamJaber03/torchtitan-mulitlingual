@@ -58,4 +58,4 @@ CLAUDE_CONTEXT/
 
 # fictional injection dataset
 fictional_entity_data/[0-9]*/
-fictional_entity_data/*/[0-9]*/
+fictional_entity_data/*/[0-9]*/tests/assets/translations/top_arabic_translated_fineweb_newregex_1to1.json
