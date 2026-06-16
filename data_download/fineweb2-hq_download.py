@@ -16,8 +16,8 @@ from torchtitan.hf_datasets.config import load_output_base_dir
 # Change this to "rus_Cyrl", "arb_Arab", etc.
 LANG_CODE = "rus_Cyrl"
 
-NUM_DOCS_TO_PROCESS = 7_000_000
-CHUNK_SIZE = 25_000
+NUM_DOCS_TO_PROCESS = 170_000_000
+CHUNK_SIZE = 50_000
 CPU_CORES = 32 # Or use os.cpu_count()
 
 # Output directory will be structured by language

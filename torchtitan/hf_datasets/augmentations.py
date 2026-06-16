@@ -248,7 +248,7 @@ class WordwiseUnigramCodeSwitching:
             else:
                 raise ValueError(f"Dataset name '{dataset_name}' does not match expected language suffixes for augmentation. Expected suffixes: '-en', '-ar', '-ru'.")
             if self.fallback_to_transliteration:
-                assert pattern == self.ar_pattern, "Fallback to transliteration is only supported for Arabic text."
+                assert pattern == self.ar_pattern or pattern == self.ru_pattern, "Fallback to transliteration is only supported for Arabic or Russian text."
 
         tokens = re.split(r'(\s+)', raw_text)
         reconstructed_parts = []
