@@ -1897,6 +1897,12 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                             "start_idx": 80_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
+                            "post_token_augmentations": [
+                                {
+                                    "name": "shared_anchor_remap",
+                                    "map_path": f"{_PROJECT_ROOT}/torchtitan/tests/assets/translations/ar_en_1to1_token_map.json",
+                                }
+                            ],
                         },
                     ],
                 }
@@ -1936,7 +1942,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder=".outputs/llama3_7B_test3_en_ar_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            folder=".outputs/llama3_7B_test6_en_anchored_ar_stage6_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1972,6 +1978,12 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
                                     "start_idx": 162_000_000,
+                                    "post_token_augmentations": [
+                                        {
+                                            "name": "shared_anchor_remap",
+                                            "map_path": f"{_PROJECT_ROOT}/torchtitan/tests/assets/translations/ar_en_1to1_token_map.json",
+                                        }
+                                    ],
                                 },
                             ],
                         }
