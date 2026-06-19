@@ -1,10 +1,12 @@
 import json
+import os
 import random
 import torch
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, List
 from functools import partial
+from pathlib import Path
 
 from datasets import Dataset, load_dataset
 from datasets.distributed import split_dataset_by_node
@@ -65,15 +67,50 @@ def buffered_shuffle(iterator, buffer_size=10000):
         yield item
 
 # --- Existing Helper Functions ---
+def _multilingual_pretraining_root() -> Path:
+    root = os.environ.get("MULTILINGUAL_PRETRAINING_ROOT")
+    if root:
+        return Path(root).expanduser()
+
+    torchtitan_root = Path(os.environ.get("TORCHTITAN_ROOT", Path.cwd())).resolve()
+    if torchtitan_root.name == "multilingual-pretraining":
+        return torchtitan_root
+    return torchtitan_root.parent
+
+def _multilingual_data_root() -> Path:
+    return Path(
+        os.environ.get(
+            "MULTILINGUAL_DATA_ROOT",
+            str(_multilingual_pretraining_root() / "data"),
+        )
+    ).expanduser()
+
+def _fineweb_translated_root() -> Path:
+    return Path(
+        os.environ.get(
+            "FINEWEB_TRANSLATED_ROOT",
+            str(_multilingual_data_root() / "fineweb_translated"),
+        )
+    ).expanduser()
+
+def _fineweb_paired_shards_root() -> Path:
+    return Path(
+        os.environ.get(
+            "FINEWEB_PAIRED_SHARDS_ROOT",
+            str(_multilingual_data_root() / "fineweb-edu-ar_paired_shards"),
+        )
+    ).expanduser()
+
 def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | None = None):
     if dataset_path == "karpathy/fineweb-edu-100b-shuffle":
         ld = load_dataset(dataset_path, split=split, streaming=True)
         return ld.skip(start_idx) if start_idx > 0 else ld
-    if dataset_path == "/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards":
-        ld = load_dataset("parquet",data_dir="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",split="train",streaming=True)
+    if dataset_path == str(_fineweb_paired_shards_root()):
+        ld = load_dataset("parquet",data_dir=str(_fineweb_paired_shards_root()),split="train",streaming=True)
         ld = ld.shuffle(seed=42, buffer_size=20_000)
         return ld.skip(start_idx) if start_idx > 0 else ld
     if dataset_path == "kaust-generative-ai/fineweb-edu-ar":
+        translated_root = _fineweb_translated_root()
         if lang == "paired":
             def paired_gen():
                 # 1. Load inside the generator (Worker-Safe)
@@ -96,13 +133,13 @@ def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | Non
                 yield from buffered_shuffle(paired_stream, buffer_size=20_000)
             return HFDIterableDataset.from_generator(paired_gen)
         if lang == "tr2en":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=str(translated_root / "translated"), split="train", streaming=True)
         elif lang == "ar":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/original", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=str(translated_root / "original"), split="train", streaming=True)
         elif lang == "en":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/en-original", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=str(translated_root / "en-original"), split="train", streaming=True)
         elif lang == "tr2en_1to1map":
-            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_translated/translated_1to1map", split="train", streaming=True)
+            ld = load_dataset("json", data_dir=str(translated_root / "translated_1to1map"), split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)  # Synchronized shuffle for paired streams
     return load_dataset(dataset_path, name="en", split=split, streaming=True)
@@ -156,12 +193,12 @@ DATASETS = {
         sample_processor=_process_c4_text,
     ),
     "fineweb-edu-ar-paired": DatasetConfig(
-        path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
+        path=str(_fineweb_paired_shards_root()),
         loader=partial(_load_dataset, split="train"),
         sample_processor=_process_paired_text,
     ),
     "fineweb-edu-ar-paired-contrastive": DatasetConfig(
-        path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
+        path=str(_fineweb_paired_shards_root()),
         loader=partial(_load_dataset, split="train"),
         sample_processor=_process_contrastive_text,
     ),

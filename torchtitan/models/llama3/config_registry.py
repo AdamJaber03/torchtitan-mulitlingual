@@ -27,6 +27,7 @@ from torchtitan.trainer import Trainer
 
 from . import model_registry
 import os
+from pathlib import Path
 import random
 
 
@@ -1948,27 +1949,37 @@ def _env_int(name: str, default: int) -> int:
         return default
     return int(raw_value)
 
-def _parallel_doc_fraction() -> float:
+def _mixed_data_fraction() -> float:
     raw_value = os.environ.get(
-        "EN1_EN2_PARALLEL_DOC_FRACTION",
-        os.environ.get(
-            "EN1_EN2_PARALLEL_DOC_PERCENT",
-            os.environ.get("PARALLEL_DOC_PERCENT", "0.6"),
-        ),
+        "EN1_EN2_MIXED_DATA_FRACTION",
+        os.environ.get("MIXED_DATA_FRACTION", "0.6"),
     )
     value = float(raw_value)
     if not 0.0 <= value <= 1.0:
         raise ValueError(
-            "EN1_EN2_PARALLEL_DOC_FRACTION must be a fraction in [0, 1], "
+            "EN1_EN2_MIXED_DATA_FRACTION must be a fraction in [0, 1], "
             f"got {raw_value}."
         )
     return value
+
+def _multilingual_pretraining_root() -> Path:
+    root = os.environ.get("MULTILINGUAL_PRETRAINING_ROOT")
+    if root:
+        return Path(root).expanduser()
+
+    torchtitan_root = Path(os.environ.get("TORCHTITAN_ROOT", Path.cwd())).resolve()
+    if torchtitan_root.name == "multilingual-pretraining":
+        return torchtitan_root
+    return torchtitan_root.parent
+
+def _under_multilingual_root(*parts: str) -> str:
+    return str(_multilingual_pretraining_root().joinpath(*parts))
 
 def _en1_en2_fictional_entity_files():
     base_probs = [0, 0.00000411, 0.00002055, 0.0002055]
     data_root = os.environ.get(
         "FICTIONAL_ENTITY_DATA_ROOT",
-        "/home/adamga/torchtitan/fictional_entity_data/gemini_seeds",
+        _under_multilingual_root("fictional_entity_data", "gemini_seeds"),
     )
 
     file_order_shuffler = random.Random(43)
@@ -2004,8 +2015,8 @@ def _append_source_if_positive(sources: list[dict], source: dict) -> None:
         sources.append(source)
 
 def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
-    doc_fraction = _parallel_doc_fraction()
-    clean_fraction = 1.0 - doc_fraction
+    mixed_data_fraction = _mixed_data_fraction()
+    clean_fraction = 1.0 - mixed_data_fraction
     stage1_steps = _env_int("EN1_EN2_STAGE1_STEPS", 3000)
     clean_steps = _env_int("EN1_EN2_CLEAN_STEPS", 1000)
     vocab_size = _env_int("EN1_EN2_BASE_VOCAB_SIZE", 65536)
@@ -2018,7 +2029,7 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
         stage1_sources,
         {
             "name": "fineweb-edu-ar-en",
-            "weight": doc_fraction,
+            "weight": mixed_data_fraction,
             "augmentations": [
                 {
                     "name": "synthetic_sentence_language_mixing",
@@ -2051,16 +2062,16 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
         },
     )
 
-    x_tag = f"{doc_fraction * 100:g}".replace(".", "p")
+    mixed_data_tag = f"{mixed_data_fraction * 100:g}".replace(".", "p")
     output_root = os.environ.get(
         "EN1_EN2_OUTPUT_ROOT",
-        "/home/adamga/leshemg/adamga/train/torchtitan",
+        _under_multilingual_root("outputs", "torchtitan"),
     )
 
     return Trainer.Config(
         hf_assets_path=os.environ.get(
             "EN1_EN2_HF_ASSETS_PATH",
-            "/home/adamga/torchtitan/tests/assets/65k_paired",
+            _under_multilingual_root("assets", "65k_paired"),
         ),
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=_env_int("EN1_EN2_NUM_WORKERS", 3),
@@ -2122,7 +2133,8 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
         checkpoint=CheckpointManager.Config(
             interval=_env_int("EN1_EN2_CHECKPOINT_INTERVAL", 500),
             folder=(
-                f"{output_root}/smollm2_360m_en1_en2_{mode}_x{x_tag}"
+                f"{output_root}/smollm2_360m_en1_en2_{mode}"
+                f"_mixed_data{mixed_data_tag}pct"
                 f"_stage1_{stage1_steps}_stage2_{clean_steps}"
             ),
             enable=True,

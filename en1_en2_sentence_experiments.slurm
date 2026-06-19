@@ -13,19 +13,27 @@
 set -euo pipefail
 
 # Usage examples:
-#   sbatch --export=ALL,X=0.01 en1_en2_sentence_experiments.slurm
-#   sbatch --export=ALL,X=0.6 en1_en2_sentence_experiments.slurm
-#   sbatch --export=ALL,X=0.25,RUN_EVAL=1 en1_en2_sentence_experiments.slurm
-#   sbatch --export=ALL,VARIANT=sentence_parallel_doc_order,X=0.6 en1_en2_sentence_experiments.slurm
+#   sbatch --export=ALL,MIXED_DATA_FRACTION=0.01 en1_en2_sentence_experiments.slurm
+#   sbatch --export=ALL,MIXED_DATA_FRACTION=0.6 en1_en2_sentence_experiments.slurm
+#   sbatch --export=ALL,MIXED_DATA_FRACTION=0.25,RUN_EVAL=1 en1_en2_sentence_experiments.slurm
+#   sbatch --export=ALL,VARIANT=sentence_parallel_doc_order,MIXED_DATA_FRACTION=0.6 en1_en2_sentence_experiments.slurm
 #
 # Before the first run in a fresh environment:
 #   uv pip install -e .
-#   python -m nltk.downloader -d "${HOME}/nltk_data" punkt punkt_tab
+#   python -m nltk.downloader -d "${MULTILINGUAL_PRETRAINING_ROOT}/nltk_data" punkt punkt_tab
 #
 # VARIANT values:
 #   sentence_wise_code_switching
 #   sentence_parallel_doc_order
 #   sentence_parallel_sentence_order
+#
+# Default directory layout:
+#   multilingual-pretraining/
+#     torchtitan-mulitlingual/
+#     data/fineweb_translated/en-original/
+#     fictional_entity_data/gemini_seeds/
+#     assets/65k_paired/
+#     outputs/torchtitan/
 
 VARIANTS=(
   "sentence_wise_code_switching"
@@ -61,26 +69,42 @@ esac
 TORCHTITAN_ROOT="${TORCHTITAN_ROOT:-${SLURM_SUBMIT_DIR:-$(pwd)}}"
 cd "${TORCHTITAN_ROOT}"
 
+if [[ -z "${MULTILINGUAL_PRETRAINING_ROOT:-}" ]]; then
+  TORCHTITAN_BASENAME="$(basename "${TORCHTITAN_ROOT}")"
+  if [[ "${TORCHTITAN_BASENAME}" == "multilingual-pretraining" ]]; then
+    MULTILINGUAL_PRETRAINING_ROOT="${TORCHTITAN_ROOT}"
+  else
+    MULTILINGUAL_PRETRAINING_ROOT="$(cd "${TORCHTITAN_ROOT}/.." && pwd)"
+  fi
+fi
+
 NGPU="${NGPU:-8}"
 MODULE="${MODULE:-llama3}"
-X="${X:-${EN1_EN2_PARALLEL_DOC_FRACTION:-${EN1_EN2_PARALLEL_DOC_PERCENT:-0.6}}}"
+MIXED_DATA_FRACTION="${MIXED_DATA_FRACTION:-${EN1_EN2_MIXED_DATA_FRACTION:-0.6}}"
 
-export EN1_EN2_PARALLEL_DOC_FRACTION="${X}"
+export MULTILINGUAL_PRETRAINING_ROOT
+export MULTILINGUAL_DATA_ROOT="${MULTILINGUAL_DATA_ROOT:-${MULTILINGUAL_PRETRAINING_ROOT}/data}"
+export FINEWEB_TRANSLATED_ROOT="${FINEWEB_TRANSLATED_ROOT:-${MULTILINGUAL_DATA_ROOT}/fineweb_translated}"
+export FINEWEB_PAIRED_SHARDS_ROOT="${FINEWEB_PAIRED_SHARDS_ROOT:-${MULTILINGUAL_DATA_ROOT}/fineweb-edu-ar_paired_shards}"
+export MIXED_DATA_FRACTION
+export EN1_EN2_MIXED_DATA_FRACTION="${MIXED_DATA_FRACTION}"
 export EN1_EN2_STAGE1_STEPS="${EN1_EN2_STAGE1_STEPS:-3000}"
 export EN1_EN2_CLEAN_STEPS="${EN1_EN2_CLEAN_STEPS:-1000}"
-export EN1_EN2_HF_ASSETS_PATH="${EN1_EN2_HF_ASSETS_PATH:-/home/adamga/torchtitan/tests/assets/65k_paired}"
-export FICTIONAL_ENTITY_DATA_ROOT="${FICTIONAL_ENTITY_DATA_ROOT:-/home/adamga/torchtitan/fictional_entity_data/gemini_seeds}"
-export EN1_EN2_OUTPUT_ROOT="${EN1_EN2_OUTPUT_ROOT:-/home/adamga/leshemg/adamga/train/torchtitan}"
-export HF_HOME="${HF_HOME:-/home/adamga/leshemg/adamga/hf_home}"
-export NLTK_DATA="${NLTK_DATA:-${HOME}/nltk_data}"
+export EN1_EN2_HF_ASSETS_PATH="${EN1_EN2_HF_ASSETS_PATH:-${MULTILINGUAL_PRETRAINING_ROOT}/assets/65k_paired}"
+export FICTIONAL_ENTITY_DATA_ROOT="${FICTIONAL_ENTITY_DATA_ROOT:-${MULTILINGUAL_PRETRAINING_ROOT}/fictional_entity_data/gemini_seeds}"
+export EN1_EN2_OUTPUT_ROOT="${EN1_EN2_OUTPUT_ROOT:-${MULTILINGUAL_PRETRAINING_ROOT}/outputs/torchtitan}"
+export HF_HOME="${HF_HOME:-${MULTILINGUAL_PRETRAINING_ROOT}/hf_home}"
+export NLTK_DATA="${NLTK_DATA:-${MULTILINGUAL_PRETRAINING_ROOT}/nltk_data}"
 export TORCHINDUCTOR_MAX_AUTOTUNE="${TORCHINDUCTOR_MAX_AUTOTUNE:-1}"
 export LOGLEVEL="${LOGLEVEL:-INFO}"
 export PYTHONFAULTHANDLER="${PYTHONFAULTHANDLER:-1}"
 export NCCL_DEBUG="${NCCL_DEBUG:-WARN}"
 export OMP_NUM_THREADS="${OMP_NUM_THREADS:-8}"
 
-X_PERCENT="$(awk -v x="${X}" 'BEGIN { printf "%g", x * 100.0 }')"
-X_TAG="${X_PERCENT//./p}"
+mkdir -p "${EN1_EN2_OUTPUT_ROOT}" "${HF_HOME}" "${NLTK_DATA}"
+
+MIXED_DATA_PERCENT="$(awk -v x="${MIXED_DATA_FRACTION}" 'BEGIN { printf "%g", x * 100.0 }')"
+MIXED_DATA_TAG="${MIXED_DATA_PERCENT//./p}"
 
 if [[ -n "${ENV_SETUP:-}" ]]; then
   # Optional: point ENV_SETUP at a shell file that activates your venv/modules.
@@ -88,7 +112,12 @@ if [[ -n "${ENV_SETUP:-}" ]]; then
   source "${ENV_SETUP}"
 fi
 
-echo "Starting ${VARIANT} with X=${X_PERCENT}% using CONFIG=${CONFIG}"
+echo "Root: ${MULTILINGUAL_PRETRAINING_ROOT}"
+echo "FineWeb translated data: ${FINEWEB_TRANSLATED_ROOT}"
+echo "Fictional entity data: ${FICTIONAL_ENTITY_DATA_ROOT}"
+echo "Tokenizer assets: ${EN1_EN2_HF_ASSETS_PATH}"
+echo "Output root: ${EN1_EN2_OUTPUT_ROOT}"
+echo "Starting ${VARIANT} with mixed_data_fraction=${MIXED_DATA_FRACTION} (${MIXED_DATA_PERCENT}%) using CONFIG=${CONFIG}"
 
 srun torchrun \
   --standalone \
@@ -108,7 +137,7 @@ if [[ "${RUN_EVAL}" != "1" ]]; then
 fi
 
 TOTAL_STEPS="$((EN1_EN2_STAGE1_STEPS + EN1_EN2_CLEAN_STEPS))"
-RUN_DIR="${EN1_EN2_OUTPUT_ROOT}/smollm2_360m_en1_en2_${VARIANT}_x${X_TAG}_stage1_${EN1_EN2_STAGE1_STEPS}_stage2_${EN1_EN2_CLEAN_STEPS}"
+RUN_DIR="${EN1_EN2_OUTPUT_ROOT}/smollm2_360m_en1_en2_${VARIANT}_mixed_data${MIXED_DATA_TAG}pct_stage1_${EN1_EN2_STAGE1_STEPS}_stage2_${EN1_EN2_CLEAN_STEPS}"
 TT_CHECKPOINT="${TT_CHECKPOINT:-${RUN_DIR}/step-${TOTAL_STEPS}}"
 HF_OUTPUT_ROOT="${HF_OUTPUT_ROOT:-${RUN_DIR}/hf_eval}"
 

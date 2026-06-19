@@ -52,11 +52,12 @@ The new sentence-level configs are:
 - `smollm2_360m_en1_en2_sentence_parallel_doc_order`
 - `smollm2_360m_en1_en2_sentence_parallel_sentence_order`
 
-`EN1_EN2_PARALLEL_DOC_FRACTION` controls X, the fraction of stage-1 training
-documents receiving the intervention. Use fractions only: `0.01` means 1%,
-`0.6` means 60%, and `1.0` means all documents. The intervention source gets
-weight X; clean injected en1/en2 sources split `1-X`. Stage-1 injection
-probabilities are scaled to keep absolute exposure comparable when X changes.
+`EN1_EN2_MIXED_DATA_FRACTION` controls the fraction of stage-1 training
+documents drawn from the sentence-wise or sentence-parallel mixed-data source.
+Use fractions only: `0.01` means 1%, `0.6` means 60%, and `1.0` means all
+documents. The mixed-data source gets this weight; clean injected en1/en2
+sources split the remaining weight. Stage-1 injection probabilities are scaled
+to keep absolute exposure comparable when this fraction changes.
 
 The sentence-level implementation records character spans before tokenization
 with `synthetic_sentence_language_mixing`, then shifts the tokens whose offsets
@@ -66,11 +67,20 @@ NLTK Punkt span tokenization so the transform gets abbreviation-aware
 
 ## Common Environment Variables
 
-- `EN1_EN2_PARALLEL_DOC_PERCENT`: X for the sentence experiment.
+- `MULTILINGUAL_PRETRAINING_ROOT`: root directory that contains the repo,
+  data, assets, checkpoints, HF cache, and NLTK data. The Slurm launcher
+  infers this as the repo parent when the repo is cloned under
+  `multilingual-pretraining/torchtitan-mulitlingual`.
+- `MULTILINGUAL_DATA_ROOT`: defaults to
+  `$MULTILINGUAL_PRETRAINING_ROOT/data`.
+- `FINEWEB_TRANSLATED_ROOT`: defaults to
+  `$MULTILINGUAL_DATA_ROOT/fineweb_translated`.
+- `EN1_EN2_MIXED_DATA_FRACTION`: mixed-data fraction for the sentence
+  experiment.
 - `FICTIONAL_ENTITY_DATA_ROOT`: root containing `0/en_data.jsonl`, ...,
   `2079/en_data.jsonl`.
-- `EN1_EN2_HF_ASSETS_PATH`: tokenizer/HF assets path, defaulting to the
-  existing 65k paired tokenizer path.
+- `EN1_EN2_HF_ASSETS_PATH`: tokenizer/HF assets path, defaulting to
+  `$MULTILINGUAL_PRETRAINING_ROOT/assets/65k_paired`.
 - `EN1_EN2_OUTPUT_ROOT`: checkpoint output root.
 - `EN1_EN2_STAGE1_STEPS`, `EN1_EN2_CLEAN_STEPS`: curriculum lengths.
 - `EN1_EN2_LOCAL_BATCH_SIZE`, `EN1_EN2_GLOBAL_BATCH_SIZE`, `EN1_EN2_SEQ_LEN`:
@@ -81,7 +91,7 @@ dependencies and download Punkt data once:
 
 ```bash
 uv pip install -e .
-python -m nltk.downloader -d "${HOME}/nltk_data" punkt punkt_tab
+python -m nltk.downloader -d "${MULTILINGUAL_PRETRAINING_ROOT}/nltk_data" punkt punkt_tab
 ```
 
 ## Evaluation Notes
