@@ -25,6 +25,7 @@ dependencies = [
     "wandb",
     "einops",
     "pillow",
+    "nltk>=3.8",
 ]
 dynamic = ["version"]
 

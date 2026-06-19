@@ -26,6 +26,7 @@ from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
 
 from . import model_registry
+import os
 import random
 
 
@@ -1935,6 +1936,261 @@ def smollm2_360m_flex_curriculum6() -> Trainer.Config:
             ]
         )
     )
+def _env_float(name: str, default: float) -> float:
+    raw_value = os.environ.get(name)
+    if raw_value is None or raw_value == "":
+        return default
+    return float(raw_value)
+
+def _env_int(name: str, default: int) -> int:
+    raw_value = os.environ.get(name)
+    if raw_value is None or raw_value == "":
+        return default
+    return int(raw_value)
+
+def _parallel_doc_fraction() -> float:
+    raw_value = os.environ.get(
+        "EN1_EN2_PARALLEL_DOC_FRACTION",
+        os.environ.get(
+            "EN1_EN2_PARALLEL_DOC_PERCENT",
+            os.environ.get("PARALLEL_DOC_PERCENT", "0.6"),
+        ),
+    )
+    value = float(raw_value)
+    if not 0.0 <= value <= 1.0:
+        raise ValueError(
+            "EN1_EN2_PARALLEL_DOC_FRACTION must be a fraction in [0, 1], "
+            f"got {raw_value}."
+        )
+    return value
+
+def _en1_en2_fictional_entity_files():
+    base_probs = [0, 0.00000411, 0.00002055, 0.0002055]
+    data_root = os.environ.get(
+        "FICTIONAL_ENTITY_DATA_ROOT",
+        "/home/adamga/torchtitan/fictional_entity_data/gemini_seeds",
+    )
+
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+
+    en_files = [f"{data_root}/{i}/en_data.jsonl" for i in file_order]
+    en1_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    en2_probs = [
+        base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)
+    ]
+    return en_files, en1_probs, en2_probs
+
+def _en2_post_token_aug(vocab_size: int) -> list[dict]:
+    return [
+        {
+            "name": "stochastic_word_tagging",
+            "prob": 1.0,
+            "vocab_size": vocab_size,
+        }
+    ]
+
+def _span_post_token_aug(vocab_size: int) -> list[dict]:
+    return [
+        {
+            "name": "language_span_token_tagging",
+            "vocab_size": vocab_size,
+        }
+    ]
+
+def _append_source_if_positive(sources: list[dict], source: dict) -> None:
+    if source.get("weight", 0.0) > 0.0:
+        sources.append(source)
+
+def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
+    doc_fraction = _parallel_doc_fraction()
+    clean_fraction = 1.0 - doc_fraction
+    stage1_steps = _env_int("EN1_EN2_STAGE1_STEPS", 3000)
+    clean_steps = _env_int("EN1_EN2_CLEAN_STEPS", 1000)
+    vocab_size = _env_int("EN1_EN2_BASE_VOCAB_SIZE", 65536)
+
+    en_files, en1_probs, en2_probs = _en1_en2_fictional_entity_files()
+    stage1_injection_scale = 1.0 / clean_fraction if clean_fraction > 0 else 0.0
+
+    stage1_sources = []
+    _append_source_if_positive(
+        stage1_sources,
+        {
+            "name": "fineweb-edu-ar-en",
+            "weight": doc_fraction,
+            "augmentations": [
+                {
+                    "name": "synthetic_sentence_language_mixing",
+                    "mode": mode,
+                    "lang2_prob": 0.5,
+                }
+            ],
+            "post_token_augmentations": _span_post_token_aug(vocab_size),
+        },
+    )
+    _append_source_if_positive(
+        stage1_sources,
+        {
+            "name": "fineweb-edu-ar-en",
+            "weight": clean_fraction / 2,
+            "start_idx": 3_000_000,
+            "injection_paths": en_files,
+            "injection_probs": [prob * stage1_injection_scale for prob in en1_probs],
+        },
+    )
+    _append_source_if_positive(
+        stage1_sources,
+        {
+            "name": "fineweb-edu-ar-en",
+            "weight": clean_fraction / 2,
+            "start_idx": 4_000_000,
+            "injection_paths": en_files,
+            "injection_probs": [prob * stage1_injection_scale for prob in en2_probs],
+            "post_token_augmentations": _en2_post_token_aug(vocab_size),
+        },
+    )
+
+    x_tag = f"{doc_fraction * 100:g}".replace(".", "p")
+    output_root = os.environ.get(
+        "EN1_EN2_OUTPUT_ROOT",
+        "/home/adamga/leshemg/adamga/train/torchtitan",
+    )
+
+    return Trainer.Config(
+        hf_assets_path=os.environ.get(
+            "EN1_EN2_HF_ASSETS_PATH",
+            "/home/adamga/torchtitan/tests/assets/65k_paired",
+        ),
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=_env_int("EN1_EN2_NUM_WORKERS", 3),
+            stages=[
+                {
+                    "steps": stage1_steps,
+                    "sources": stage1_sources,
+                },
+                {
+                    "steps": clean_steps,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "start_idx": 5_000_000,
+                            "injection_paths": en_files,
+                            "injection_probs": en1_probs,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "start_idx": 5_800_000,
+                            "injection_paths": en_files,
+                            "injection_probs": en2_probs,
+                            "post_token_augmentations": _en2_post_token_aug(
+                                vocab_size
+                            ),
+                        },
+                    ],
+                },
+            ],
+            eos_token_id=0,
+        ),
+        model_spec=model_registry("smollm2_360m_2xvocab"),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=_env_float("EN1_EN2_LR", 5e-4),
+            weight_decay=0.1,
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=_env_int("EN1_EN2_WARMUP_STEPS", 300),
+            decay_ratio=1.0,
+            decay_type="cosine",
+            min_lr_factor=0.05,
+        ),
+        training=TrainingConfig(
+            local_batch_size=_env_int("EN1_EN2_LOCAL_BATCH_SIZE", 24),
+            global_batch_size=_env_int("EN1_EN2_GLOBAL_BATCH_SIZE", 768),
+            seq_len=_env_int("EN1_EN2_SEQ_LEN", 2048),
+            steps=stage1_steps + clean_steps,
+            max_norm=1.0,
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=_env_int("EN1_EN2_LOG_FREQ", 10),
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=_env_int("EN1_EN2_CHECKPOINT_INTERVAL", 500),
+            folder=(
+                f"{output_root}/smollm2_360m_en1_en2_{mode}_x{x_tag}"
+                f"_stage1_{stage1_steps}_stage2_{clean_steps}"
+            ),
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            async_mode="async",
+        ),
+        validator=Validator.Config(
+            freq=_env_int("EN1_EN2_VALIDATOR_FREQ", 500),
+            steps=_env_int("EN1_EN2_VALIDATOR_STEPS", 10),
+            enable=True,
+            dataloader={
+                "en1": HuggingFaceTextDataLoader.Config(
+                    num_workers=_env_int("EN1_EN2_NUM_WORKERS", 3),
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0,
+                ),
+                "en2": HuggingFaceTextDataLoader.Config(
+                    num_workers=_env_int("EN1_EN2_NUM_WORKERS", 3),
+                    stages=[
+                        {
+                            "steps": 300,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 6_600_000,
+                                    "post_token_augmentations": _en2_post_token_aug(
+                                        vocab_size
+                                    ),
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0,
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0,
+                },
+            ]
+        ),
+    )
+
+def smollm2_360m_en1_en2_sentence_wise_code_switching() -> Trainer.Config:
+    return _smollm2_360m_en1_en2_sentence_config("sentence_wise_code_switching")
+
+def smollm2_360m_en1_en2_sentence_parallel_doc_order() -> Trainer.Config:
+    return _smollm2_360m_en1_en2_sentence_config("sentence_parallel_doc_order")
+
+def smollm2_360m_en1_en2_sentence_parallel_sentence_order() -> Trainer.Config:
+    return _smollm2_360m_en1_en2_sentence_config("sentence_parallel_sentence_order")
+
 def smollm2_360m_en1_en2() -> Trainer.Config:
     base_probs = [0, 0.00000411, 0.00002055, 0.0002055] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)

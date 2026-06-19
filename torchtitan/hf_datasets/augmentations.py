@@ -388,10 +388,156 @@ class WordwiseUnigramCodeSwitching:
     #     assert len(text["text"].split()) == len(mask), f"Mask length does not match the number of words in the text, expected {len(text['text'].split())}, got {len(mask)}"
     #     return text
 
+class SyntheticSentenceLanguageMixing:
+    """
+    Builds artificial en1/en2 documents before tokenization and records the
+    character spans that should be shifted into the second vocabulary copy.
+
+    Supported modes:
+    - sentence_wise_code_switching: each sentence independently chooses en1/en2.
+    - sentence_parallel_doc_order: each sentence appears twice, with the
+      en1/en2 order sampled once per document.
+    - sentence_parallel_sentence_order: each sentence appears twice, with the
+      en1/en2 order sampled independently per sentence.
+    """
+
+    def __init__(self, config: dict):
+        self.name = config.get("name", "synthetic_sentence_language_mixing")
+        self.mode = config.get("mode", "sentence_wise_code_switching")
+        self.lang2_prob = config.get("lang2_prob", 0.5)
+        self.document_prob = config.get("document_prob", 1.0)
+        self.separator = config.get("separator", " ")
+        self._punkt_tokenizer = self._load_punkt_tokenizer()
+
+        valid_modes = {
+            "sentence_wise_code_switching",
+            "sentence_parallel_doc_order",
+            "sentence_parallel_sentence_order",
+        }
+        if self.mode not in valid_modes:
+            raise ValueError(
+                f"[{self.name}] unsupported mode '{self.mode}'. "
+                f"Available modes: {sorted(valid_modes)}"
+            )
+
+    def _load_punkt_tokenizer(self):
+        try:
+            import nltk.data
+
+            return nltk.data.load("tokenizers/punkt/english.pickle")
+        except (ImportError, LookupError) as exc:
+            raise RuntimeError(
+                f"[{self.name}] requires the nltk package and English Punkt "
+                "data. Install nltk in the training environment and run: "
+                "python -m nltk.downloader punkt punkt_tab."
+            ) from exc
+
+    def __call__(self, text: dict, dataset_name: str) -> dict:
+        if not isinstance(text, dict) or "text" not in text:
+            raise TypeError(
+                f"[{self.name}] expected a dictionary with a 'text' key, "
+                f"got {type(text).__name__}"
+            )
+
+        if self.document_prob < 1.0 and random.random() >= self.document_prob:
+            return text
+
+        raw_text = text["text"]
+        if not raw_text:
+            text["language_spans"] = []
+            return text
+
+        if self.mode == "sentence_wise_code_switching":
+            text["text"], text["language_spans"] = self._codeswitch(raw_text)
+        else:
+            text["text"], text["language_spans"] = self._parallel(raw_text)
+        return text
+
+    def _sentence_chunks(self, raw_text: str) -> list[str]:
+        spans = list(self._punkt_tokenizer.span_tokenize(raw_text))
+        if not spans:
+            return [raw_text]
+
+        chunks = []
+        cursor = 0
+        for start, end in spans:
+            if start > cursor:
+                chunks.append(raw_text[cursor:start])
+            chunks.append(raw_text[start:end])
+            cursor = end
+        if cursor < len(raw_text):
+            chunks.append(raw_text[cursor:])
+        return chunks
+
+    def _append_with_lang(
+        self,
+        parts: list[str],
+        spans: list[tuple[int, int, int]],
+        segment: str,
+        lang: int,
+    ) -> None:
+        if not segment:
+            return
+
+        start = sum(len(part) for part in parts)
+        parts.append(segment)
+        end = start + len(segment)
+        spans.append((start, end, lang))
+
+    def _split_outer_space(self, chunk: str) -> tuple[str, str, str]:
+        left_len = len(chunk) - len(chunk.lstrip())
+        right_len = len(chunk) - len(chunk.rstrip())
+        if left_len + right_len >= len(chunk):
+            return chunk, "", ""
+
+        leading = chunk[:left_len]
+        trailing = chunk[len(chunk) - right_len :] if right_len else ""
+        core = chunk[left_len : len(chunk) - right_len if right_len else len(chunk)]
+        return leading, core, trailing
+
+    def _codeswitch(self, raw_text: str) -> tuple[str, list[tuple[int, int, int]]]:
+        parts = []
+        spans = []
+        for chunk in self._sentence_chunks(raw_text):
+            leading, core, trailing = self._split_outer_space(chunk)
+            if not core:
+                parts.append(chunk)
+                continue
+
+            lang = 2 if random.random() < self.lang2_prob else 1
+            parts.append(leading)
+            self._append_with_lang(parts, spans, core, lang)
+            parts.append(trailing)
+        return "".join(parts), spans
+
+    def _parallel(self, raw_text: str) -> tuple[str, list[tuple[int, int, int]]]:
+        parts = []
+        spans = []
+        doc_order = (1, 2) if random.random() < 0.5 else (2, 1)
+
+        for chunk in self._sentence_chunks(raw_text):
+            leading, core, trailing = self._split_outer_space(chunk)
+            if not core:
+                parts.append(chunk)
+                continue
+
+            order = doc_order
+            if self.mode == "sentence_parallel_sentence_order":
+                order = (1, 2) if random.random() < 0.5 else (2, 1)
+
+            parts.append(leading)
+            self._append_with_lang(parts, spans, core, order[0])
+            parts.append(self.separator)
+            self._append_with_lang(parts, spans, core, order[1])
+            parts.append(trailing)
+
+        return "".join(parts), spans
+
 AUGMENTATIONS_REGISTRY = {
     "wordwise_codeswitching": WordwiseCodeSwitching,
     "decapitalization": decapitalize,
     "document_translation": DocumentTranslation,
     "text_duplication": TextDuplication,
     "wordwise_unigram_codeswitching": WordwiseUnigramCodeSwitching,
+    "synthetic_sentence_language_mixing": SyntheticSentenceLanguageMixing,
 }

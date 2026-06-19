@@ -137,6 +137,76 @@ class StochasticWordTokenTagging:
         tokens_in["tokens"] = shifted_tokens
         return tokens_in
 
+class LanguageSpanTokenTagging:
+    """
+    Shifts token IDs into the second synthetic vocabulary based on character
+    spans produced by SyntheticSentenceLanguageMixing.
+    """
+
+    def __init__(self, config: dict):
+        self.name = config.get("name", "language_span_token_tagging")
+        self.vocab_size = config.get("vocab_size")
+        if self.vocab_size is None:
+            raise ValueError(f"[{self.name}] config must include 'vocab_size'")
+
+        self.shift_lang = config.get("shift_lang", 2)
+        self.special_tokens = set(config.get("special_tokens", []))
+        print(
+            f"Initializing {self.name} for lang={self.shift_lang}, "
+            f"shift={self.vocab_size}."
+        )
+
+    def __call__(self, tokens_in: dict | list[dict], dataset_name: str = None):
+        if isinstance(tokens_in, list):
+            return [self(item, dataset_name=dataset_name) for item in tokens_in]
+
+        spans = tokens_in.get("language_spans", [])
+        if not spans:
+            return tokens_in
+
+        offsets = tokens_in.get("offsets")
+        if offsets is None:
+            raise ValueError(
+                f"[{self.name}] requires token character offsets. "
+                "Use encode_with_token_metadata in the dataset pipeline."
+            )
+
+        shift_spans = [
+            (int(start), int(end))
+            for start, end, lang in spans
+            if int(lang) == self.shift_lang and int(end) > int(start)
+        ]
+        if not shift_spans:
+            return tokens_in
+
+        shifted_tokens = []
+        for token_id, offset in zip(tokens_in["tokens"], offsets):
+            if token_id in self.special_tokens or offset is None:
+                shifted_tokens.append(token_id)
+                continue
+
+            start, end = offset
+            if start is None or end is None or end <= start:
+                shifted_tokens.append(token_id)
+                continue
+
+            should_shift = any(
+                max(start, span_start) < min(end, span_end)
+                for span_start, span_end in shift_spans
+            )
+            shifted_tokens.append(
+                token_id + self.vocab_size if should_shift else token_id
+            )
+
+        if len(shifted_tokens) != len(tokens_in["tokens"]):
+            raise AssertionError(
+                f"[{self.name}] shifted token count {len(shifted_tokens)} "
+                f"!= input token count {len(tokens_in['tokens'])}"
+            )
+
+        tokens_in["tokens"] = shifted_tokens
+        return tokens_in
+
 class WordWiseContrastive:
     def __init__(self, tokenizer):
         # 1. Grab the tokenizer injected from the Dataset
@@ -236,4 +306,5 @@ class WordWiseContrastive:
 POST_TOKEN_AUGMENTATIONS_REGISTRY = {
     "stochastic_token_tagging": StochasticTokenTagging,
     "stochastic_word_tagging": StochasticWordTokenTagging,
+    "language_span_token_tagging": LanguageSpanTokenTagging,
 }

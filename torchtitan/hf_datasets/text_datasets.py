@@ -28,7 +28,7 @@ from torchtitan.hf_datasets.post_tokenization_augmentations import WordWiseContr
 WORDWISE_CONTRASTIVE_ENABLED = True  # Set to False to disable the word-wise contrastive augmentation
 MAX_SEQS = 128
 
-def encode_with_word_ids(tokenizer, text):
+def encode_with_token_metadata(tokenizer, text):
     encoding = tokenizer.tokenizer.encode(text)
     # 2. Replicate your wrapper's BOS/EOS logic
     bos = [tokenizer.bos_id] if tokenizer.bos_id is not None else []
@@ -41,6 +41,11 @@ def encode_with_word_ids(tokenizer, text):
     bos_pad = [None] * len(bos)
     eos_pad = [None] * len(eos)
     word_ids = bos_pad + encoding.word_ids + eos_pad
+    offsets = bos_pad + encoding.offsets + eos_pad
+    return tokens, word_ids, offsets
+
+def encode_with_word_ids(tokenizer, text):
+    tokens, word_ids, _ = encode_with_token_metadata(tokenizer, text)
     return tokens, word_ids
 
 def buffered_shuffle(iterator, buffer_size=10000):
@@ -300,7 +305,9 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
 
         # Apply post tokenization shifts
         tokens = {k: v for k, v in doc.items() if k != "text"}
-        tokens["tokens"], tokens["word_ids"] = encode_with_word_ids(self._tokenizer, doc["text"])
+        tokens["tokens"], tokens["word_ids"], tokens["offsets"] = (
+            encode_with_token_metadata(self._tokenizer, doc["text"])
+        )
         tokens = self._apply_post_token_augs(tokens)
         
         if len(tokens["tokens"]) > 0 and tokens["tokens"][-1] != self.eos_token_id:
@@ -330,9 +337,13 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 if self.enable_contrastive_mask:
                     assert isinstance(sample_text, list) and len(sample_text) == 2, "Expected paired text for contrastive masking"
                     tokens_1 = {k:v for k,v in sample_text[0].items() if k != "text"}
-                    tokens_1["tokens"], tokens_1["word_ids"] = encode_with_word_ids(self._tokenizer, sample_text[0]["text"])
+                    tokens_1["tokens"], tokens_1["word_ids"], tokens_1["offsets"] = (
+                        encode_with_token_metadata(self._tokenizer, sample_text[0]["text"])
+                    )
                     tokens_2 = {k:v for k,v in sample_text[1].items() if k != "text"}
-                    tokens_2["tokens"], tokens_2["word_ids"] = encode_with_word_ids(self._tokenizer, sample_text[1]["text"])
+                    tokens_2["tokens"], tokens_2["word_ids"], tokens_2["offsets"] = (
+                        encode_with_token_metadata(self._tokenizer, sample_text[1]["text"])
+                    )
 
                     # Apply post tokenization shifts
                     if self.wordwisecontrastive is not None:
@@ -354,7 +365,9 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 else:
                     # sample_text = self._apply_augs(sample_text)
                     new_tokens = {k: v for k, v in sample_text.items() if k != "text"}
-                    new_tokens["tokens"], new_tokens["word_ids"] = encode_with_word_ids(self._tokenizer, sample_text["text"])
+                    new_tokens["tokens"], new_tokens["word_ids"], new_tokens["offsets"] = (
+                        encode_with_token_metadata(self._tokenizer, sample_text["text"])
+                    )
 
                     # Apply post tokenization shifts
                     new_tokens = self._apply_post_token_augs(new_tokens)
