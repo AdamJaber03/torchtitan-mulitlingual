@@ -147,3 +147,12 @@ class Llama3Model(Decoder):
 
         super().init_weights(buffer_device=buffer_device, **kwargs)
 
+    def reinit_embeddings(self):
+        # Re-establish tying before reinitializing so the shared input/output weight ends up with the
+        # output's (smaller, truncated-normal) distribution, exactly as at initial init. Used by
+        # active forgetting (periodic embedding reset) as well as initial init_weights.
+        if self.enable_weight_tying:
+            assert self.tok_embeddings is not None and self.output is not None
+            self.tok_embeddings.weight = self.output.weight
+        super().reinit_embeddings()
+

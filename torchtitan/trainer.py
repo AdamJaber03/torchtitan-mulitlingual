@@ -890,6 +890,36 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             extra_metrics=extra_metrics,
         )
 
+    def _maybe_active_forget(self) -> None:
+        """Active forgetting (arXiv:2410.16168 / Chen et al. 2023): every
+        `training.active_forgetting_interval` steps, reinitialize the token embeddings and reset
+        their optimizer (Adam) state. The transformer body and the LR schedule are left untouched.
+        Skipped on the final step so the converged model is not perturbed."""
+        k = self.config.training.active_forgetting_interval
+        if not k or self.step % k != 0 or self.step == self.config.training.steps:
+            return
+
+        emb_params = set()
+        with torch.no_grad():
+            for mp in self.model_parts:
+                if hasattr(mp, "reinit_embeddings"):
+                    mp.reinit_embeddings()
+                for name in ("tok_embeddings", "output"):
+                    mod = getattr(mp, name, None)
+                    weight = getattr(mod, "weight", None) if mod is not None else None
+                    if weight is not None:
+                        emb_params.add(weight)  # tied input/output -> same tensor, set dedups
+
+        # Reset Adam moments for the embedding params so fresh weights start from a clean state.
+        for optimizer in self.optimizers.optimizers:
+            for param in emb_params:
+                optimizer.state.pop(param, None)
+
+        logger.info(
+            f"[active-forgetting] reinitialized {len(emb_params)} embedding tensor(s) and reset "
+            f"their optimizer state at step {self.step} (interval={k})"
+        )
+
     @record
     def train(self):
         config = self.config
@@ -976,6 +1006,10 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                     self.step
                 ):
                     self.validator.validate(self.model_parts, self.step)
+
+                # Active forgetting: periodically reinitialize the token embeddings. Done after
+                # checkpoint/validation so those reflect the trained (pre-reset) model.
+                self._maybe_active_forget()
 
                 # signal the profiler that the next profiling step has started
                 if torch_profiler:

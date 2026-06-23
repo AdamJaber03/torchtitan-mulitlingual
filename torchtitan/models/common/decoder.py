@@ -117,23 +117,13 @@ class Decoder(BaseModel):
             rope = self.config.rope.build()
             rope.init_weights(buffer_device=buffer_device)
             self.freqs_cis = rope.cache
-        if self.tok_embeddings is not None:
-            nn.init.normal_(self.tok_embeddings.weight)
+        self._init_tok_embeddings()
         for layer in self.layers.values():
             # pyrefly: ignore [not-callable]
             layer.init_weights(buffer_device=buffer_device)
         if self.norm is not None:
             self.norm.reset_parameters()
-        final_out_std = self.config.dim**-0.5
-        cutoff_factor = 3
-        if self.output is not None:
-            trunc_normal_(
-                self.output.weight,
-                mean=0.0,
-                std=final_out_std,
-                a=-cutoff_factor * final_out_std,
-                b=cutoff_factor * final_out_std,
-            )
+        self._init_output()
         # --- NEW: Initialize MLP weights ---
         if self.enable_contrastive and self.contrastive_proj is not None:
             buffer_device = kwargs.get("buffer_device") or self.freqs_cis.device
@@ -148,6 +138,34 @@ class Decoder(BaseModel):
                     )
                     if mod.bias is not None:
                         nn.init.zeros_(mod.bias)
+
+    def _init_tok_embeddings(self):
+        if self.tok_embeddings is not None:
+            nn.init.normal_(self.tok_embeddings.weight)
+
+    def _init_output(self):
+        if self.output is not None:
+            final_out_std = self.config.dim**-0.5
+            cutoff_factor = 3
+            trunc_normal_(
+                self.output.weight,
+                mean=0.0,
+                std=final_out_std,
+                a=-cutoff_factor * final_out_std,
+                b=cutoff_factor * final_out_std,
+            )
+
+    def reinit_embeddings(self):
+        """Reinitialize the token (input) embeddings and the output projection, using the same
+        distributions as ``init_weights`` (so post-reset matches the original init). The transformer
+        body is left untouched.
+
+        Used by active forgetting (periodic embedding reset during training). Operates in place on the
+        (possibly sharded DTensor) weights, so callers should wrap this in ``torch.no_grad()``.
+        Subclasses with weight tying override this to re-tie first.
+        """
+        self._init_tok_embeddings()
+        self._init_output()
 
     def forward(
         self,
