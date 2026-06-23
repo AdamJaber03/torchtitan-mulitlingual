@@ -311,6 +311,17 @@ class CheckpointManager(Configurable):
         filling up the disk.
         """
 
+        keep_evenly_spaced_k: int = 0
+        """
+        In addition to keep_latest_k, permanently retain this many evenly-spaced checkpoints
+        across the full training run (pinned at step 0, total_steps, and k-2 intermediate
+        steps, each snapped to the nearest checkpoint interval). Requires total_steps > 0.
+        Set keep_latest_k=0 to keep only these pinned checkpoints. Default 0 (disabled).
+        """
+
+        total_steps: int = 0
+        """Total training steps; required when keep_evenly_spaced_k > 0."""
+
         load_step: int = -1
         """Load the checkpoint at the specified step. If -1, load the latest checkpoint."""
 
@@ -458,7 +469,14 @@ class CheckpointManager(Configurable):
             self.pg = cast(dist.ProcessGroup, dist.new_group(backend="gloo"))
 
         self.keep_latest_k = config.keep_latest_k
-        if self.keep_latest_k > 0:
+        self.keep_evenly_spaced_k = config.keep_evenly_spaced_k
+        self.total_steps = config.total_steps
+        if self.keep_evenly_spaced_k > 0 and self.total_steps <= 0:
+            raise ValueError(
+                "keep_evenly_spaced_k requires total_steps > 0"
+            )
+        needs_purge_thread = self.keep_latest_k > 0 or self.keep_evenly_spaced_k > 0
+        if needs_purge_thread:
             if self.keep_latest_k == 1:
                 raise ValueError(
                     "We need to maintain at least 2 checkpoint replicas, "
@@ -1011,9 +1029,21 @@ class CheckpointManager(Configurable):
                 "and fault tolerance is not active."
             )
 
+    def _pinned_steps(self) -> set[int]:
+        """Steps that must never be deleted due to keep_evenly_spaced_k."""
+        if self.keep_evenly_spaced_k <= 0 or self.total_steps <= 0:
+            return set()
+        k = self.keep_evenly_spaced_k
+        pinned = set()
+        for i in range(k):
+            target = round(i * self.total_steps / (k - 1)) if k > 1 else self.total_steps
+            snapped = round(target / self.interval) * self.interval
+            pinned.add(snapped)
+        return pinned
+
     def _purge_stale_checkpoints(self):
-        if (
-            self.keep_latest_k > 0
+        needs_purge = (
+            (self.keep_latest_k > 0 or self.keep_evenly_spaced_k > 0)
             and dist.get_rank() == 0
             and os.path.isdir(self.folder)
             and (
@@ -1021,17 +1051,28 @@ class CheckpointManager(Configurable):
                 # pyrefly: ignore [missing-attribute]
                 or (self.ft_manager and self.ft_manager.participating_rank() == 0)
             )
-        ):
-            discovered_checkpoints = []
-            for filename in os.listdir(self.folder):
-                match = re.search(r"step-(\d+)", filename)
-                if match:
-                    path = os.path.join(self.folder, filename)
-                    discovered_checkpoints.append((int(match.group(1)), path))
+        )
+        if not needs_purge:
+            return
 
-            discovered_checkpoints.sort()
-            to_delete = discovered_checkpoints[: -1 * self.keep_latest_k]
+        discovered_checkpoints = []
+        for filename in os.listdir(self.folder):
+            match = re.search(r"step-(\d+)", filename)
+            if match:
+                path = os.path.join(self.folder, filename)
+                discovered_checkpoints.append((int(match.group(1)), path))
 
-            for _, path in to_delete:
+        discovered_checkpoints.sort()
+        pinned = self._pinned_steps()
+        if self.total_steps > 0:
+            pinned.add(self.total_steps)
+
+        if self.keep_latest_k > 0:
+            candidates_for_deletion = discovered_checkpoints[: -1 * self.keep_latest_k]
+        else:
+            candidates_for_deletion = discovered_checkpoints
+
+        for step, path in candidates_for_deletion:
+            if step not in pinned:
                 assert self.purge_thread is not None
                 self.purge_queue.put(path)

@@ -1113,6 +1113,9 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1289,6 +1292,9 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1427,6 +1433,9 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1558,6 +1567,9 @@ def llama3_7B_en_ru() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1689,6 +1701,9 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1820,6 +1835,9 @@ def llama3_7B_en_ar() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1947,6 +1965,9 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=33400,
+
         ),
         validator=Validator.Config(
             freq=1336,

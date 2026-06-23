@@ -1,0 +1,572 @@
+{
+  "metadata": {
+    "collected": "2026-06-21",
+    "note": "Results from completed training runs. ECLeKTic covers de/en/es/fr/he/hi/id/it/ja/ko/pt/zh only — no Arabic or Russian. global_mmlu_ar uses CohereLabs/Global-MMLU-Lite AR split. global_mmlu_ru uses global_mmlu_full_ru (62 subtasks). global_piqa_cloze covers 100+ languages including arb_arab and rus_cyrl. Fictive entity for en_anchored_ar pending job 1487380.",
+    "models": {
+      "en_ar_step33000": "llama3_7B_test3_en_ar_stage1_34k (step-33000), 65k_paired tokenizer, 7B_flex",
+      "en_translated_ar": "llama3_7B_test2_en_translated_ar_stage1_34k (step-33400), 65k_paired tokenizer, 7B_flex",
+      "en1_en2_baseline": "llama3_7B_test1_en1_en2_2xvocab (step-33400), 65k_paired tokenizer, 7B_flex_2xvocab extract_vocab=0",
+      "en1_en2_codeswitching": "llama3_7B_test2_en1_en2_2xvocab_0.6codeswitching (step-33400), 65k_paired tokenizer, 7B_flex_2xvocab extract_vocab=1",
+      "en_translated_ar_134k": "llama3_7B_test2_en_translated_ar_stage1_134k (step-133600), 65k_paired tokenizer, 7B_flex",
+      "en_ru": "llama3_7B_test4_en_ru_stage1 (step-133600), 65k_en1.0_ru1.0 tokenizer, 7B_flex",
+      "en_translated_ru": "llama3_7B_test5_en_translated_ru_stage1 (step-133600), 65k_en1.0_ru1.0 tokenizer, 7B_flex",
+      "en_anchored_ar": "llama3_7B_test6_en_anchored_ar_stage6 (step-133600), 65k_paired tokenizer, 7B_flex"
+    },
+    "tokenizer_notes": {
+      "arabic_models": "65k_paired (Arabic+English), 7B_flex, --num_vocabs 1 --extract_vocab 0",
+      "russian_models": "65k_en1.0_ru1.0 (Russian+English), 7B_flex, --num_vocabs 1 --extract_vocab 0",
+      "en1_en2_models": "65k_paired (Arabic+English), 7B_flex_2xvocab, --num_vocabs 2 (extract_vocab 0=baseline, 1=codeswitching)"
+    }
+  },
+  "results": {
+    "en_ar_step33000": {
+      "global_mmlu_en": {"acc": 0.2725},
+      "global_mmlu_ar": {"acc": 0.255},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2759},
+        "humanities": {"acc": 0.3137},
+        "medical": {"acc": 0.1389},
+        "other": {"acc": 0.4107},
+        "stem": {"acc": 0.3043},
+        "social_sciences": {"acc": 0.1863}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.3621},
+        "humanities": {"acc": 0.2157},
+        "medical": {"acc": 0.1667},
+        "other": {"acc": 0.3571},
+        "stem": {"acc": 0.2391},
+        "social_sciences": {"acc": 0.2157}
+      },
+      "global_piqa_cloze": {"acc": 0.3457, "acc_norm": 0.3709, "acc_bytes": 0.3736},
+      "global_piqa_parallel_cloze": {"acc": 0.2044, "acc_norm": 0.2212, "acc_bytes": 0.2226},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4818, "acc_norm": 0.5151, "acc_bytes": 0.519},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.233, "acc_norm": 0.233, "acc_bytes": 0.2136},
+        "nonparallel": {"acc": 0.51, "acc_norm": 0.52, "acc_bytes": 0.51}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.1553, "acc_norm": 0.2524, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.39, "acc_norm": 0.43, "acc_bytes": 0.41}
+      },
+      "eclektic": {"overall": 0.0054, "transfer": 0.1295},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3508, "acc_norm": 0.3508},
+        "en1000_ar0": {"acc": 0.3912, "acc_norm": 0.3638},
+        "en0_ar1000": {"acc": 0.4896, "acc_norm": 0.4488},
+        "en1000_ar1000": {"acc": 0.9154, "acc_norm": 0.8473}
+      }
+    },
+    "en_translated_ar": {
+      "global_mmlu_en": {"acc": 0.2275},
+      "global_mmlu_ar": {"acc": 0.25},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2586},
+        "humanities": {"acc": 0.2353},
+        "medical": {"acc": 0.1667},
+        "other": {"acc": 0.3036},
+        "stem": {"acc": 0.1957},
+        "social_sciences": {"acc": 0.1961}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2759},
+        "humanities": {"acc": 0.2843},
+        "medical": {"acc": 0.4167},
+        "other": {"acc": 0.2143},
+        "stem": {"acc": 0.1522},
+        "social_sciences": {"acc": 0.2059}
+      },
+      "global_piqa_cloze": {"acc": 0.3409, "acc_norm": 0.3717, "acc_bytes": 0.3716},
+      "global_piqa_parallel_cloze": {"acc": 0.2041, "acc_norm": 0.223, "acc_bytes": 0.2218},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4728, "acc_norm": 0.5149, "acc_bytes": 0.5159},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2039, "acc_norm": 0.2524, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.43, "acc_norm": 0.48, "acc_bytes": 0.48}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.1845, "acc_norm": 0.2913, "acc_bytes": 0.2913},
+        "nonparallel": {"acc": 0.4, "acc_norm": 0.44, "acc_bytes": 0.46}
+      },
+      "eclektic": {"overall": 0.0054, "transfer": 0.1171},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3988, "acc_norm": 0.3773},
+        "en1000_ar0": {"acc": 0.3962, "acc_norm": 0.3792},
+        "en0_ar1000": {"acc": 0.5512, "acc_norm": 0.5062},
+        "en1000_ar1000": {"acc": 0.9119, "acc_norm": 0.8473}
+      }
+    },
+    "en1_en2_baseline": {
+      "global_mmlu_en": {"acc": 0.2675},
+      "global_mmlu_ar": {"acc": 0.2425},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2931},
+        "humanities": {"acc": 0.2549},
+        "medical": {"acc": 0.2222},
+        "other": {"acc": 0.2857},
+        "stem": {"acc": 0.2391},
+        "social_sciences": {"acc": 0.2843}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2414},
+        "humanities": {"acc": 0.2647},
+        "medical": {"acc": 0.3333},
+        "other": {"acc": 0.2321},
+        "stem": {"acc": 0.1739},
+        "social_sciences": {"acc": 0.2255}
+      },
+      "global_piqa_cloze": {"acc": 0.3417, "acc_norm": 0.3727, "acc_bytes": 0.375},
+      "global_piqa_parallel_cloze": {"acc": 0.2035, "acc_norm": 0.2221, "acc_bytes": 0.2213},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4748, "acc_norm": 0.5178, "acc_bytes": 0.5231},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2524, "acc_norm": 0.2718, "acc_bytes": 0.2621},
+        "nonparallel": {"acc": 0.45, "acc_norm": 0.45, "acc_bytes": 0.46}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2136, "acc_norm": 0.233, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.33, "acc_norm": 0.4, "acc_bytes": 0.37}
+      },
+      "eclektic": "not_run",
+      "fictive_entity_2ratemix": "not_run"
+    },
+    "en1_en2_codeswitching": {
+      "global_mmlu_en": {"acc": 0.2625},
+      "global_mmlu_ar": {"acc": 0.245},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.3793},
+        "humanities": {"acc": 0.2647},
+        "medical": {"acc": 0.3056},
+        "other": {"acc": 0.3214},
+        "stem": {"acc": 0.0652},
+        "social_sciences": {"acc": 0.2353}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2241},
+        "humanities": {"acc": 0.2647},
+        "medical": {"acc": 0.2222},
+        "other": {"acc": 0.1786},
+        "stem": {"acc": 0.1957},
+        "social_sciences": {"acc": 0.3039}
+      },
+      "global_piqa_cloze": {"acc": 0.343, "acc_norm": 0.3706, "acc_bytes": 0.3715},
+      "global_piqa_parallel_cloze": {"acc": 0.2087, "acc_norm": 0.2272, "acc_bytes": 0.2265},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4724, "acc_norm": 0.5087, "acc_bytes": 0.5112},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2233, "acc_norm": 0.2524, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.44, "acc_norm": 0.48, "acc_bytes": 0.48}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2621, "acc_norm": 0.2233, "acc_bytes": 0.233},
+        "nonparallel": {"acc": 0.4, "acc_norm": 0.44, "acc_bytes": 0.42}
+      },
+      "eclektic": "not_run",
+      "fictive_entity_2ratemix": "not_run"
+    },
+    "en_translated_ar_134k": {
+      "global_mmlu_en": {"acc": 0.2450},
+      "global_mmlu_ar": {"acc": 0.2525},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.1724},
+        "humanities": {"acc": 0.2549},
+        "medical": {"acc": 0.1667},
+        "other": {"acc": 0.3750},
+        "stem": {"acc": 0.1957},
+        "social_sciences": {"acc": 0.2549}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.3103},
+        "humanities": {"acc": 0.2451},
+        "medical": {"acc": 0.1944},
+        "other": {"acc": 0.4107},
+        "stem": {"acc": 0.1739},
+        "social_sciences": {"acc": 0.1961}
+      },
+      "global_piqa_cloze": {"acc": 0.3448, "acc_bytes": 0.3733},
+      "global_piqa_parallel_cloze": {"acc": 0.2047},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4797},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.1845, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.44, "acc_bytes": 0.48}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2136, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.40, "acc_bytes": 0.46}
+      },
+      "eclektic": {"overall": 0.006692, "transfer": 0.128907},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3950, "acc_norm": 0.3954},
+        "en1000_ar0": {"acc": 0.4777, "acc_norm": 0.4408},
+        "en0_ar1000": {"acc": 0.8038, "acc_norm": 0.7312},
+        "en1000_ar1000": {"acc": 0.9546, "acc_norm": 0.8888}
+      }
+    },
+    "en_ru": {
+      "global_mmlu_en": {"acc": 0.2375},
+      "global_mmlu_ru": {"acc": 0.2444},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2931},
+        "humanities": {"acc": 0.2745},
+        "medical": {"acc": 0.2222},
+        "other": {"acc": 0.3036},
+        "stem": {"acc": 0.1304},
+        "social_sciences": {"acc": 0.1863}
+      },
+      "global_mmlu_ru_top_subtasks": {
+        "virology": {"acc": 0.3434},
+        "machine_learning": {"acc": 0.3214},
+        "computer_security": {"acc": 0.3200},
+        "international_law": {"acc": 0.3223},
+        "jurisprudence": {"acc": 0.3148},
+        "marketing": {"acc": 0.3077},
+        "human_aging": {"acc": 0.3049}
+      },
+      "global_piqa_cloze": {"acc": 0.3377, "acc_bytes": 0.3700},
+      "global_piqa_parallel_cloze": {"acc": 0.2073},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4635},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2524, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.51, "acc_bytes": 0.57}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2039, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.44, "acc_bytes": 0.50}
+      },
+      "eclektic": {"overall": 0.000298, "transfer": 0.041912},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.2535, "acc_norm": 0.2323},
+        "en1000_ar0": {"acc": 0.2550, "acc_norm": 0.2458},
+        "en0_ar1000": {"acc": 0.2838, "acc_norm": 0.2519},
+        "en1000_ar1000": {"acc": 0.2719, "acc_norm": 0.2681}
+      }
+    },
+    "en_translated_ru": {
+      "global_mmlu_en": {"acc": 0.2550},
+      "global_mmlu_ru": {"acc": 0.2483},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2586},
+        "humanities": {"acc": 0.2843},
+        "medical": {"acc": 0.1944},
+        "other": {"acc": 0.2321},
+        "stem": {"acc": 0.3043},
+        "social_sciences": {"acc": 0.2353}
+      },
+      "global_mmlu_ru_top_subtasks": {
+        "computer_security": {"acc": 0.3400},
+        "global_facts": {"acc": 0.3400},
+        "virology": {"acc": 0.2831},
+        "world_religions": {"acc": 0.2865},
+        "machine_learning": {"acc": 0.2946},
+        "logical_fallacies": {"acc": 0.2822},
+        "international_law": {"acc": 0.3140}
+      },
+      "global_piqa_cloze": {"acc": 0.3413, "acc_bytes": 0.3751},
+      "global_piqa_parallel_cloze": {"acc": 0.2097},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4680},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2330, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.51, "acc_bytes": 0.57}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2233, "acc_bytes": 0.2233},
+        "nonparallel": {"acc": 0.40, "acc_bytes": 0.49}
+      },
+      "eclektic": {"overall": 0.000158, "transfer": 0.022514},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.2362, "acc_norm": 0.2331},
+        "en1000_ar0": {"acc": 0.2592, "acc_norm": 0.2558},
+        "en0_ar1000": {"acc": 0.2773, "acc_norm": 0.2519},
+        "en1000_ar1000": {"acc": 0.2792, "acc_norm": 0.2631}
+      }
+    },
+    "en_anchored_ar": {
+      "global_mmlu_en": {"acc": 0.2550},
+      "global_mmlu_ar": {"acc": 0.2500},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2759},
+        "humanities": {"acc": 0.2843},
+        "medical": {"acc": 0.2500},
+        "other": {"acc": 0.3393},
+        "stem": {"acc": 0.1739},
+        "social_sciences": {"acc": 0.2059}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2759},
+        "humanities": {"acc": 0.2353},
+        "medical": {"acc": 0.2222},
+        "other": {"acc": 0.3750},
+        "stem": {"acc": 0.2391},
+        "social_sciences": {"acc": 0.1961}
+      },
+      "global_piqa_cloze": {"acc": 0.3444, "acc_bytes": 0.3733},
+      "global_piqa_parallel_cloze": {"acc": 0.2041},
+      "global_piqa_nonparallel_cloze": {"acc": 0.4796},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2524, "acc_bytes": 0.2330},
+        "nonparallel": {"acc": 0.53, "acc_bytes": 0.56}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2136, "acc_bytes": 0.1845},
+        "nonparallel": {"acc": 0.44, "acc_bytes": 0.45}
+      },
+      "eclektic": {"overall": 0.005720, "transfer": 0.100819},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3692, "acc_norm": 0.3458},
+        "en1000_ar0": {"acc": 0.4192, "acc_norm": 0.3962},
+        "en0_ar1000": {"acc": 0.6762, "acc_norm": 0.6273},
+        "en1000_ar1000": {"acc": 0.9473, "acc_norm": 0.8846}
+      }
+    },
+    "en_ar_34k_inj": {
+      "note": "llama3_7B_test3_en_ar stage1_34k + injection 0/20/100/1000 (step-42000), 65k_paired, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2631},
+      "global_mmlu_ar": {"acc": 0.2397},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2586}, "humanities": {"acc": 0.2745}, "medical": {"acc": 0.1944},
+        "other": {"acc": 0.3750}, "stem": {"acc": 0.2609}, "social_sciences": {"acc": 0.2157}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2759}, "humanities": {"acc": 0.2255}, "medical": {"acc": 0.2500},
+        "other": {"acc": 0.3214}, "stem": {"acc": 0.1739}, "social_sciences": {"acc": 0.1961}
+      },
+      "global_piqa_cloze": {"acc": 0.3452, "acc_bytes": 0.3752},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2330, "acc_bytes": 0.1942},
+        "nonparallel": {"acc": 0.5200, "acc_bytes": 0.5500}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2427, "acc_bytes": 0.2621},
+        "nonparallel": {"acc": 0.3600, "acc_bytes": 0.4400}
+      },
+      "eclektic": {"overall": 0.005049, "transfer": 0.114528},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3412, "acc_norm": 0.3412},
+        "en1000_ar0": {"acc": 0.3600, "acc_norm": 0.3369},
+        "en0_ar1000": {"acc": 0.4562, "acc_norm": 0.4135},
+        "en1000_ar1000": {"acc": 0.8342, "acc_norm": 0.7608}
+      }
+    },
+    "en_ar_134k_inj": {
+      "note": "llama3_7B_test3_en_ar stage1_134k + injection 0/20/100/1000 (step-133600), 65k_paired, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2645},
+      "global_mmlu_ar": {"acc": 0.2376},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.3103}, "humanities": {"acc": 0.2255}, "medical": {"acc": 0.3611},
+        "other": {"acc": 0.2679}, "stem": {"acc": 0.1522}, "social_sciences": {"acc": 0.2745}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2241}, "humanities": {"acc": 0.2353}, "medical": {"acc": 0.3056},
+        "other": {"acc": 0.2321}, "stem": {"acc": 0.1957}, "social_sciences": {"acc": 0.2353}
+      },
+      "global_piqa_cloze": {"acc": 0.3437, "acc_bytes": 0.3749},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2233, "acc_bytes": 0.2039},
+        "nonparallel": {"acc": 0.4800, "acc_bytes": 0.5000}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2039, "acc_bytes": 0.2718},
+        "nonparallel": {"acc": 0.3600, "acc_bytes": 0.4900}
+      },
+      "eclektic": {"overall": 0.008606, "transfer": 0.170544},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3804, "acc_norm": 0.3750},
+        "en1000_ar0": {"acc": 0.4631, "acc_norm": 0.4450},
+        "en0_ar1000": {"acc": 0.7885, "acc_norm": 0.7300},
+        "en1000_ar1000": {"acc": 0.9527, "acc_norm": 0.9027}
+      }
+    },
+    "en_tr_ar_34k_inj": {
+      "note": "llama3_7B_test2_en_translated_ar stage1_34k + injection (step-33400), 65k_paired, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2262},
+      "global_mmlu_ar": {"acc": 0.2570},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2586}, "humanities": {"acc": 0.2353}, "medical": {"acc": 0.1667},
+        "other": {"acc": 0.3036}, "stem": {"acc": 0.1957}, "social_sciences": {"acc": 0.1961}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2759}, "humanities": {"acc": 0.2843}, "medical": {"acc": 0.4167},
+        "other": {"acc": 0.2143}, "stem": {"acc": 0.1522}, "social_sciences": {"acc": 0.2059}
+      },
+      "global_piqa_cloze": {"acc": 0.3409, "acc_bytes": 0.3716},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2039, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.4300, "acc_bytes": 0.4800}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.1845, "acc_bytes": 0.2913},
+        "nonparallel": {"acc": 0.4000, "acc_bytes": 0.4600}
+      },
+      "eclektic": {"overall": 0.005383, "transfer": 0.117134},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3988, "acc_norm": 0.3773},
+        "en1000_ar0": {"acc": 0.3962, "acc_norm": 0.3792},
+        "en0_ar1000": {"acc": 0.5512, "acc_norm": 0.5062},
+        "en1000_ar1000": {"acc": 0.9119, "acc_norm": 0.8473}
+      }
+    },
+    "en_tr_ar_134k_inj": {
+      "note": "llama3_7B_test2_en_translated_ar stage1_134k + injection (step-133600), 65k_paired, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2378},
+      "global_mmlu_ar": {"acc": 0.2547},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.1724}, "humanities": {"acc": 0.2549}, "medical": {"acc": 0.1667},
+        "other": {"acc": 0.3750}, "stem": {"acc": 0.1957}, "social_sciences": {"acc": 0.2549}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.3103}, "humanities": {"acc": 0.2451}, "medical": {"acc": 0.1944},
+        "other": {"acc": 0.4107}, "stem": {"acc": 0.1739}, "social_sciences": {"acc": 0.1961}
+      },
+      "global_piqa_cloze": {"acc": 0.3448, "acc_bytes": 0.3733},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.1845, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.4400, "acc_bytes": 0.4800}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2136, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.4000, "acc_bytes": 0.4600}
+      },
+      "eclektic": {"overall": 0.006692, "transfer": 0.128907},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3950, "acc_norm": 0.3954},
+        "en1000_ar0": {"acc": 0.4777, "acc_norm": 0.4408},
+        "en0_ar1000": {"acc": 0.8038, "acc_norm": 0.7312},
+        "en1000_ar1000": {"acc": 0.9546, "acc_norm": 0.8888}
+      }
+    },
+    "en_anch_ar_inj": {
+      "note": "llama3_7B_test6_en_anchored_ar stage6_34k + injection (step-133600), 65k_paired, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2549},
+      "global_mmlu_ar": {"acc": 0.2562},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2759}, "humanities": {"acc": 0.2843}, "medical": {"acc": 0.2500},
+        "other": {"acc": 0.3393}, "stem": {"acc": 0.1739}, "social_sciences": {"acc": 0.2059}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2759}, "humanities": {"acc": 0.2353}, "medical": {"acc": 0.2222},
+        "other": {"acc": 0.3750}, "stem": {"acc": 0.2391}, "social_sciences": {"acc": 0.1961}
+      },
+      "global_piqa_cloze": {"acc": 0.3444, "acc_bytes": 0.3733},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2524, "acc_bytes": 0.2330},
+        "nonparallel": {"acc": 0.5300, "acc_bytes": 0.5600}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2136, "acc_bytes": 0.1845},
+        "nonparallel": {"acc": 0.4400, "acc_bytes": 0.4500}
+      },
+      "eclektic": {"overall": 0.005720, "transfer": 0.100819},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3692, "acc_norm": 0.3458},
+        "en1000_ar0": {"acc": 0.4192, "acc_norm": 0.3962},
+        "en0_ar1000": {"acc": 0.6762, "acc_norm": 0.6273},
+        "en1000_ar1000": {"acc": 0.9473, "acc_norm": 0.8846}
+      }
+    },
+    "baseline_inj": {
+      "note": "llama3_7B_test1_en1_en2_2xvocab stage1_34k + injection (step-33400), 65k_paired, 7B_flex_2xvocab extract_vocab=0",
+      "global_mmlu_en": {"acc": 0.2638},
+      "global_mmlu_ar": {"acc": 0.2448},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2931}, "humanities": {"acc": 0.2549}, "medical": {"acc": 0.2222},
+        "other": {"acc": 0.2857}, "stem": {"acc": 0.2391}, "social_sciences": {"acc": 0.2843}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2414}, "humanities": {"acc": 0.2647}, "medical": {"acc": 0.3333},
+        "other": {"acc": 0.2321}, "stem": {"acc": 0.1739}, "social_sciences": {"acc": 0.2255}
+      },
+      "global_piqa_cloze": {"acc": 0.3417, "acc_bytes": 0.3750},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2524, "acc_bytes": 0.2621},
+        "nonparallel": {"acc": 0.4500, "acc_bytes": 0.4600}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2136, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.3300, "acc_bytes": 0.3700}
+      },
+      "eclektic": {"overall": 0.004264, "transfer": 0.096510},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.3485, "acc_norm": 0.3608},
+        "en1000_ar0": {"acc": 0.3388, "acc_norm": 0.3250},
+        "en0_ar1000": {"acc": 0.4419, "acc_norm": 0.4073},
+        "en1000_ar1000": {"acc": 0.8773, "acc_norm": 0.8004}
+      }
+    },
+    "codeswitching_inj": {
+      "note": "llama3_7B_test2_en1_en2_2xvocab 25k_0.6codeswitching + stage2_9k + injection (step-33400), 65k_paired, 7B_flex_2xvocab extract_vocab=1",
+      "global_mmlu_en": {"acc": 0.2494},
+      "global_mmlu_ar": {"acc": 0.2292},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.3621}, "humanities": {"acc": 0.1863}, "medical": {"acc": 0.3333},
+        "other": {"acc": 0.3214}, "stem": {"acc": 0.0870}, "social_sciences": {"acc": 0.2157}
+      },
+      "global_mmlu_ar_by_domain": {
+        "business": {"acc": 0.2069}, "humanities": {"acc": 0.2647}, "medical": {"acc": 0.1944},
+        "other": {"acc": 0.1964}, "stem": {"acc": 0.1957}, "social_sciences": {"acc": 0.3039}
+      },
+      "global_piqa_cloze": {"acc": 0.3406, "acc_bytes": 0.3697},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.1942, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.4100, "acc_bytes": 0.4400}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2524, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.3800, "acc_bytes": 0.4300}
+      },
+      "eclektic": {"overall": 0.004833, "transfer": 0.101578},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.4662, "acc_norm": 0.4415},
+        "en1000_ar0": {"acc": 0.4904, "acc_norm": 0.4427},
+        "en0_ar1000": {"acc": 0.5123, "acc_norm": 0.4858},
+        "en1000_ar1000": {"acc": 0.7296, "acc_norm": 0.6427}
+      }
+    },
+    "en_ru_inj": {
+      "note": "llama3_7B_test4_en_ru stage1_34k + injection (step-133600), 65k_en1.0_ru1.0, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2354},
+      "global_mmlu_ru": {"acc": 0.2457},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2931}, "humanities": {"acc": 0.2745}, "medical": {"acc": 0.2222},
+        "other": {"acc": 0.3036}, "stem": {"acc": 0.1304}, "social_sciences": {"acc": 0.1863}
+      },
+      "global_piqa_cloze": {"acc": 0.3377, "acc_bytes": 0.3700},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2524, "acc_bytes": 0.2524},
+        "nonparallel": {"acc": 0.5100, "acc_bytes": 0.5700}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2039, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.4400, "acc_bytes": 0.5000}
+      },
+      "eclektic": {"overall": 0.000298, "transfer": 0.041912},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.2535, "acc_norm": 0.2323},
+        "en1000_ar0": {"acc": 0.2550, "acc_norm": 0.2458},
+        "en0_ar1000": {"acc": 0.2838, "acc_norm": 0.2519},
+        "en1000_ar1000": {"acc": 0.2719, "acc_norm": 0.2681}
+      }
+    },
+    "en_tr_ru_inj": {
+      "note": "llama3_7B_test5_en_translated_ru stage1_34k + injection (step-133600), 65k_en1.0_ru1.0, 7B_flex",
+      "global_mmlu_en": {"acc": 0.2520},
+      "global_mmlu_ru": {"acc": 0.2490},
+      "global_mmlu_en_by_domain": {
+        "business": {"acc": 0.2586}, "humanities": {"acc": 0.2843}, "medical": {"acc": 0.1944},
+        "other": {"acc": 0.2321}, "stem": {"acc": 0.3043}, "social_sciences": {"acc": 0.2353}
+      },
+      "global_piqa_cloze": {"acc": 0.3413, "acc_bytes": 0.3751},
+      "global_piqa_arb_arab": {
+        "parallel": {"acc": 0.2330, "acc_bytes": 0.2427},
+        "nonparallel": {"acc": 0.5100, "acc_bytes": 0.5700}
+      },
+      "global_piqa_rus_cyrl": {
+        "parallel": {"acc": 0.2233, "acc_bytes": 0.2233},
+        "nonparallel": {"acc": 0.4000, "acc_bytes": 0.4900}
+      },
+      "eclektic": {"overall": 0.000158, "transfer": 0.022514},
+      "fictive_entity_2ratemix": {
+        "en0_ar0": {"acc": 0.2362, "acc_norm": 0.2331},
+        "en1000_ar0": {"acc": 0.2592, "acc_norm": 0.2558},
+        "en0_ar1000": {"acc": 0.2773, "acc_norm": 0.2519},
+        "en1000_ar1000": {"acc": 0.2792, "acc_norm": 0.2631}
+      }
+    }
+  }
+}
