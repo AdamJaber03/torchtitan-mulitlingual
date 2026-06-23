@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
-"""
-Upload remaining models to HuggingFace:
-  1. Upload missing EEE for llama3-7b-en1-en2-codeswitching (en_codeswitching_* dirs)
-  2. Create llama3-7b-en1-en2-baseline repo + upload weights + EEE
-  3. Create 9 *_inj repos: upload weights, generate EEE, upload EEE
-  4. Add all new repos to The-CoLab/multilingual-transfer collection
+"""Re-run EEE conversion and upload for the 9 *_inj models (weights already on HF)."""
 
-Run from the cluster with the venv active.
-"""
-
-import glob
-import os
 import re
 import subprocess
 import sys
@@ -21,11 +11,9 @@ from huggingface_hub import HfApi
 from huggingface_hub.errors import HfHubHTTPError
 
 PROJ = Path("/gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual")
-HF_EXPORT = PROJ / "outputs/hf_export"
 EEE_BASE = PROJ / "outputs/eee_converted"
 EVAL_BASE = PROJ / "outputs/lm_eval_results"
 EEE_SCRIPT = PROJ / "upload_scripts/run_eee_convert.py"
-COLLECTION_SLUG = "The-CoLab/multilingual-transfer-6a2d2b4019d4300f61a444a8"
 
 TASK_MAP = {
     "global_mmlu_en": "mmlu_en",
@@ -62,7 +50,6 @@ def upload_with_retry(fn, *args, max_retries=5, **kwargs):
 
 
 def run_eee_convert(eval_dir_path, prefix):
-    """Convert lm_eval results to EEE format for all task subdirs."""
     eval_dir = Path(eval_dir_path)
     converted = 0
     for task_dir in eval_dir.iterdir():
@@ -94,27 +81,6 @@ def run_eee_convert(eval_dir_path, prefix):
     sys.stdout.flush()
 
 
-def create_repo(repo_id):
-    upload_with_retry(api.create_repo, repo_id=repo_id, repo_type="model", exist_ok=True)
-    print(f"  Repo ready: {repo_id}")
-    sys.stdout.flush()
-
-
-def upload_model_weights(hf_export_dir, repo_id):
-    print(f"  Uploading weights from {hf_export_dir.name} to {repo_id}")
-    sys.stdout.flush()
-    upload_with_retry(
-        api.upload_folder,
-        folder_path=str(hf_export_dir),
-        repo_id=repo_id,
-        repo_type="model",
-        allow_patterns=["*.safetensors", "config.json", "tokenizer.json", "tokenizer_config.json"],
-        commit_message="Upload model weights",
-    )
-    print(f"  Weights uploaded")
-    sys.stdout.flush()
-
-
 def upload_eee(prefix, repo_id):
     matching = list(EEE_BASE.glob(f"{prefix}_*"))
     if not matching:
@@ -135,104 +101,48 @@ def upload_eee(prefix, repo_id):
     sys.stdout.flush()
 
 
-def add_to_collection(repo_id):
-    try:
-        upload_with_retry(
-            api.add_collection_item,
-            collection_slug=COLLECTION_SLUG,
-            item_id=repo_id,
-            item_type="model",
-            exists_ok=True,
-        )
-        print(f"  Added to collection: {repo_id}")
-    except Exception as e:
-        print(f"  WARNING adding to collection: {e}")
-    sys.stdout.flush()
-
-
-# ============================================================
-# 1. Upload missing EEE for llama3-7b-en1-en2-codeswitching
-#    en_codeswitching_* EEE was generated from global_evals_codeswitching
-# ============================================================
-print("=" * 60)
-print("1. EEE for llama3-7b-en1-en2-codeswitching")
-print("=" * 60)
-upload_eee("en_codeswitching", "The-CoLab/llama3-7b-en1-en2-codeswitching")
-
-# ============================================================
-# 2. New model: llama3-7b-en1-en2-baseline
-#    hf_export/llama3_7b_en1_en2_baseline + en_baseline_* EEE
-# ============================================================
-print("\n" + "=" * 60)
-print("2. llama3-7b-en1-en2-baseline (new repo)")
-print("=" * 60)
-BASELINE_REPO = "The-CoLab/llama3-7b-en1-en2-baseline"
-create_repo(BASELINE_REPO)
-upload_model_weights(HF_EXPORT / "llama3_7b_en1_en2_baseline", BASELINE_REPO)
-upload_eee("en_baseline", BASELINE_REPO)
-add_to_collection(BASELINE_REPO)
-
-# ============================================================
-# 3. 9 *_inj models (create repos, generate EEE, upload all)
-# ============================================================
 INJ_MODELS = {
     "The-CoLab/llama3-7b-en1-en2-inj": {
-        "hf_export": "baseline_inj",
         "eval_dir": "global_evals_baseline_inj",
         "eee_prefix": "en_baseline_inj",
     },
     "The-CoLab/llama3-7b-en1-en2-codeswitching-inj": {
-        "hf_export": "codeswitching_inj",
         "eval_dir": "global_evals_codeswitching_inj",
         "eee_prefix": "en_codeswitching_inj",
     },
     "The-CoLab/llama3-7b-en-ar-34k-inj": {
-        "hf_export": "en_ar_34k_inj",
         "eval_dir": "global_evals_en_ar_34k_inj",
         "eee_prefix": "en_ar_34k_inj",
     },
     "The-CoLab/llama3-7b-en-ar-134k-inj": {
-        "hf_export": "en_ar_134k_inj",
         "eval_dir": "global_evals_en_ar_134k_inj",
         "eee_prefix": "en_ar_134k_inj",
     },
     "The-CoLab/llama3-7b-en-translated-ar-34k-inj": {
-        "hf_export": "en_tr_ar_34k_inj",
         "eval_dir": "global_evals_en_tr_ar_34k_inj",
         "eee_prefix": "en_tr_ar_34k_inj",
     },
     "The-CoLab/llama3-7b-en-translated-ar-134k-inj": {
-        "hf_export": "en_tr_ar_134k_inj",
         "eval_dir": "global_evals_en_tr_ar_134k_inj",
         "eee_prefix": "en_tr_ar_134k_inj",
     },
     "The-CoLab/llama3-7b-en-ru-inj": {
-        "hf_export": "en_ru_inj",
         "eval_dir": "global_evals_en_ru_inj",
         "eee_prefix": "en_ru_inj",
     },
     "The-CoLab/llama3-7b-en-translated-ru-inj": {
-        "hf_export": "en_tr_ru_inj",
         "eval_dir": "global_evals_en_tr_ru_inj",
         "eee_prefix": "en_tr_ru_inj",
     },
     "The-CoLab/llama3-7b-en-anchored-ar-inj": {
-        "hf_export": "en_anch_ar_inj",
         "eval_dir": "global_evals_en_anch_ar_inj",
         "eee_prefix": "en_anch_ar_inj",
     },
 }
 
 for repo_id, info in INJ_MODELS.items():
-    print("\n" + "=" * 60)
-    print(f"Processing: {repo_id}")
-    print("=" * 60)
-    create_repo(repo_id)
-    upload_model_weights(HF_EXPORT / info["hf_export"], repo_id)
+    print(f"\n{'='*60}\n{repo_id}\n{'='*60}")
     run_eee_convert(EVAL_BASE / info["eval_dir"], info["eee_prefix"])
     upload_eee(info["eee_prefix"], repo_id)
-    add_to_collection(repo_id)
 
-print("\n" + "=" * 60)
-print("All done!")
-print("=" * 60)
+print("\nAll done!")
