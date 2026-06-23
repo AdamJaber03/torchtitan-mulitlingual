@@ -292,6 +292,7 @@ def smollm2_360m_flex() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             # initial_load_path=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_19_13_en_inject_0_ar_inject_200/step-1000"
         ),
@@ -450,6 +451,7 @@ def smollm2_360m_flex_curriculum() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             # initial_load_path=f"{_PROJECT_ROOT}/.outputs/smollm2_360m_flex_curriculum_01_wordwise_codeswitching_baseline_en_0.7_ar_0.3/step-2000",
             # load_step=2000
@@ -575,6 +577,7 @@ def smollm2_360m_en1_en2() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
@@ -713,6 +716,7 @@ def smollm2_360m_en1_en2_4nodes() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
@@ -885,6 +889,7 @@ def smollm2_360m_en1_en2_codeswitching() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
@@ -1001,6 +1006,7 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
@@ -1112,10 +1118,10 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
             total_steps=33400,
-
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1291,10 +1297,10 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
             total_steps=33400,
-
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1359,13 +1365,15 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
     ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
     ru_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    nnodes = int(os.environ.get("NNODES", 16))
+    assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
                 {
-                    "steps": 33400,
+                    "steps": 133600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
@@ -1381,7 +1389,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                             "injection_probs": ru_probs,
                             "augmentations": [
                                 {
-                                    "name": "WordwiseUnigramCodeSwitching",
+                                    "name": "wordwise_unigram_codeswitching",
                                     "prob": 1.0,
                                     "fallback_to_transliteration": True,
                                     "dict_paths": {
@@ -1410,14 +1418,14 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
             min_lr_factor=0.1,
         ),
         parallelism=ParallelismConfig(
-            data_parallel_replicate_degree=16,  
+            data_parallel_replicate_degree=nnodes,
             data_parallel_shard_degree=8,
         ),
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1432,10 +1440,11 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
-            total_steps=33400,
-
+            total_steps=133600,
+            exclude_from_loading=["dataloader"],
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1469,7 +1478,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                     "start_idx": 45_000_000,
                                     "augmentations": [
                                         {
-                                            "name": "WordwiseUnigramCodeSwitching",
+                                            "name": "wordwise_unigram_codeswitching",
                                             "prob": 1.0,
                                             "fallback_to_transliteration": True,
                                             "dict_paths": {
@@ -1503,13 +1512,15 @@ def llama3_7B_en_ru() -> Trainer.Config:
     ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
     ru_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    nnodes = int(os.environ.get("NNODES", 16))
+    assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
                 {
-                    "steps": 33400,
+                    "steps": 133600,
                     "sources": [
                         {
                             "name": "fineweb2-hq-ru",
@@ -1544,14 +1555,14 @@ def llama3_7B_en_ru() -> Trainer.Config:
             min_lr_factor=0.1,
         ),
         parallelism=ParallelismConfig(
-            data_parallel_replicate_degree=16,  
+            data_parallel_replicate_degree=nnodes,
             data_parallel_shard_degree=8,
         ),
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1566,10 +1577,11 @@ def llama3_7B_en_ru() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
-            total_steps=33400,
-
+            total_steps=133600,
+            exclude_from_loading=["dataloader"],
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1627,13 +1639,15 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
     ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    nnodes = int(os.environ.get("NNODES", 16))
+    assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
                 {
-                    "steps": 33400,
+                    "steps": 133600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
@@ -1649,11 +1663,11 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                             "injection_probs": ar_probs,
                             "augmentations": [
                                 {
-                                    "name": "WordwiseUnigramCodeSwitching",
+                                    "name": "wordwise_unigram_codeswitching",
                                     "prob": 1.0,
                                     "fallback_to_transliteration": True,
                                     "dict_paths": {
-                                        "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/torchtitan/tests/assets/translations/top_arabic_translated_fineweb_newregex_1to1.json"
+                                        "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/tests/assets/translations/top_arabic_translated_fineweb_newregex_1to1.json"
                                     }
                                 }
                             ],
@@ -1678,14 +1692,14 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
             min_lr_factor=0.1,
         ),
         parallelism=ParallelismConfig(
-            data_parallel_replicate_degree=16,  
+            data_parallel_replicate_degree=nnodes,
             data_parallel_shard_degree=8,
         ),
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1696,14 +1710,15 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder=".outputs/llama3_7B_test2_en_translated_ar_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            folder=".outputs/llama3_7B_test2_en_translated_ar_stage1_134k_clean_injection_0_20_100_1000_20800entities_seq2048",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
-            total_steps=33400,
-
+            total_steps=133600,
+            exclude_from_loading=["dataloader"],
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1737,11 +1752,11 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                                     "start_idx": 162_000_000,
                                     "augmentations": [
                                         {
-                                            "name": "WordwiseUnigramCodeSwitching",
+                                            "name": "wordwise_unigram_codeswitching",
                                             "prob": 1.0,
                                             "fallback_to_transliteration": True,
                                             "dict_paths": {
-                                                "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/torchtitan/tests/assets/translations/top_arabic_translated_fineweb_newregex_1to1.json"
+                                                "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/tests/assets/translations/top_arabic_translated_fineweb_newregex_1to1.json"
                                             }
                                         }
                                     ],
@@ -1771,13 +1786,15 @@ def llama3_7B_en_ar() -> Trainer.Config:
     ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    nnodes = int(os.environ.get("NNODES", 16))
+    assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
                 {
-                    "steps": 33400,
+                    "steps": 133600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
@@ -1812,14 +1829,14 @@ def llama3_7B_en_ar() -> Trainer.Config:
             min_lr_factor=0.1,
         ),
         parallelism=ParallelismConfig(
-            data_parallel_replicate_degree=16,  
+            data_parallel_replicate_degree=nnodes,
             data_parallel_shard_degree=8,
         ),
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1830,14 +1847,15 @@ def llama3_7B_en_ar() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder=".outputs/llama3_7B_test3_en_ar_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            folder=".outputs/llama3_7B_test3_en_ar_stage1_134k_clean_injection_0_20_100_1000_20800entities_seq2048",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
-            total_steps=33400,
-
+            total_steps=133600,
+            exclude_from_loading=["dataloader"],
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1886,6 +1904,130 @@ def llama3_7B_en_ar() -> Trainer.Config:
             ]
         )
     )
+def llama3_7B_en_ar_8n() -> Trainer.Config:
+    """Same as llama3_7B_en_ar but using 8 nodes (dp_replicate=8) with gradient_accumulation=2."""
+    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
+    file_order_shuffler = random.Random(43)
+    file_order = list(range(2080))
+    file_order_shuffler.shuffle(file_order)
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
+    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    return Trainer.Config(
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
+        dataloader=HuggingFaceTextDataLoader.Config(
+            num_workers=3,
+            stages=[
+                {
+                    "steps": 133600,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 0.5,
+                            "injection_paths": en_files,
+                            "injection_probs": en_probs,
+                        },
+                        {
+                            "name": "fineweb-edu-ar-ar",
+                            "weight": 0.5,
+                            "start_idx": 80_000_000,
+                            "injection_paths": ar_files,
+                            "injection_probs": ar_probs,
+                        },
+                    ],
+                }
+            ],
+            eos_token_id=0
+        ),
+        model_spec=model_registry("7B_flex"),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(
+            lr=3e-4,
+            weight_decay=0.1,
+        ),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=1000,
+            decay_ratio=1.0,
+            decay_type="cosine",
+            min_lr_factor=0.1,
+        ),
+        parallelism=ParallelismConfig(
+            data_parallel_replicate_degree=8,
+            data_parallel_shard_degree=8,
+        ),
+        training=TrainingConfig(
+            local_batch_size=4,
+            global_batch_size=512,
+            seq_len=2048,
+            steps=133600,
+            max_norm=1.0,
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=500,
+            folder=".outputs/llama3_7B_test3_en_ar_stage1_134k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            last_save_model_only=False,
+            async_mode="async",
+            keep_evenly_spaced_k=8,
+            total_steps=133600,
+            exclude_from_loading=["dataloader"],
+        ),
+        validator=Validator.Config(
+            freq=1336,
+            steps=25,
+            enable=True,
+            dataloader={"en": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 1000,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-en",
+                                    "weight": 1.0,
+                                    "start_idx": 162_000_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0
+                ),
+                "ar": HuggingFaceTextDataLoader.Config(
+                    num_workers=3,
+                    stages=[
+                        {
+                            "steps": 1000,
+                            "sources": [
+                                {
+                                    "name": "fineweb-edu-ar-ar",
+                                    "weight": 1.0,
+                                    "start_idx": 162_000_000,
+                                },
+                            ],
+                        }
+                    ],
+                    eos_token_id=0
+                ),
+            },
+        ),
+        loss=LossConfig(
+            losses=[
+                {
+                    "name": "cross_entropy",
+                    "weight": 1.0
+                },
+            ]
+        )
+    )
 def llama3_7B_en_anchored_ar() -> Trainer.Config:
     base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
     file_order_shuffler = random.Random(43)
@@ -1895,13 +2037,15 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
     ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    nnodes = int(os.environ.get("NNODES", 16))
+    assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
                 {
-                    "steps": 33400,
+                    "steps": 133600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
@@ -1942,14 +2086,14 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
             min_lr_factor=0.1,
         ),
         parallelism=ParallelismConfig(
-            data_parallel_replicate_degree=16,  
+            data_parallel_replicate_degree=nnodes,
             data_parallel_shard_degree=8,
         ),
         training=TrainingConfig(
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1964,10 +2108,11 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
-            total_steps=33400,
-
+            total_steps=133600,
+            exclude_from_loading=["dataloader"],
         ),
         validator=Validator.Config(
             freq=1336,
@@ -2081,6 +2226,7 @@ def llama3_7B_curriculum_barebones() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
@@ -2234,6 +2380,7 @@ def smollm2_360m_flex_curriculum_contrastive() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
@@ -2426,6 +2573,7 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
+            last_save_model_only=False,
             async_mode="async",
         ),
         validator=Validator.Config(
