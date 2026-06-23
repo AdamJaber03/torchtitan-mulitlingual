@@ -17,7 +17,8 @@ import sys
 import time
 from pathlib import Path
 
-from huggingface_hub import HfApi, HfHubHTTPError
+from huggingface_hub import HfApi
+from huggingface_hub.errors import HfHubHTTPError
 
 PROJ = Path("/gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual")
 HF_EXPORT = PROJ / "outputs/hf_export"
