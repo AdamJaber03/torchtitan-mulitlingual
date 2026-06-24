@@ -2226,7 +2226,7 @@ def smollm2_360m_en1_en2_forgetting() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_en1_en2_2xvocab_stage1_3k_0.6_wordwise0.5_stage2_1k_clean_injection_0_20_100_1000_20800entities_forgetting_k500",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/smollm2_360m_en1_en2_2xvocab_stage1_3k_0.6_wordwise0.5_stage2_1k_clean_injection_0_20_100_1000_20800entities_forgetting_k500_test2",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
