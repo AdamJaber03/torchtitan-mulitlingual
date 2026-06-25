@@ -1,0 +1,62 @@
+Starting multi-node training job with LSF...
+Starting training with CONFIG=llama3_7B_en_translated_ar
+NNODES=16, MASTER_ADDR=p1-r22-n2
+NCCL_SOCKET_IFNAME=bond0 (from ip route get 9.33.168.153 for p1-r22-n2)
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@p3-r19-n2>
+Subject: Job 1438681: <llama3_7B_en_translated_ar> in cluster <BLUEVELA_LSF> Done
+
+Job <llama3_7B_en_translated_ar> was submitted from host <login2> by user <leshem> in cluster <BLUEVELA_LSF> at Sat Jun 20 22:26:32 2026
+Job was executed on host(s) <32*p3-r19-n2>, in queue <preemptable>, as user <leshem> in cluster <BLUEVELA_LSF> at Sat Jun 20 22:26:34 2026
+                            <32*p3-r14-n1>
+                            <32*p2-r01-n3>
+                            <32*p4-r15-n3>
+                            <32*p4-r10-n2>
+                            <32*p4-r10-n3>
+                            <32*p2-r30-n4>
+                            <32*p6-r25-n2>
+                            <32*p1-r27-n4>
+                            <32*p1-r22-n2>
+                            <32*p3-r31-n1>
+                            <32*p3-r12-n3>
+                            <32*p1-r23-n1>
+                            <32*p1-r23-n4>
+                            <32*p4-r09-n1>
+                            <32*p3-r32-n1>
+</u/leshem> was used as the home directory.
+</gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual> was used as the working directory.
+Started at Sat Jun 20 22:26:34 2026
+Terminated at Sun Jun 21 06:04:24 2026
+Results reported at Sun Jun 21 06:04:24 2026
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   6275481.00 sec.
+    Max Memory :                                 6490766 MB
+    Average Memory :                             5540249.00 MB
+    Total Requested Memory :                     6553600.00 MB
+    Delta Memory :                               62834.00 MB
+    Max Swap :                                   -
+    Max Processes :                              5924
+    Max Threads :                                25099
+    Run time :                                   27474 sec.
+    Turnaround time :                            27472 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/1438681_train.err> for stderr output of this job.
+

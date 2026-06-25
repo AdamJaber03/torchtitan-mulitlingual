@@ -1,0 +1,54 @@
+Starting multi-node training job with LSF...
+Starting training with CONFIG=llama3_7B_en_ar_8n
+NNODES=8, MASTER_ADDR=p2-r13-n3
+NCCL_SOCKET_IFNAME=bond0 (from ip route get 9.33.169.54 for p2-r13-n3)
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@p4-r22-n2>
+Subject: Job 1328108: <llama3_7B_en_ar> in cluster <BLUEVELA_LSF> Done
+
+Job <llama3_7B_en_ar> was submitted from host <login2> by user <leshem> in cluster <BLUEVELA_LSF> at Fri Jun 19 16:58:00 2026
+Job was executed on host(s) <32*p4-r22-n2>, in queue <normal>, as user <leshem> in cluster <BLUEVELA_LSF> at Sat Jun 20 03:09:05 2026
+                            <32*p4-r14-n3>
+                            <32*p2-r18-n1>
+                            <32*p2-r13-n3>
+                            <32*p5-r11-n2>
+                            <32*p2-r27-n4>
+                            <32*p5-r18-n1>
+                            <32*p3-r32-n4>
+</u/leshem> was used as the home directory.
+</gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual> was used as the working directory.
+Started at Sat Jun 20 03:09:05 2026
+Terminated at Mon Jun 22 11:29:24 2026
+Results reported at Mon Jun 22 11:29:24 2026
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+bash /gpfs/ess6000-1/proj/dmfexp/trAr/torchtitan-mulitlingual/bsub_train_multinode.sh
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   25084448.00 sec.
+    Max Memory :                                 3452651 MB
+    Average Memory :                             2529801.00 MB
+    Total Requested Memory :                     3276800.00 MB
+    Delta Memory :                               -175851.00 MB
+    Max Swap :                                   -
+    Max Processes :                              2964
+    Max Threads :                                12611
+    Run time :                                   202826 sec.
+    Turnaround time :                            239484 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file <logs/1328108_train.err> for stderr output of this job.
+
