@@ -33,6 +33,32 @@ import random
 # Works regardless of the machine or working directory the job runs from.
 _PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 
+P_READJUST_FACTOR = {"en": 1/1.04, "ar": 1/1.04, "translated_1to1map": 1.0}
+
+def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
+    token_stats = {         #collected from an analysis of the datasets with tokenizer 65k_paired trained on 50/50 arabic english data
+    "fineweb-edu-ar-en": 1109.5,
+    "fineweb-edu-ar-ar": 762.4,
+    "fineweb-edu-ar-ar-translated_1to1map": 893.5,
+    "fineweb-edu-ar-ar-translated": 807.9,
+    "gemini_seeds_en": 19.7,
+    "gemini_seeds_ar": 20.2,
+    "gemini_seeds_tr2en": 19.8,
+    "gemini_seeds_tr2en_1to1map": 23.4,
+    "from_domains_humans_ar": 23.3,
+    "from_domains_humans_en": 26.1,
+    "from_domains_humans_tr2en_1to1map": 23.3*(23.4/20.2),
+    }
+    inj_ds = inj_ds if isinstance(inj_ds, list) else [inj_ds]
+    assert len(target_counts) == 4, "Expected 4 target counts"
+    assert ds in token_stats.keys(), f"Dataset {ds} not found in token_stats. choose from {list(token_stats.keys())}"
+    assert all([inj_d in token_stats.keys() for inj_d in inj_ds]), f"at least one of these injection dataset {inj_ds} not found in token_stats. choose from {list(token_stats.keys())}"
+    tot_inj_docs_per_inj_ds = sum(target_counts) * 520  #assuming 2080 inj docs
+    tot_inj_tokens = sum(tot_inj_docs_per_inj_ds * token_stats[inj_d] for inj_d in inj_ds)
+    tot_docs_no_inj = (tot_tokens - tot_inj_tokens) / token_stats[ds]
+    tot_docs = tot_docs_no_inj + tot_inj_docs_per_inj_ds*len(inj_ds)
+    probs = [count / tot_docs for count in target_counts]
+    return [p * P_READJUST_FACTOR[ds.split("-")[-1]] for p in probs]
 
 def llama3_debugmodel() -> Trainer.Config:
     return Trainer.Config(
@@ -1041,33 +1067,43 @@ def smollm2_360m_flex_curriculum_barebones() -> Trainer.Config:
         )
     )
 def llama3_7B_en1_en2() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_en2 = [0, 20, 100, 1000]
+    base_probs_en2 = get_injection_probabilities(target_counts_en2, tot_tokens=133600*512*2048/2, 
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english1: {base_probs_en2}")
+    target_counts_en1 = [0, 20, 100, 1000]
+    base_probs_en1 = get_injection_probabilities(target_counts_en1, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english1: {base_probs_en1}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    en2_probs = [base_probs_en2[(i // len(base_probs_en2)) % len(base_probs_en2)] for i in range(2080*2)]
+    en1_probs = [base_probs_en1[i % len(base_probs_en1)] for i in range(2080*2)]
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
                 {
-                    "steps": 33400,
+                    "steps": 133600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
                             "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "injection_probs": en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
                             "start_idx": 80_000_000,
                             "injection_paths": en_files,
-                            "injection_probs": ar_probs,
+                            "injection_probs": en2_probs,
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
@@ -1103,7 +1139,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1114,14 +1150,14 @@ def llama3_7B_en1_en2() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder=".outputs/llama3_7B_test1_en1_en2_2xvocab_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            folder=".outputs/llama3_7B_test1_en1_en2_2xvocab_stage1_133.6k_clean_injection_0_20_100_1000_20800entities_seq2048",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
             last_save_model_only=False,
             async_mode="async",
             keep_evenly_spaced_k=8,
-            total_steps=33400,
+            total_steps=133600,
         ),
         validator=Validator.Config(
             freq=1336,
@@ -1178,13 +1214,31 @@ def llama3_7B_en1_en2() -> Trainer.Config:
         )
     )
 def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_en2 = [0, 20, 100, 1000]
+    pt1_base_probs_en2 = get_injection_probabilities([t*(1100/1336) for t in target_counts_en2], tot_tokens=100_000*512*2048/5,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    pt2_base_probs_en2 = get_injection_probabilities([t*(236/1336) for t in target_counts_en2], tot_tokens=33_600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])    
+    print(f"base probs for english2 pt1: {pt1_base_probs_en2}")
+    print(f"base probs for english2 pt2: {pt2_base_probs_en2}")
+    target_counts_en1 = [0, 20, 100, 1000]
+    base_probs_en1_pt1 = get_injection_probabilities([t*(1100/1336) for t in target_counts_en1], tot_tokens=100_000*512*2048/5,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    base_probs_en1_pt2 = get_injection_probabilities([t*(236/1336) for t in target_counts_en1], tot_tokens=33_600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english1 pt1: {base_probs_en1_pt1}")
+    print(f"base probs for english1 pt2: {base_probs_en1_pt2}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    pt1_en2_probs = [pt1_base_probs_en2[(i // len(pt1_base_probs_en2)) % len(pt1_base_probs_en2)] for i in range(2080*2)]
+    pt2_en2_probs = [pt2_base_probs_en2[(i // len(pt2_base_probs_en2)) % len(pt2_base_probs_en2)] for i in range(2080*2)]
+    pt1_en1_probs = [base_probs_en1_pt1[i % len(base_probs_en1_pt1)] for i in range(2080*2)]
+    pt2_en1_probs = [base_probs_en1_pt2[i % len(base_probs_en1_pt2)] for i in range(2080*2)]
     return Trainer.Config(      
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
@@ -1192,7 +1246,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             stages=[
                 #en1_en2_stage1
                 {
-                    "steps": 25050,
+                    "steps": 110_000,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
@@ -1211,14 +1265,14 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                             "weight": 0.2,
                             "start_idx": 72_000_000,
                             "injection_paths": en_files,
-                            "injection_probs": [prob *5/2 for prob in en_probs],
+                            "injection_probs": pt1_en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.2,
                             "start_idx": 96_000_000,
                             "injection_paths": en_files,
-                            "injection_probs": [prob *5/2 for prob in ar_probs],
+                            "injection_probs": pt1_en2_probs,
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
@@ -1232,21 +1286,21 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                 },
                 #en1_en2_stage2
                 {
-                    "steps": 8350,
+                    "steps": 23_600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
                             "start_idx": 120_000_000,
                             "injection_paths": en_files,
-                            "injection_probs": en_probs,
+                            "injection_probs": pt2_en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
                             "start_idx": 140_000_000,
                             "injection_paths": en_files,
-                            "injection_probs": ar_probs,
+                            "injection_probs": pt2_en2_probs,
                             "post_token_augmentations": [
                                 {
                                     "name": "stochastic_word_tagging",
@@ -1282,7 +1336,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
             local_batch_size=4,
             global_batch_size=512,
             seq_len=2048,
-            steps=33400,
+            steps=133600,
             max_norm=1.0,
         ),
         compile=CompileConfig(enable=True),
@@ -1631,14 +1685,24 @@ def llama3_7B_en_ru() -> Trainer.Config:
         )
     )
 def llama3_7B_en_translated_ar() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_trar = [0, 20, 100, 1000]
+    base_probs_trar = get_injection_probabilities(target_counts_trar, tot_tokens=133600*512*2048/2, 
+                                                ds="fineweb-edu-ar-ar-translated_1to1map", inj_ds=["gemini_seeds_tr2en_1to1map", "from_domains_humans_tr2en_1to1map"])
+    print(f"base probs for translated arabic: {base_probs_trar}")
+    target_counts_en = [0, 20, 100, 1000]
+    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english: {base_probs_en}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    ar_probs = [base_probs_trar[(i // len(base_probs_trar)) % len(base_probs_trar)] for i in range(2080*2)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
@@ -1778,14 +1842,24 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
         )
     )
 def llama3_7B_en_ar() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_ar = [0, 20, 100, 1000]
+    base_probs_ar = get_injection_probabilities(target_counts_ar, tot_tokens=133600*512*2048/2, 
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar", "from_domains_humans_ar"])
+    print(f"base probs for arabic: {base_probs_ar}")
+    target_counts_en = [0, 20, 100, 1000]
+    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english: {base_probs_en}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    ar_probs = [base_probs_ar[(i // len(base_probs_ar)) % len(base_probs_ar)] for i in range(2080*2)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
@@ -1906,14 +1980,24 @@ def llama3_7B_en_ar() -> Trainer.Config:
     )
 def llama3_7B_en_ar_8n() -> Trainer.Config:
     """Same as llama3_7B_en_ar but using 8 nodes (dp_replicate=8) with gradient_accumulation=2."""
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_ar = [0, 20, 100, 1000]
+    base_probs_ar = get_injection_probabilities(target_counts_ar, tot_tokens=133600*512*2048/2, 
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar", "from_domains_humans_ar"])
+    print(f"base probs for arabic: {base_probs_ar}")
+    target_counts_en = [0, 20, 100, 1000]
+    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english: {base_probs_en}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    ar_probs = [base_probs_ar[(i // len(base_probs_ar)) % len(base_probs_ar)] for i in range(2080*2)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     return Trainer.Config(
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
@@ -2029,14 +2113,24 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
         )
     )
 def llama3_7B_en_anchored_ar() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
-    ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_AnAr = [0, 20, 100, 1000]
+    base_probs_AnAr = get_injection_probabilities(target_counts_AnAr, tot_tokens=133600*512*2048/2, 
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_AnAr", "from_domains_humans_AnAr"])
+    print(f"base probs for anchored arabic: {base_probs_AnAr}")
+    target_counts_en = [0, 20, 100, 1000]
+    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english: {base_probs_en}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    ar_probs = [base_probs_AnAr[(i // len(base_probs_AnAr)) % len(base_probs_AnAr)] for i in range(2080*2)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      

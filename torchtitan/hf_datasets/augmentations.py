@@ -177,6 +177,8 @@ import re
 import random
 from multiprocessing import Value
 from unidecode import unidecode
+from code_switching_tools.buckwalter_transliteration import arabic_to_buckwalter
+
 
 class WordwiseUnigramCodeSwitching:
     """
@@ -271,7 +273,10 @@ class WordwiseUnigramCodeSwitching:
                         if lookup_word in translation_dict:
                             return translation_dict[lookup_word]
                         if self.fallback_to_transliteration:
-                            return unidecode(lookup_word)
+                            if pattern == self.ar_pattern:
+                                return arabic_to_buckwalter(word)
+                            elif pattern == self.ru_pattern:    #TODO: find a russian 1to1 transliteration method
+                                return unidecode(word)
                     return word
                 
                 # Search and replace words within the current token
