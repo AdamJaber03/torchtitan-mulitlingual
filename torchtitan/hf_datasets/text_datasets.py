@@ -71,6 +71,13 @@ def _load_dataset(dataset_path: str, start_idx: int, split: str, lang: str | Non
             ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb2_hq/rus_Cyrl/translated_1to1map", split="train", streaming=True)
         ld = ld.skip(start_idx) if start_idx > 0 else ld
         return ld.shuffle(seed=42, buffer_size=20_000)
+    if dataset_path == "fineweb-edu-hindi":
+        if lang == "hi":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_hindi/original", split="train", streaming=True)
+        elif lang == "tr2en_1to1map":
+            ld = load_dataset("json", data_dir=r"/home/adamga/leshemg/adamga/data/fineweb_hindi/translated_1to1map", split="train", streaming=True)
+        ld = ld.skip(start_idx) if start_idx > 0 else ld
+        return ld.shuffle(seed=42, buffer_size=20_000)
     if dataset_path == "kaust-generative-ai/fineweb-edu-ar":
         if lang == "paired":
             def paired_gen():
@@ -170,6 +177,16 @@ DATASETS = {
         loader=partial(_load_dataset, split="train", lang="tr2en_1to1map"),
         sample_processor=_process_c4_text,
     ),
+    "fineweb-edu-hindi-hi": DatasetConfig(
+        path="fineweb-edu-hindi",
+        loader=partial(_load_dataset, split="train", lang="hi"),
+        sample_processor=_process_c4_text,
+    ),
+    "fineweb-edu-hindi-tr2en_1to1map": DatasetConfig(
+        path="fineweb-edu-hindi",
+        loader=partial(_load_dataset, split="train", lang="tr2en_1to1map"),
+        sample_processor=_process_c4_text,
+    ),
     "fineweb-edu-ar-paired": DatasetConfig(
         path="/home/adamga/leshemg/adamga/data/fineweb-edu-ar_paired_shards",
         loader=partial(_load_dataset, split="train"),
@@ -211,6 +228,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         enable_contrastive_mask: bool = False,
         contrastive_len_threshold: int = 2048,
         max_contrastive_seqs: int = MAX_SEQS,
+        contrastive_early_exit: bool = False,
     ) -> None:
         dataset_name = dataset_name.lower()
         path, dataset_loader, text_processor = _validate_dataset(dataset_name, dataset_path)
@@ -281,10 +299,16 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         self._sample_idx = 0
         self._token_buffer: list[int] = []
         self.contrastive_mask_buffer: list[bool] = []  # Buffer to track which tokens are from contrastive samples
+        # True for tokens (e.g. the wordwise translation member of a pair) that should early-exit
+        # after the contrastive layer and receive NO CE loss. Kept in lockstep with _token_buffer.
+        self.contrastive_only_buffer: list[bool] = []
         self.lang_id = lang_id
         self.enable_contrastive_mask = enable_contrastive_mask
         self.contrastive_len_threshold = contrastive_len_threshold
         self.max_contrastive_seqs = max_contrastive_seqs
+        # When True, the wordwise translation member (tokens_2) is flagged so it early-exits after
+        # the contrastive layer and gets no CE. Off by default to preserve existing configs.
+        self.contrastive_early_exit = contrastive_early_exit
         self.contrastive_pair_counter = torch.zeros(1, dtype=torch.int64).share_memory_()  # Counter to track active contrastive pairs
         self.wordwisecontrastive = WordWiseContrastive(tokenizer=self._tokenizer) if WORDWISE_CONTRASTIVE_ENABLED else None
         self.contrastive_pair_idx = 0
@@ -369,6 +393,13 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                         mask2 = [-m for m in mask2]  # Invert the mask for the second sequence to indicate negative pairs
                         assert n1 == n2, f"if using wordwise contrastive, both sequences must have the same number of words (as determined by the contrastive augmentation) to ensure proper alignment of contrastive masks. Please check your augmentation configuration and input data. Are tokens same? {tokens_1 == tokens_2}. n1: {n1}, n2: {n2}. mask1: {mask1}, mask2: {mask2}, is text same? {sample_text[0]['text'] == sample_text[1]['text']}"
                         self.contrastive_mask_buffer.extend(mask1 + mask2)
+                        # tokens_1 (sequence 0) is the member that gets full depth + CE; tokens_2
+                        # (sequence 1, the wordwise translation) only flows to the contrastive layer
+                        # and gets no CE *when early-exit is enabled for this source*. mask lengths
+                        # match the per-token counts added above.
+                        self.contrastive_only_buffer.extend(
+                            [False] * len(mask1) + [self.contrastive_early_exit] * len(mask2)
+                        )
                         self.contrastive_pair_counter += n1
                         self.contrastive_pair_idx += n1
                     # elif len(tokens_1["tokens"]) <= self.contrastive_len_threshold:
@@ -376,6 +407,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                     #     self.contrastive_pair_counter += 1
                     else:
                         self.contrastive_mask_buffer.extend([0] * (len(tokens_1["tokens"])+len(tokens_2["tokens"])))
+                        self.contrastive_only_buffer.extend([False] * (len(tokens_1["tokens"])+len(tokens_2["tokens"])))
                     tokens_1, tokens_2 = self._apply_post_token_augs([tokens_1, tokens_2])  # Pass both sequences together if your post-token aug needs to consider them jointly
 
                     new_tokens = tokens_1["tokens"] + tokens_2["tokens"]
@@ -388,11 +420,13 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                     new_tokens = self._apply_post_token_augs(new_tokens)
                     new_tokens = new_tokens["tokens"]
                     self.contrastive_mask_buffer.extend([0] * len(new_tokens))
-                self._sample_idx += 1 
+                    self.contrastive_only_buffer.extend([False] * len(new_tokens))
+                self._sample_idx += 1
             else:
                 new_tokens = self._get_injected_tokens(choice - 1)["tokens"]
                 self.contrastive_mask_buffer.extend([0] * len(new_tokens))
-            
+                self.contrastive_only_buffer.extend([False] * len(new_tokens))
+
             self._token_buffer.extend(new_tokens)
 
             while len(self._token_buffer) >= max_buffer_token_len:
@@ -401,6 +435,12 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 
                 contrastive_mask = torch.LongTensor(self.contrastive_mask_buffer[:max_buffer_token_len])
                 self.contrastive_mask_buffer = self.contrastive_mask_buffer[max_buffer_token_len:]
+
+                # Early-exit / no-CE flag, kept in lockstep with the token buffer. We do NOT reset
+                # the leftover (unlike the contrastive mask): a translation block that spills past
+                # the window boundary stays flagged so it is still dropped (and gets no CE) next window.
+                contrastive_only = torch.tensor(self.contrastive_only_buffer[:max_buffer_token_len], dtype=torch.bool)
+                self.contrastive_only_buffer = self.contrastive_only_buffer[max_buffer_token_len:]
                 # zero out contrastive mask buffer after yielding to prevent leakage across samples
                 if len(set(self.contrastive_mask_buffer)) > 1:
                     self.contrastive_pair_counter -= len(set([abs(x) for x in set(self.contrastive_mask_buffer)]))
@@ -412,8 +452,16 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                     inputs["lang_id"] = self.lang_id
                 # if self.enable_contrastive_mask:
                 inputs["contrastive_masks"] = self.get_masks(contrastive_mask[:-1], x[:-1])
+                # Per-input-token early-exit flag, aligned to inputs["input"] == x[:-1]. The trainer
+                # consumes this to compact the batch after the contrastive layer.
+                inputs["contrastive_only_mask"] = contrastive_only[:-1]
                 assert len(inputs["input"]) == self.seq_len and (False not in [len(inputs.get("contrastive_masks", [])[i]) == self.seq_len for i in range(self.max_contrastive_seqs)]), f"Expected input and contrastive_masks lengths to match seq_len ({self.seq_len}), but got {len(inputs['input'])} and {len(inputs.get('contrastive_masks', []))} respectively."
-                yield inputs, x[1:]
+                # Skip CE on translation tokens: mask positions that ARE a translation input token
+                # (their deep representation is dropped) and positions whose next-token TARGET is a
+                # translation token (incl. the Arabic-EOS -> first-translation boundary).
+                labels = x[1:].clone()
+                labels[contrastive_only[:-1] | contrastive_only[1:]] = -100
+                yield inputs, labels
     
     def step(self, global_step: int):
         """Propagates the global training step down to the augmentations."""
@@ -456,6 +504,10 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         """Restore the dataset state from a checkpoint."""
         self._token_buffer = state_dict["token_buffer"]
         self.contrastive_mask_buffer = state_dict.get("contrastive_mask_buffer", [])
+        # Default to all-False (length-matched) for checkpoints saved before this buffer existed.
+        self.contrastive_only_buffer = state_dict.get(
+            "contrastive_only_buffer", [False] * len(self._token_buffer)
+        )
         
         # --- NEW: Restore the injection counts ---
         if "injection_counts" in state_dict:
@@ -474,6 +526,7 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         _state_dict: dict[str, Any] = {
             "token_buffer": self._token_buffer,
             "contrastive_mask_buffer": self.contrastive_mask_buffer,
+            "contrastive_only_buffer": self.contrastive_only_buffer,
             # --- NEW: Save the injection counts ---
             "injection_counts": self.injection_counts
         }
@@ -551,7 +604,8 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                         lang_id=src.get("lang_id", None),
                         enable_contrastive_mask=src.get("enable_contrastive_mask", False),
                         contrastive_len_threshold=src.get("contrastive_len_threshold", 256),
-                        max_contrastive_seqs=src.get("max_contrastive_seqs", MAX_SEQS)
+                        max_contrastive_seqs=src.get("max_contrastive_seqs", MAX_SEQS),
+                        contrastive_early_exit=src.get("contrastive_early_exit", False),
                     )
                     datasets.append(ds)
                     weights.append(final_weight)
@@ -602,8 +656,8 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                     lang_id=src.get("lang_id", None),
                     enable_contrastive_mask=src.get("enable_contrastive_mask", False),
                     contrastive_len_threshold=src.get("contrastive_len_threshold", 256),
-                    max_contrastive_seqs=src.get("max_contrastive_seqs", MAX_SEQS)
-
+                    max_contrastive_seqs=src.get("max_contrastive_seqs", MAX_SEQS),
+                    contrastive_early_exit=src.get("contrastive_early_exit", False),
                 )
                 datasets.append(ds)
                 weights.append(src.get("weight", 1.0))

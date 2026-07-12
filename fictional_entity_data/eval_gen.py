@@ -1,19 +1,21 @@
 import os
 import yaml
 import random
+import numpy as np
 
-# rate_list = [0, 20, 100, 1000]
-rate_list = [0, 1000]
-# base_dir = "/home/adamga/torchtitan/fictional_entity_data/gemini_seeds"
-# base_dir = "/home/adamga/torchtitan/fictional_entity_data/from_domains_humans"
-output_dir = "/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_en_2ratemix_fictive_entity_eval_suite"
-# output_dir = "/home/adamga/lm-evaluation-harness/custom_evals/human_seeds_en_fictive_entity_eval_suite"
+rate_list = [0, 20, 100, 1000]
+SEED = 43
+RANDOM_GEN = ["np", "random"][1]
+ext = {"np": f"nps{SEED}", "random": f"s{SEED}"}[RANDOM_GEN]    #task name extension for reproducibility
+output_dir = f"/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_en_ar_fictive_entity_eval_suite_{ext}"
+# output_dir = f"/home/adamga/lm-evaluation-harness/custom_evals/human_seeds_en_ar_fictive_entity_eval_suite_{ext}"
 
 # Create the directory for the lm-eval tasks
 os.makedirs(output_dir, exist_ok=True)
 
 all_task_names = []
-file_order_shuffler = random.Random(43)
+file_order_shuffler = {"np": np.random.default_rng, "random": random.Random}[RANDOM_GEN](SEED)
+# file_order_shuffler = random.Random(1248)
 file_order = []
 # for start in range(0, 2080, 32):
 #     chunk = list(range(start, start + 32))
@@ -40,7 +42,7 @@ for group_idx in range(len(rate_list)**2):
     
     # Generate a task for both English and Arabic
     # for lang in ["mcq_en", "mcq_ar", "ar_wordwise_tr2en_mcq"]:
-    for lang in ["mcq_en"]:
+    for lang in ["mcq_en", "mcq_ar"]:
         # e.g., gemini_fictive_en_5_ar_5_en
         task_name = f"fictive_{combo_base_name}_{lang}"
         all_task_names.append(task_name)

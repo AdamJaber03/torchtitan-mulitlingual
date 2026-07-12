@@ -176,6 +176,9 @@ import json
 import re
 import random
 from multiprocessing import Value
+from code_switching_tools.buckwalter_transliteration import arabic_to_buckwalter
+# from unidecode import unidecode
+
 
 class WordwiseUnigramCodeSwitching:
     """
@@ -197,16 +200,19 @@ class WordwiseUnigramCodeSwitching:
         self.idx = config.get("idx", None)
         self.pattern = config.get("pattern", None)
         if self.pattern is not None:
-            assert self.pattern in ["en", "ar", "ru"]
+            assert self.pattern in ["en", "ar", "ru", "hi"]
         self.tokenizer = config.get("tokenizer")
         self.dictionaries = {}
         self._load_dictionaries()
+        self.fallback_to_transliteration = config.get("fallback_to_transliteration", False)
 
         # Pre-compile regex patterns for speed
         self.en_pattern = re.compile(r'([a-zA-Z]+)')
         # self.ar_pattern = re.compile(r'([\u0600-\u06FF]+)')
         self.ar_pattern = re.compile(r'([\u0620-\u065F\u0670-\u06EF\u06FA-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF\u200C\u200D]+)')
         self.ru_pattern = re.compile(r'([\u0400-\u04FF\u0500-\u052F\u2DE0-\u2DFF\uA640-\uA69F\u1C80-\u1C8F\u0300-\u036F\u200C\u200D\u00AD]+)')
+        # Hindi (Devanagari). Excludes danda U+0964/U+0965 (handled as punctuation); includes ZWNJ/ZWJ.
+        self.hi_pattern = re.compile(r'([\u0900-\u0963\u0966-\u097F\uA8E0-\uA8FF\u200C\u200D]+)')
 
     def step(self, global_step):
         # logger.info(f"************Stepping {self.name} augmentation at global step {global_step}...*********************")
@@ -237,15 +243,19 @@ class WordwiseUnigramCodeSwitching:
         if do_augment:
             translation_dict = self.dictionaries[dataset_name]
             if self.pattern is not None:
-                pattern = {"en": self.en_pattern, "ar": self.ar_pattern, "ru": self.ru_pattern}[self.pattern]
+                pattern = {"en": self.en_pattern, "ar": self.ar_pattern, "ru": self.ru_pattern, "hi": self.hi_pattern}[self.pattern]
             elif dataset_name.endswith("-en"):
                 pattern = self.en_pattern
             elif dataset_name.endswith("-ar"):
                 pattern = self.ar_pattern
             elif dataset_name.endswith("-ru"):
                 pattern = self.ru_pattern
+            elif dataset_name.endswith("-hi"):
+                pattern = self.hi_pattern
             else:
-                raise ValueError(f"Dataset name '{dataset_name}' does not match expected language suffixes for augmentation. Expected suffixes: '-en', '-ar', '-ru'.")
+                raise ValueError(f"Dataset name '{dataset_name}' does not match expected language suffixes for augmentation. Expected suffixes: '-en', '-ar', '-ru', '-hi'.")
+            if self.fallback_to_transliteration:
+                assert pattern == self.ar_pattern or pattern == self.ru_pattern, "Fallback to transliteration is only supported for Arabic or Russian text."
 
         tokens = re.split(r'(\s+)', raw_text)
         reconstructed_parts = []
@@ -266,6 +276,12 @@ class WordwiseUnigramCodeSwitching:
                     # assert lookup_word in translation_dict, f"Lookup word '{lookup_word}' should either be in the dictionary or not, but got an unexpected case. Original word: '{word}'"
                     if lookup_word in translation_dict and random.random() < self.replace_prob.value:
                         return translation_dict[lookup_word]
+                    if self.fallback_to_transliteration:
+                        if pattern == self.ar_pattern:
+                            return arabic_to_buckwalter(word)
+                        elif pattern == self.ru_pattern:
+                            return word
+                            # return unidecode(lookup_word)
                     return word
                 
                 # Search and replace words within the current token

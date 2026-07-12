@@ -85,7 +85,7 @@ def process_and_save_chunk(chunk_id, docs_chunk, save_dir):
 
 def main():
     # --- CONFIGURATION ---
-    NUM_DOCS_TO_PROCESS = 7_000_000
+    NUM_DOCS_TO_PROCESS = 30_000_000
     CHUNK_SIZE = 25_000
     
     OUTPUT_BASE_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/"
@@ -206,7 +206,7 @@ def main():
     end_time = time.time()
     mins = (end_time - start_time) / 60
     print(f"\n✅ COMPLETE! {completed_docs} documents downloaded and saved in {mins:.2f} minutes.")
-    # print(f"Originals ar saved to: {AR_DIR}")
+    print(f"Originals ar saved to: {AR_DIR}")
     print(f"Originals en saved to: {EN_DIR}")
 
 if __name__ == "__main__":

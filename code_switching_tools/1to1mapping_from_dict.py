@@ -50,9 +50,11 @@ def process_and_clean_dictionary_file(input_filepath, output_filepath):
 
 if __name__ == "__main__":
     # input_file = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex.json"
-    input_file = "/home/adamga/leshemg/adamga/data/translations/top_russian_translated_fineweb_regex.json"
+    # input_file = "/home/adamga/leshemg/adamga/data/translations/top_russian_translated_fineweb_regex.json"
+    input_file = "/home/adamga/leshemg/adamga/data/translations/top_hindi_translated_fineweb.json"
     # output_file = "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated_fineweb_newregex_1to1.json"
-    output_file = "/home/adamga/leshemg/adamga/data/translations/top_russian_translated_fineweb_regex_1to1.json"
+    # output_file = "/home/adamga/leshemg/adamga/data/translations/top_russian_translated_fineweb_regex_1to1.json"
+    output_file = "/home/adamga/leshemg/adamga/data/translations/top_hindi_translated_fineweb_1to1.json"
     
     # Run the function
     process_and_clean_dictionary_file(input_file, output_file)

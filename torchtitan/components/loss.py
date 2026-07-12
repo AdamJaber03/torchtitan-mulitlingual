@@ -70,68 +70,167 @@ class CrossEntropyLoss(nn.Module):
         )
 
 
+def _extract_contrastive_pairs(
+    raw_vectors: torch.Tensor, valid_mask: torch.Tensor
+) -> torch.Tensor | None:
+    """Shared pair-extraction helper for paired-vector losses (InfoNCE, L2 alignment, ...).
+
+    Args:
+        raw_vectors: [Batch, MaxSeqs, D] pooled contrastive vectors for one layer.
+        valid_mask: [Batch, MaxSeqs] boolean mask of valid (non-padding) sequence slots.
+    Returns:
+        [N, 2, D] float tensor of (member0, member1) pairs, or None if there are zero or an
+        odd number of valid vectors (caller should fall back to an FSDP-safe zero in that case).
+    """
+    contrastive_vectors = raw_vectors[valid_mask]  # [Total_Valid_Seqs, D]
+    num_vectors = contrastive_vectors.size(0)
+    if num_vectors == 0 or num_vectors % 2 != 0:
+        return None
+    N = num_vectors // 2
+    return contrastive_vectors.view(N, 2, -1).float()
+
+
 @register_loss("contrastive")
 class BidirectionalInfoNCELoss(nn.Module):
     def __init__(
-        self, 
-        key: str = "contrastive_vectors", 
+        self,
+        key: str = "contrastive_vectors",
         temperature: float = 0.05,
+        layer_reduction: str = "mean",
         **kwargs,
     ):
         """
         Args:
-            key: The key to extract contrastive embeddings from input_dict. 
-                 Expected to point to interleaved [2N, D] tensor of (EN, AR) vectors.
+            key: The key to extract contrastive embeddings from input_dict. Points to either a single
+                 [Batch, MaxSeqs, D] tensor (single-layer) or a dict {layer: tensor} (multi-depth).
+            temperature: InfoNCE temperature.
+            layer_reduction: how to combine the per-layer InfoNCE losses in the multi-depth case,
+                 "mean" (default; keeps magnitude ~ single-layer) or "sum".
         """
         super().__init__()
         self.key = key
+        self.layer_reduction = layer_reduction
         self.register_buffer('temperature', torch.tensor(temperature))
+
+    def _info_nce(self, raw_vectors: torch.Tensor, valid_mask: torch.Tensor) -> torch.Tensor:
+        """Bidirectional InfoNCE for one layer's vectors [Batch, MaxSeqs, D].
+
+        Returns a scalar; if there are no/odd valid pairs, returns a graph-derived zero (the FSDP
+        autograd trick) so the term still participates in the backward graph.
+        """
+        pairs = _extract_contrastive_pairs(raw_vectors, valid_mask)
+        if pairs is None:
+            return (raw_vectors * 0.0).sum()
+        z_en = F.normalize(pairs[:, 0, :], p=2, dim=1)
+        z_ar = F.normalize(pairs[:, 1, :], p=2, dim=1)
+        N = pairs.size(0)
+        sim_matrix = torch.matmul(z_en, z_ar.T) / self.temperature
+        labels_contrastive = torch.arange(N, device=sim_matrix.device)
+        loss_en_ar = F.cross_entropy(sim_matrix, labels_contrastive)
+        loss_ar_en = F.cross_entropy(sim_matrix.T, labels_contrastive)
+        return (loss_en_ar + loss_ar_en) / 2.0
 
     @torch.compiler.disable
     def forward(self, input_dict: Dict[str, Any], labels: Union[torch.Tensor, Dict[str, torch.Tensor]]):
         if self.key not in input_dict or input_dict[self.key] is None:
-            logger.info("skipping contrastive loss because self.key not in input_dict or input_dict[self.key] is None")
+            logger.info("skipping contrastive loss because key missing or None")
             return torch.tensor(0.0, device=labels.device if not isinstance(labels, dict) else labels['labels'].device)
-            
-        raw_vectors = input_dict[self.key]        # [Batch, MaxSeqs, Proj_Dim]
-        logger.info(f"loss raw_vectors shape: {raw_vectors.shape}")
-        valid_mask = input_dict["valid_seq_mask"] # [Batch, MaxSeqs]
-        logger.info(f"loss valid_mask shape: {valid_mask.shape}, valid_mask sum: {valid_mask.sum()}")
-        # --- DYNAMIC SLICING ---
-        # Flattens the batch and extracts ONLY the real sequences.
-        # Shape becomes: [Total_Valid_Seqs, Proj_Dim]
-        contrastive_vectors = raw_vectors[valid_mask] 
-        
-        num_vectors = contrastive_vectors.size(0)
-        
-        # --- THE FSDP AUTOGRAD TRICK ---
-        # If empty or odd, return a 0 derived from the graph
-        if num_vectors == 0 or num_vectors % 2 != 0:
-            logger.info(f"skipping contrastive loss because num_vectors == 0 or num_vectors % 2 != 0. num_vectors: {num_vectors}")
-            return (raw_vectors * 0.0).sum()
-            
-        N = num_vectors // 2
-        
-        # The rest of your InfoNCE math stays exactly the same
-        pairs = contrastive_vectors.view(N, 2, -1).float()
-        z_en = pairs[:, 0, :]
-        z_ar = pairs[:, 1, :]
-        
-        z_en = F.normalize(z_en, p=2, dim=1)
-        z_ar = F.normalize(z_ar, p=2, dim=1)
-        
-        sim_matrix = torch.matmul(z_en, z_ar.T) / self.temperature
-        labels_contrastive = torch.arange(N, device=sim_matrix.device)
-        
-        loss_en_ar = F.cross_entropy(sim_matrix, labels_contrastive)
-        loss_ar_en = F.cross_entropy(sim_matrix.T, labels_contrastive)
-        info_nce_loss_mean = (loss_en_ar + loss_ar_en) / 2.0
-        
+
+        vecs = input_dict[self.key]
+        valid_mask = input_dict["valid_seq_mask"]     # [Batch, MaxSeqs] (shared across layers)
+
+        if isinstance(vecs, dict):
+            # Multi-depth: one [Batch, MaxSeqs, D] tensor per contrastive layer.
+            per_layer = [self._info_nce(v, valid_mask) for v in vecs.values()]
+            if len(per_layer) == 0:
+                return torch.tensor(0.0, device=valid_mask.device)
+            combined = sum(per_layer)
+            if self.layer_reduction != "sum":
+                combined = combined / len(per_layer)   # mean
+            logger.info(f"contrastive (multi-depth, {len(per_layer)} layers, {self.layer_reduction}): {combined}")
+        else:
+            combined = self._info_nce(vecs, valid_mask)
+            logger.info(f"contrastive (single layer): {combined}")
+
         targets = labels["labels"] if isinstance(labels, dict) else labels
         valid_tokens = (targets != -100).sum()
-        
-        logger.info(f"didnt skip contrastive loss, its value is : {info_nce_loss_mean}")
-        return info_nce_loss_mean * valid_tokens
+        return combined * valid_tokens
+
+
+@register_loss("l2_alignment")
+class BidirectionalL2Loss(nn.Module):
+    """Simple L2 (MSE) alignment loss between paired Ar/En pooled vectors.
+
+    Structurally mirrors BidirectionalInfoNCELoss (same key/multi-depth/layer_reduction/
+    valid_tokens-scaling machinery) but replaces the normalize+cosine-similarity+cross-entropy
+    InfoNCE math with a direct MSE between each matched pair's two vectors -- no temperature,
+    no negatives, just pull each pair together.
+
+    normalize=True (default) L2-normalizes both vectors to unit norm before MSE, matching the
+    normalization InfoNCE already applies before its cosine-similarity step. This keeps the loss
+    bounded in [0, 4] and comparable across the different contrastive_target_layers (raw
+    residual-stream activation norm grows with depth in this pre-norm architecture, so
+    un-normalized MSE would be implicitly dominated by the deepest layers). Set normalize=False
+    for literal raw-vector MSE instead.
+    """
+
+    def __init__(
+        self,
+        key: str = "contrastive_vectors",
+        layer_reduction: str = "mean",
+        normalize: bool = True,
+        **kwargs,
+    ):
+        super().__init__()
+        self.key = key
+        self.layer_reduction = layer_reduction
+        self.normalize = normalize
+
+    def _l2(self, raw_vectors: torch.Tensor, valid_mask: torch.Tensor) -> torch.Tensor:
+        """Bidirectional L2/MSE alignment for one layer's vectors [Batch, MaxSeqs, D].
+
+        Returns a scalar; if there are no/odd valid pairs, returns a graph-derived zero (the FSDP
+        autograd trick) so the term still participates in the backward graph.
+        """
+        pairs = _extract_contrastive_pairs(raw_vectors, valid_mask)
+        if pairs is None:
+            return (raw_vectors * 0.0).sum()
+        a = pairs[:, 0, :]
+        b = pairs[:, 1, :]
+        if self.normalize:
+            a = F.normalize(a, p=2, dim=1)
+            b = F.normalize(b, p=2, dim=1)
+        # Sum over the feature dim (squared Euclidean distance per pair), then mean over pairs --
+        # NOT F.mse_loss's default (mean over every element including D), which would shrink
+        # toward 0 as D grows and break the normalized [0,4] bound this loss relies on.
+        return (a - b).pow(2).sum(dim=-1).mean()
+
+    @torch.compiler.disable
+    def forward(self, input_dict: Dict[str, Any], labels: Union[torch.Tensor, Dict[str, torch.Tensor]]):
+        if self.key not in input_dict or input_dict[self.key] is None:
+            logger.info("skipping l2_alignment loss because key missing or None")
+            return torch.tensor(0.0, device=labels.device if not isinstance(labels, dict) else labels['labels'].device)
+
+        vecs = input_dict[self.key]
+        valid_mask = input_dict["valid_seq_mask"]     # [Batch, MaxSeqs] (shared across layers)
+
+        if isinstance(vecs, dict):
+            # Multi-depth: one [Batch, MaxSeqs, D] tensor per contrastive layer.
+            per_layer = [self._l2(v, valid_mask) for v in vecs.values()]
+            if len(per_layer) == 0:
+                return torch.tensor(0.0, device=valid_mask.device)
+            combined = sum(per_layer)
+            if self.layer_reduction != "sum":
+                combined = combined / len(per_layer)   # mean
+            logger.info(f"l2_alignment (multi-depth, {len(per_layer)} layers, {self.layer_reduction}): {combined}")
+        else:
+            combined = self._l2(vecs, valid_mask)
+            logger.info(f"l2_alignment (single layer): {combined}")
+
+        targets = labels["labels"] if isinstance(labels, dict) else labels
+        valid_tokens = (targets != -100).sum()
+        return combined * valid_tokens
+
 
 @register_loss("hnet_ratio")
 class HNetRatioLoss(nn.Module):

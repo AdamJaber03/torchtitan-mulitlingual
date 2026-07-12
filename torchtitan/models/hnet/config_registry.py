@@ -277,8 +277,8 @@ def hnet_1stage_L_paper() -> Trainer.Config:
     file_order_shuffler = random.Random(43)
     file_order = list(range(2080))
     file_order_shuffler.shuffle(file_order)
-    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order]
+    en_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order] # + [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in file_order]
+    ar_files = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in file_order] # + [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in file_order]
     ar_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
     en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
     return Trainer.Config(
@@ -314,14 +314,14 @@ def hnet_1stage_L_paper() -> Trainer.Config:
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
                             "injection_paths": en_files,
-                            "injection_probs": [p/2 for p in en_probs],
+                            "injection_probs": [p*1.5 for p in en_probs],
                         },
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
                             # "start_idx": 3_200_000,
                             "injection_paths": ar_files,
-                            "injection_probs": [p/2 for p in ar_probs],
+                            "injection_probs": [p*1.5 for p in ar_probs],
                         },
                     ],
                 }
@@ -339,7 +339,7 @@ def hnet_1stage_L_paper() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=1000,
-            folder="/home/adamga/leshemg/adamga/train/torchtitan/hnet_1stage_L_test6_en_ar_stage1_8k_clean_injection_0_20_100_1000_20800entities",
+            folder="/home/adamga/leshemg/adamga/train/torchtitan/hnet_1stage_L_test9_en_ar_stage1_24k_clean_3xinjection_0_20_100_1000_20800entities",
             enable=True,
             last_save_in_hf=False,
             async_mode="async",

@@ -42,6 +42,15 @@ class TrainingConfig:
     steps: int = 10000
     """How many train steps to run"""
 
+    active_forgetting_interval: int | None = None
+    """
+    Active forgetting (arXiv:2410.16168 / Chen et al. 2023): reinitialize the token embeddings
+    (and reset their optimizer state) every `active_forgetting_interval` steps to improve plasticity
+    / cross-representation generalization. The transformer body and the global LR schedule are left
+    unchanged. None disables. Under weight tying the input and output embedding are the same tensor,
+    so the reset covers both.
+    """
+
     enable_cpu_offload: bool = False
     """
     Whether to apply CPU offloading of parameters, gradients, and optimizer states in FSDP

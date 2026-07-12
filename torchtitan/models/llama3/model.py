@@ -13,6 +13,10 @@ from torch import nn
 
 from torchtitan.models.common.attention import AttentionMasksType
 from torchtitan.models.common.decoder import Decoder, TransformerBlock
+from torchtitan.models.common.hybrid_anchor_embedding import (
+    HybridAnchorEmbedding,
+    TiedAnchorOutput,
+)
 from torchtitan.models.utils import get_dense_model_nparams_and_flops
 from torchtitan.tools.logging import logger
 
@@ -79,10 +83,36 @@ class Llama3Model(Decoder):
         n_layers: int = 32
         vocab_size: int = 128256
         enable_weight_tying: bool = False
+        # --- Hybrid anchor embedding (partial cross-lingual tying) ---
+        # Path to a token map JSON (must contain 'id_remap' or 'pairs', e.g.
+        # ar_en_1to1_token_map.json). When set, tok_embeddings is replaced by a
+        # HybridAnchorEmbedding that splits the embedding dim into a shared/tied "anchor"
+        # subspace (matched id pairs index the SAME row) and an independent "residual"
+        # subspace. None (default) keeps the stock nn.Embedding -- no change from today.
+        anchor_embedding_path: str | None = None
+        # Fraction of the embedding dim allocated to the shared/tied anchor subspace when
+        # anchor_embedding_path is set. 0.5 = half the dims tied, half independent. Sweepable
+        # ablation knob: lower -> closer to fully independent embeddings (weaker anchor, less
+        # interference); higher -> closer to full id-remap-style tying (stronger anchor, more
+        # interference risk). Ignored when anchor_embedding_path is None.
+        anchor_shared_dim_fraction: float = 0.5
         layer: TransformerBlock.Config
         enable_contrastive_alignment: bool = False
         contrastive_proj_dim: int = 512
+        # Contrastive projection head: "mlp" (Linear-GELU-Linear, current default), "linear"
+        # (single Linear), or "identity" (InfoNCE directly on the pooled layer embeddings).
+        contrastive_head_type: str = "mlp"
         contrastive_target_layer: int = 4  # -1 for embeddings, 0 for first layer, etc.
+        # When set (non-empty), apply the contrastive loss at EACH of these layers simultaneously
+        # (each gets its own head; the per-layer InfoNCE losses are combined in the loss). When None,
+        # falls back to the single contrastive_target_layer above.
+        contrastive_target_layers: list[int] | None = None
+        # Contrastive early-exit budget: number of kept (non-translation) tokens per row that run
+        # through the layers AFTER contrastive_target_layer + the output head. When set (with the
+        # dataloader emitting contrastive_only_mask), the trainer compacts the batch to this length
+        # after the contrastive layer so the translation member only reaches contrastive_target_layer.
+        # Typically ~ (2/3) * training.seq_len when training.seq_len is the 1.5x "raw" length.
+        keep_len: int | None = None
 
         def update_from_config(
             self,
@@ -112,6 +142,16 @@ class Llama3Model(Decoder):
                     f"Varlen attention is not supported with CP."
                 )
 
+            if (
+                self.anchor_embedding_path is not None
+                and parallelism.tensor_parallel_degree > 1
+            ):
+                raise NotImplementedError(
+                    "anchor_embedding_path (HybridAnchorEmbedding) does not yet support "
+                    "tensor parallelism: RowwiseParallel cannot shard a non-nn.Embedding "
+                    "tok_embeddings module. Use FSDP-only (tensor_parallel_degree=1)."
+                )
+
         def get_nparams_and_flops(
             self, model: nn.Module, seq_len: int
         ) -> tuple[int, int]:
@@ -125,8 +165,22 @@ class Llama3Model(Decoder):
     def __init__(self, config: Config):
         super().__init__(config)
         self.enable_weight_tying = config.enable_weight_tying
+        self.has_anchor_embedding = config.anchor_embedding_path is not None
 
-        if self.enable_weight_tying:
+        if self.has_anchor_embedding:
+            self.tok_embeddings = HybridAnchorEmbedding.Config(
+                vocab_size=config.vocab_size,
+                dim=config.dim,
+                anchor_map_path=config.anchor_embedding_path,
+                shared_dim_fraction=config.anchor_shared_dim_fraction,
+            ).build()
+            if self.enable_weight_tying:
+                # No .weight to alias (HybridAnchorEmbedding has none) -- the LM head instead
+                # recomputes from the SAME anchor_table/residual_table params every forward.
+                # Real gradient-level tying, never needs re-establishing (see init_weights/
+                # reinit_embeddings below: nothing drifts, so there's nothing to re-tie).
+                self.output = TiedAnchorOutput(self.tok_embeddings)
+        elif self.enable_weight_tying:
             self.tok_embeddings.weight = self.output.weight
 
     def init_weights(
@@ -139,7 +193,7 @@ class Llama3Model(Decoder):
         # standard deviation for the output layer. Under weight_tying, both should
         # use the output weights with a smaller, truncated normal distribution to
         # improve training stability.
-        if self.enable_weight_tying:
+        if self.enable_weight_tying and not self.has_anchor_embedding:
             # since when the model is initialized on meta device,
             # the tying in the __init__ may not have worked correctly
             # we ensure the weights are tied here
@@ -147,4 +201,32 @@ class Llama3Model(Decoder):
             self.tok_embeddings.weight = self.output.weight
 
         super().init_weights(buffer_device=buffer_device, **kwargs)
+
+    def reinit_embeddings(self):
+        # Re-establish tying before reinitializing so the shared input/output weight ends up with the
+        # output's (smaller, truncated-normal) distribution, exactly as at initial init. Used by
+        # active forgetting (periodic embedding reset) as well as initial init_weights.
+        # (Anchor-embedding + tying needs no re-establishing: TiedAnchorOutput always recomputes
+        # live from tok_embeddings, it never holds a snapshot that could drift apart.)
+        if self.enable_weight_tying and not self.has_anchor_embedding:
+            assert self.tok_embeddings is not None and self.output is not None
+            self.tok_embeddings.weight = self.output.weight
+        super().reinit_embeddings()
+
+    def _init_tok_embeddings(self):
+        if self.has_anchor_embedding:
+            # Tied case: this table is also read directly as unembedding logits (via
+            # TiedAnchorOutput), so it needs the same small truncated-normal scale
+            # Decoder._init_output() uses for a standalone output layer -- see
+            # HybridAnchorEmbedding.init_weights() for why this can't just rely on the stock
+            # _init_output() overwrite-after-the-fact trick used by the non-anchor tied case.
+            final_out_std = self.config.dim**-0.5 if self.enable_weight_tying else None
+            self.tok_embeddings.init_weights(final_out_std=final_out_std)
+        else:
+            super()._init_tok_embeddings()
+
+    def _init_output(self):
+        if self.has_anchor_embedding and self.enable_weight_tying:
+            return  # TiedAnchorOutput has no independent weight; nothing to reinit.
+        super()._init_output()
 

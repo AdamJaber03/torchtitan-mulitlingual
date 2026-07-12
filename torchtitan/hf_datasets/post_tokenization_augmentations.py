@@ -1,7 +1,19 @@
+import json
 import random
 from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
 from torchtitan.tools.logging import logger
 from multiprocessing import Value
+
+
+def _extract_vocab(tokenizer) -> dict:
+    """Return the {token_str: id} vocab, handling HF/torchtitan tokenizer wrappers."""
+    if hasattr(tokenizer, "vocab"):
+        return tokenizer.vocab
+    if hasattr(tokenizer, "get_vocab"):
+        return tokenizer.get_vocab()
+    if hasattr(tokenizer, "_tokenizer") and hasattr(tokenizer._tokenizer, "get_vocab"):
+        return tokenizer._tokenizer.get_vocab()
+    raise AttributeError("Could not extract vocabulary from the tokenizer object.")
 
 
 class StochasticTokenTagging:
@@ -259,8 +271,98 @@ class TokenPrefix:
         return tokens_in
 
 
+class SharedAnchorRemap:
+    """
+    Deterministic post-tokenization remap of Arabic tokens to their English
+    counterpart id, for 1-to-1 (single-token <-> single-token) translation pairs.
+
+    This creates a shared cross-lingual anchor: the Arabic token id is replaced by
+    the English token id, so both languages index the same embedding / output row.
+    The tokenizer itself is left untouched (a vocab-level id remap is NOT viable --
+    HF BPE represents merges by token id, so reassigning ids corrupts the merges),
+    hence the remap is applied here, after the BPE has produced correct ids.
+
+    Word-boundary safe (default): a mapped token is only remapped when it constitutes
+    a COMPLETE word, i.e. the next token starts a new word (begins with the byte-level
+    space marker), is a special token, or is end-of-sequence. This prevents remapping a
+    mapped function-word token that appears as a prefix subword of a longer word.
+    The mapped ids are space-prefixed forms, so they are always word starts already.
+    """
+
+    def __init__(self, config: dict):
+        self.name = config.get("name", "shared_anchor_remap")
+        self.idx = config.get("idx", None)
+        self.word_boundary_safe = config.get("word_boundary_safe", True)
+
+        map_path = config.get("map_path")
+        if map_path is None:
+            raise ValueError(f"[{self.name}] config must include 'map_path'")
+        with open(map_path) as f:
+            data = json.load(f)
+        if "id_remap" in data:
+            self.remap = {int(k): int(v) for k, v in data["id_remap"].items()}
+        elif "pairs" in data:
+            self.remap = {int(p["arabic_id"]): int(p["english_id"]) for p in data["pairs"]}
+        else:
+            raise ValueError(f"[{self.name}] map file must contain 'id_remap' or 'pairs'")
+
+        self.tokenizer = config.get("tokenizer")
+        if self.tokenizer is None:
+            raise ValueError(f"[{self.name}] requires 'tokenizer' to be passed in config.")
+
+        # Special tokens act as word boundaries and are never remapped.
+        self.special_tokens = set(config.get("special_tokens", []))
+        for attr in ("eos_id", "bos_id"):
+            tid = getattr(self.tokenizer, attr, None)
+            if tid is not None:
+                self.special_tokens.add(tid)
+
+        # Tokens that mark the start of a new word (byte-level space marker).
+        self.boundary_token_ids = set()
+        if self.word_boundary_safe:
+            for token_str, token_id in _extract_vocab(self.tokenizer).items():
+                if token_str.startswith("Ġ") or token_str.startswith(" "):
+                    self.boundary_token_ids.add(token_id)
+        # A new word / sequence-end starts here -> the previous token is a complete word.
+        self._end_markers = self.boundary_token_ids | self.special_tokens
+
+        logger.info(
+            f"Initializing {self.name}: {len(self.remap)} remap entries, "
+            f"word_boundary_safe={self.word_boundary_safe}, "
+            f"{len(self.boundary_token_ids)} boundary tokens."
+        )
+
+    def __call__(self, tokens_in: dict | list[dict], dataset_name: str = None):
+        if not tokens_in:
+            return tokens_in
+        if self.idx is not None:
+            tokens = tokens_in[self.idx]["tokens"]
+        else:
+            tokens = tokens_in["tokens"]
+
+        n = len(tokens)
+        remapped = []
+        for i, tid in enumerate(tokens):
+            new_id = tid
+            if tid in self.remap:
+                if not self.word_boundary_safe:
+                    new_id = self.remap[tid]
+                else:
+                    is_word_end = (i == n - 1) or (tokens[i + 1] in self._end_markers)
+                    if is_word_end:
+                        new_id = self.remap[tid]
+            remapped.append(new_id)
+
+        if self.idx is not None:
+            tokens_in[self.idx]["tokens"] = remapped
+            return tokens_in
+        tokens_in["tokens"] = remapped
+        return tokens_in
+
+
 POST_TOKEN_AUGMENTATIONS_REGISTRY = {
     "stochastic_token_tagging": StochasticTokenTagging,
     "stochastic_word_tagging": StochasticWordTokenTagging,
     "token_prefix": TokenPrefix,
+    "shared_anchor_remap": SharedAnchorRemap,
 }

@@ -8,6 +8,8 @@ import logging
 import re
 from typing import Any
 
+import torch
+
 logger = logging.getLogger()
 
 from torchtitan.protocols.state_dict_adapter import StateDictAdapter
@@ -78,6 +80,32 @@ class Llama3StateDictAdapter(StateDictAdapter):
         dim = self.model_config.dim
         head_dim = dim // n_heads
         hf_state_dict = {}
+
+        # --- HybridAnchorEmbedding: materialize the dense (vocab_size, dim) matrix that
+        # to_hf_map's "tok_embeddings.weight" entry would otherwise expect. The live module has
+        # no such key -- its params live under tok_embeddings.anchor_table.weight /
+        # tok_embeddings.residual_table.weight (plus the anchor_group_id buffer) -- so the normal
+        # per-key loop below would KeyError on `to_hf_map[key]`. Pop them out and emit the
+        # equivalent dense matrix under the regular HF key instead; the rest of the pipeline
+        # (including downstream vocab-slicing) then works unchanged on a normal dense matrix.
+        state_dict = dict(state_dict)  # shallow copy -- don't mutate the caller's dict
+        anchor_w = state_dict.pop("tok_embeddings.anchor_table.weight", None)
+        residual_w = state_dict.pop("tok_embeddings.residual_table.weight", None)
+        anchor_group_id = state_dict.pop("tok_embeddings.anchor_group_id", None)
+        if anchor_w is not None:
+            full_emb = torch.cat([anchor_w[anchor_group_id], residual_w], dim=-1)
+            hf_state_dict["model.embed_tokens.weight"] = full_emb
+            # Tied case: TiedAnchorOutput holds tok_embeddings as a submodule, so the SAME
+            # params are also reachable (and present in this state_dict) under
+            # output.tok_embeddings.*. Discard that duplicate path and instead emit lm_head.weight
+            # as an independent clone of the materialized matrix -- mirroring how the standard
+            # (non-anchor) tied case already always emits a separate "lm_head.weight" entry
+            # regardless of tying, later `.clone()`-d to break shared-storage aliasing.
+            state_dict.pop("output.tok_embeddings.anchor_table.weight", None)
+            state_dict.pop("output.tok_embeddings.residual_table.weight", None)
+            state_dict.pop("output.tok_embeddings.anchor_group_id", None)
+            if self.model_config.enable_weight_tying:
+                hf_state_dict["lm_head.weight"] = full_emb.clone()
 
         for key, value in state_dict.items():
             if "contrastive_proj" in key:

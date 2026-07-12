@@ -608,6 +608,10 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         if "contrastive_mask" in extra_inputs:
             extra_kwargs["contrastive_mask"] = extra_inputs.pop("contrastive_mask")
 
+        # Pull the early-exit flag out of extra_inputs so it is not passed to the model forward
+        # (the model only needs the derived keep_index / reduced mask, built below).
+        contrastive_only = extra_inputs.pop("contrastive_only_mask", None)
+
         # TODO: improve the logic on obtaining attention masks
         layer = getattr(self.model_config, "layer", None)
         attn_config = getattr(layer, "attention", None) if layer else None
@@ -622,6 +626,77 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                 tokenizer=self.tokenizer,
                 extra_inputs=extra_inputs,
             )
+
+        # --- Contrastive early-exit: batch-level compaction of the kept (non-translation) tokens ---
+        # After the contrastive layer the model only needs to run the kept tokens through the deeper
+        # layers. We build, on the host (eager), a fixed-shape gather index over the flattened batch
+        # plus a reduced attention mask, and hand them to the model. Translation tokens were already
+        # given label == IGNORE_INDEX by the dataloader; here we additionally drop CE on any kept
+        # tokens that overflow the keep_len budget.
+        keep_len = getattr(self.model_config, "keep_len", None)
+        if (
+            contrastive_only is not None
+            and keep_len is not None
+            and bool(contrastive_only.any())
+        ):
+            B, raw = inputs.shape
+            device = inputs.device
+            keep = (~contrastive_only.bool()).reshape(-1)              # [B*raw]
+            flat_keep_idx = keep.nonzero(as_tuple=True)[0]             # [total_kept], ascending
+            total_kept = int(flat_keep_idx.numel())
+            budget = B * keep_len
+            if total_kept >= budget:
+                # Overflow: keep the first `budget` kept tokens row-major; the rest get no CE so the
+                # shallow representation they retain after scatter-back is never trained on.
+                overflow = flat_keep_idx[budget:]
+                if overflow.numel() > 0:
+                    labels.reshape(-1)[overflow] = IGNORE_INDEX
+                keep_index_flat = flat_keep_idx[:budget]
+                keep_valid_flat = torch.ones(budget, dtype=torch.bool, device=device)
+            else:
+                # Underflow: pad with a dummy index (0) marked invalid; those slots are computed but
+                # never scattered back, and we set their reduced token to eos so they stay isolated.
+                pad = budget - total_kept
+                keep_index_flat = torch.cat(
+                    [flat_keep_idx, torch.zeros(pad, dtype=flat_keep_idx.dtype, device=device)]
+                )
+                keep_valid_flat = torch.cat(
+                    [
+                        torch.ones(total_kept, dtype=torch.bool, device=device),
+                        torch.zeros(pad, dtype=torch.bool, device=device),
+                    ]
+                )
+            keep_index = keep_index_flat.view(B, keep_len)
+            keep_valid = keep_valid_flat.view(B, keep_len)
+            extra_kwargs["contrastive_keep_index"] = keep_index
+            extra_kwargs["contrastive_keep_valid"] = keep_valid
+
+            # --- keep_len budget monitoring ---
+            # kept_frac < 1 => keep_len has headroom (you can shrink it for more savings);
+            # kept_frac > 1 => overflow, some kept (Arabic) tokens are truncated out of CE (raise it).
+            self._ee_kept = total_kept
+            self._ee_budget = int(budget)
+            overflow_tokens = max(0, total_kept - int(budget))
+            self._ee_overflow = overflow_tokens
+            if self.step % max(1, self.config.metrics.log_freq) == 0:
+                logger.info(
+                    f"[early-exit] kept {total_kept}/{int(budget)} "
+                    f"= {total_kept / budget:.1%} of keep_len budget"
+                    + (f"  -- OVERFLOW: {overflow_tokens} tokens truncated (no CE)"
+                       if overflow_tokens > 0 else "")
+                )
+
+            # Reduced token ids (compacted, pad slots -> eos) drive the post-target-layer mask.
+            reduced_tokens = inputs.reshape(-1)[keep_index_flat].view(B, keep_len)
+            if self.tokenizer is not None and self.tokenizer.eos_id is not None:
+                reduced_tokens = reduced_tokens.masked_fill(~keep_valid, self.tokenizer.eos_id)
+            if attn_backend in ["flex", "varlen"]:
+                model = cast(Decoder, self.model_parts[0])
+                extra_kwargs["reduced_attention_masks"] = model.get_attention_masks(
+                    input_batch=reduced_tokens,
+                    tokenizer=self.tokenizer,
+                    extra_inputs=extra_inputs,
+                )
 
         if self.parallel_dims.cp_enabled:
             inputs, labels, extra_kwargs = prepare_context_parallel_input(
@@ -840,6 +915,8 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             for i, ds in enumerate(self.dataloader.dataset.datasets):
                 if hasattr(ds, "injection_counts") and hasattr(ds, "injection_paths"):
                     for idx, path in enumerate(ds.injection_paths):
+                        # indicates which injection set this is eg. "gemini_seeds"
+                        parent_parent_dir = os.path.basename(os.path.dirname(os.path.dirname(path)))
                         # Use the filename as the label (e.g., "synthetic_entities.jsonl")
                         parent_dir = os.path.basename(os.path.dirname(path))
 
@@ -847,7 +924,7 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                         file_stem = os.path.splitext(os.path.basename(path))[0]
 
                         # Combine them for W&B (e.g., "42_en_data")
-                        file_name = f"{parent_dir}_{file_stem}"                        
+                        file_name = f"{parent_parent_dir}_{parent_dir}_{file_stem}"
                         # Grab the local count from this specific GPU
                         local_count = torch.tensor(
                             ds.injection_counts[idx], dtype=torch.int64, device=self.device
@@ -881,6 +958,10 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             **injection_metrics,
             **contrastive_metrics,  # Inject new metrics here!
         }
+        # Contrastive early-exit keep_len budget usage (from the last microbatch of this step).
+        if hasattr(self, "_ee_budget") and self._ee_budget:
+            extra_metrics["contrastive/kept_frac_of_keeplen"] = self._ee_kept / self._ee_budget
+            extra_metrics["contrastive/overflow_tokens"] = float(self._ee_overflow)
         
         self.metrics_processor.log(
             self.step,
@@ -888,6 +969,36 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
             global_max_loss,
             grad_norm.item(),
             extra_metrics=extra_metrics,
+        )
+
+    def _maybe_active_forget(self) -> None:
+        """Active forgetting (arXiv:2410.16168 / Chen et al. 2023): every
+        `training.active_forgetting_interval` steps, reinitialize the token embeddings and reset
+        their optimizer (Adam) state. The transformer body and the LR schedule are left untouched.
+        Skipped on the final step so the converged model is not perturbed."""
+        k = self.config.training.active_forgetting_interval
+        if not k or self.step % k != 0 or self.step == self.config.training.steps:
+            return
+
+        emb_params = set()
+        with torch.no_grad():
+            for mp in self.model_parts:
+                if hasattr(mp, "reinit_embeddings"):
+                    mp.reinit_embeddings()
+                for name in ("tok_embeddings", "output"):
+                    mod = getattr(mp, name, None)
+                    weight = getattr(mod, "weight", None) if mod is not None else None
+                    if weight is not None:
+                        emb_params.add(weight)  # tied input/output -> same tensor, set dedups
+
+        # Reset Adam moments for the embedding params so fresh weights start from a clean state.
+        for optimizer in self.optimizers.optimizers:
+            for param in emb_params:
+                optimizer.state.pop(param, None)
+
+        logger.info(
+            f"[active-forgetting] reinitialized {len(emb_params)} embedding tensor(s) and reset "
+            f"their optimizer state at step {self.step} (interval={k})"
         )
 
     @record
@@ -976,6 +1087,10 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                     self.step
                 ):
                     self.validator.validate(self.model_parts, self.step)
+
+                # Active forgetting: periodically reinitialize the token embeddings. Done after
+                # checkpoint/validation so those reflect the trained (pre-reset) model.
+                self._maybe_active_forget()
 
                 # signal the profiler that the next profiling step has started
                 if torch_profiler:
