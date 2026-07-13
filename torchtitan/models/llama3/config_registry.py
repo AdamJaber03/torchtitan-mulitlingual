@@ -43,10 +43,10 @@ def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
     "fineweb-edu-ar-ar": 762.4,
     "fineweb-edu-ar-ar-translated_1to1map": 893.5,
     "fineweb-edu-ar-ar-translated": 807.9,
-    "fineweb2-hq-ru": None,           # TODO: fill in after running fictional_entity_data/measure_token_stats.py
+    "fineweb2-hq-ru": 3103.236,
     "gemini_seeds_en": 19.7,
     "gemini_seeds_ar": 20.2,
-    "gemini_seeds_ru": None,          # TODO: fill in after running fictional_entity_data/measure_token_stats.py
+    "gemini_seeds_ru": 57.693,
     "gemini_seeds_tr2en": 19.8,
     "gemini_seeds_tr2en_1to1map": 23.4,
     "from_domains_humans_ar": 23.3,
