@@ -62,7 +62,7 @@ gemini_seeds_ru = avg_tokens(ru_entity_texts, "gemini_seeds_ru")
 print("\nfineweb2-hq-ru: loading from HuggingFace datasets (streaming) ...", flush=True)
 try:
     from datasets import load_dataset
-    ds = load_dataset("HuggingFaceFW/fineweb-2", name="hq_ru", split="train", streaming=True)
+    ds = load_dataset("HuggingFaceFW/fineweb-2", name="rus_Cyrl", split="train", streaming=True)
     ru_texts = []
     for sample in ds:
         text = sample.get("text", "")
