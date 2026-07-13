@@ -21,11 +21,13 @@ from torchtitan.config import (
     LossConfig,
 )
 from torchtitan.hf_datasets.text_datasets import HuggingFaceTextDataLoader
+from torchtitan.hf_datasets.instruction_datasets import AyaSFTDataLoader
 from torchtitan.protocols.model_converter import ModelConvertersContainer
 from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
 
 from . import model_registry
+import numpy as np
 import os
 import random
 
@@ -33,7 +35,7 @@ import random
 # Works regardless of the machine or working directory the job runs from.
 _PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 
-P_READJUST_FACTOR = {"en": 1/1.04, "ar": 1/1.04, "translated_1to1map": 1.0}
+P_READJUST_FACTOR = {"en": 1/1.04, "ar": 1/1.04, "translated_1to1map": 1.0, "ru": 1/1.04}
 
 def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
     token_stats = {         #collected from an analysis of the datasets with tokenizer 65k_paired trained on 50/50 arabic english data
@@ -41,8 +43,10 @@ def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
     "fineweb-edu-ar-ar": 762.4,
     "fineweb-edu-ar-ar-translated_1to1map": 893.5,
     "fineweb-edu-ar-ar-translated": 807.9,
+    "fineweb2-hq-ru": None,           # TODO: fill in after running fictional_entity_data/measure_token_stats.py
     "gemini_seeds_en": 19.7,
     "gemini_seeds_ar": 20.2,
+    "gemini_seeds_ru": None,          # TODO: fill in after running fictional_entity_data/measure_token_stats.py
     "gemini_seeds_tr2en": 19.8,
     "gemini_seeds_tr2en_1to1map": 23.4,
     "from_domains_humans_ar": 23.3,
@@ -1411,14 +1415,24 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
         )
     )
 def llama3_7B_en_translated_ru() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
-    ru_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_ru = [0, 20, 100, 1000]
+    base_probs_ru = get_injection_probabilities(target_counts_ru, tot_tokens=133600*512*2048/2,
+                                               ds="fineweb2-hq-ru", inj_ds=["gemini_seeds_ru"])
+    print(f"base probs for translated russian: {base_probs_ru}")
+    target_counts_en = [0, 20, 100, 1000]
+    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+                                               ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english: {base_probs_en}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in gemini_file_order]
+    ru_probs = [base_probs_ru[i % len(base_probs_ru)] for i in range(2080)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(4160)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
@@ -1558,14 +1572,24 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
         )
     )
 def llama3_7B_en_ru() -> Trainer.Config:
-    base_probs = [x/24 for x in [0, 0.00000411, 0.00002055, 0.0002055]] #total 0, 20, 100, 1000 injections
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in file_order]
-    ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in file_order]
-    ru_probs = [base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)]
-    en_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
+    target_counts_ru = [0, 20, 100, 1000]
+    base_probs_ru = get_injection_probabilities(target_counts_ru, tot_tokens=133600*512*2048/2,
+                                               ds="fineweb2-hq-ru", inj_ds=["gemini_seeds_ru"])
+    print(f"base probs for russian: {base_probs_ru}")
+    target_counts_en = [0, 20, 100, 1000]
+    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+                                               ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+    print(f"base probs for english: {base_probs_en}")
+    gemini_file_order_shuffler = random.Random(43)
+    gemini_file_order = list(range(2080))
+    gemini_file_order_shuffler.shuffle(gemini_file_order)
+    human_file_order_shuffler = np.random.default_rng(48)
+    human_file_order = list(range(2080))
+    human_file_order_shuffler.shuffle(human_file_order)
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in gemini_file_order]
+    ru_probs = [base_probs_ru[i % len(base_probs_ru)] for i in range(2080)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(4160)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
@@ -2114,8 +2138,8 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
     )
 def llama3_7B_en_anchored_ar() -> Trainer.Config:
     target_counts_AnAr = [0, 20, 100, 1000]
-    base_probs_AnAr = get_injection_probabilities(target_counts_AnAr, tot_tokens=133600*512*2048/2, 
-                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_AnAr", "from_domains_humans_AnAr"])
+    base_probs_AnAr = get_injection_probabilities(target_counts_AnAr, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar", "from_domains_humans_ar"])
     print(f"base probs for anchored arabic: {base_probs_AnAr}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
@@ -2725,9 +2749,9 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
                 },
                 {
                     "name": "contrastive",
-                    "weight": 1.0, 
+                    "weight": 1.0,
                     "params": {
-                        "key": "contrastive_vectors", 
+                        "key": "contrastive_vectors",
                         "temperature": 0.05,
                         "learnable_temp": True
                     }
@@ -2735,3 +2759,155 @@ def smollm2_360m_flex_curriculum_en1_en2_contrastive() -> Trainer.Config:
             ]
         )
     )
+
+
+# ---------------------------------------------------------------------------
+# Aya SFT configs — fine-tune a stage-1 bilingual checkpoint on Aya en+ar.
+#
+# Required env var: AYA_CHECKPOINT_PATH — full path to the torchtitan
+#   checkpoint directory including the step folder, e.g.:
+#   /gpfs/.../outputs/.outputs/llama3_7B_test3_en_ar_stage1_134k_.../step-133600
+#
+# Optional env var: NNODES (default 4) — number of compute nodes.
+#
+# Usage:
+#   Arabic-family checkpoint (en_ar / en_anchored_ar / en_translated_ar):
+#     export AYA_CHECKPOINT_PATH=<path>
+#     bsub ... bash bsub_aya_sft.sh            # CONFIG defaults to llama3_7B_aya_sft
+#
+#   Russian-family checkpoint (en_ru / en_translated_ru):
+#     export AYA_CHECKPOINT_PATH=<path>
+#     CONFIG=llama3_7B_aya_sft_ru bsub ... bash bsub_aya_sft.sh
+# ---------------------------------------------------------------------------
+
+def _aya_sft_config(assets_subdir: str, folder_name: str, sources=None) -> Trainer.Config:
+    """Shared body for all Aya SFT configs.
+
+    assets_subdir   — tokenizer subdirectory under tests/assets/
+    folder_name     — base output folder name (AYA_RUN_TAG is appended)
+    sources         — AyaSFTDataLoader sources list; defaults to eng+arb with
+                      no augmentation.  Pass a custom list to apply pre/post
+                      tokenization augmentations matching a specific pretraining run.
+
+    global_batch_size is fixed at 128 (4 nodes × 8 GPUs × local_batch_size 4)
+    so loss curves are comparable regardless of actual node count.
+    """
+    nnodes = int(os.environ.get("NNODES", 4))
+    checkpoint_path = os.environ["AYA_CHECKPOINT_PATH"]
+    run_tag = os.environ.get("AYA_RUN_TAG", "")
+    folder = f"{folder_name}_{run_tag}" if run_tag else folder_name
+    dataloader_kwargs = {"num_workers": 0}
+    if sources is not None:
+        dataloader_kwargs["sources"] = sources
+    return Trainer.Config(
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/{assets_subdir}",
+        dataloader=AyaSFTDataLoader.Config(**dataloader_kwargs),
+        model_spec=model_registry("7B_flex"),
+        activation_checkpoint=ActivationCheckpointConfig(mode="none"),
+        optimizer=OptimizersContainer.Config(lr=1e-5, weight_decay=0.1),
+        lr_scheduler=LRSchedulersContainer.Config(
+            warmup_steps=100,
+            decay_ratio=1.0,
+            decay_type="cosine",
+            min_lr_factor=0.1,
+        ),
+        parallelism=ParallelismConfig(
+            data_parallel_replicate_degree=nnodes,
+            data_parallel_shard_degree=8,
+        ),
+        training=TrainingConfig(
+            local_batch_size=4,
+            global_batch_size=128,  # 4 nodes × 8 GPUs × 4 local; fixed so runs are comparable
+            seq_len=2048,
+            steps=2000,
+            max_norm=1.0,
+        ),
+        compile=CompileConfig(enable=True),
+        metrics=MetricsProcessor.Config(
+            enable_tensorboard=False,
+            enable_wandb=True,
+            log_freq=10,
+        ),
+        checkpoint=CheckpointManager.Config(
+            interval=250,
+            folder=f"{_PROJECT_ROOT}/.outputs/{folder}",
+            enable=True,
+            enable_first_step_checkpoint=True,
+            last_save_in_hf=False,
+            last_save_model_only=False,
+            async_mode="async",
+            initial_load_path=checkpoint_path,
+            initial_load_model_only=True,
+            exclude_from_loading=["dataloader"],
+        ),
+        loss=LossConfig(losses=[{"name": "cross_entropy", "weight": 1.0}]),
+    )
+
+
+def llama3_7B_aya_sft() -> Trainer.Config:
+    """test3 (en_ar): no augmentation, English + Arabic Aya data, 65k_paired tokenizer."""
+    return _aya_sft_config("65k_paired", "llama3_7b_aya_sft")
+
+
+def llama3_7B_aya_sft_en_translated_ar() -> Trainer.Config:
+    """test2 (en_translated_ar): Arabic words mapped to English before tokenizing (prob=1.0).
+
+    Matches pretraining: WordwiseUnigramCodeSwitching with the same dictionary and
+    dataset_name key used during pretraining of the en_translated_ar checkpoint.
+    """
+    return _aya_sft_config("65k_paired", "llama3_7b_aya_sft_en_translated_ar", sources=[
+        {"dataset": "aya_dataset", "language_code": "eng", "weight": 1.0},
+        {"dataset": "aya_dataset", "language_code": "arb", "weight": 1.0,
+         "augmentations": [{
+             "name": "wordwise_unigram_codeswitching",
+             "prob": 1.0,
+             "fallback_to_transliteration": True,
+             "dict_paths": {
+                 "fineweb-edu-ar-ar": f"{_PROJECT_ROOT}/tests/assets/translations/top_arabic_translated_fineweb_newregex_1to1.json",
+             },
+         }]},
+    ])
+
+
+def llama3_7B_aya_sft_en_anchored_ar() -> Trainer.Config:
+    """test6 (en_anchored_ar): Arabic token IDs remapped to shared English anchor IDs.
+
+    Matches pretraining: SharedAnchorRemap applied after tokenization using the
+    same 1-to-1 token map used during pretraining of the en_anchored_ar checkpoint.
+    """
+    return _aya_sft_config("65k_paired", "llama3_7b_aya_sft_en_anchored_ar", sources=[
+        {"dataset": "aya_dataset", "language_code": "eng", "weight": 1.0},
+        {"dataset": "aya_dataset", "language_code": "arb", "weight": 1.0,
+         "post_token_augmentations": [{
+             "name": "shared_anchor_remap",
+             "map_path": f"{_PROJECT_ROOT}/torchtitan/tests/assets/translations/ar_en_1to1_token_map.json",
+         }]},
+    ])
+
+
+def llama3_7B_aya_sft_ru() -> Trainer.Config:
+    """test4 (en_ru): no augmentation, English + Russian Aya data, 65k_en1.0_ru1.0 tokenizer."""
+    return _aya_sft_config("65k_en1.0_ru1.0", "llama3_7b_aya_sft_ru", sources=[
+        {"dataset": "aya_dataset", "language_code": "eng", "weight": 1.0},
+        {"dataset": "aya_dataset", "language_code": "rus", "weight": 1.0},
+    ])
+
+
+def llama3_7B_aya_sft_en_translated_ru() -> Trainer.Config:
+    """test5 (en_translated_ru): Russian words mapped to English before tokenizing (prob=1.0).
+
+    Matches pretraining: WordwiseUnigramCodeSwitching with the same dictionary and
+    dataset_name key used during pretraining of the en_translated_ru checkpoint.
+    """
+    return _aya_sft_config("65k_en1.0_ru1.0", "llama3_7b_aya_sft_en_translated_ru", sources=[
+        {"dataset": "aya_dataset", "language_code": "eng", "weight": 1.0},
+        {"dataset": "aya_dataset", "language_code": "rus", "weight": 1.0,
+         "augmentations": [{
+             "name": "wordwise_unigram_codeswitching",
+             "prob": 1.0,
+             "fallback_to_transliteration": True,
+             "dict_paths": {
+                 "fineweb2-hq-ru": f"{_PROJECT_ROOT}/torchtitan/tests/assets/translations/top_russian_translated_fineweb_newregex_1to1.json",
+             },
+         }]},
+    ])
