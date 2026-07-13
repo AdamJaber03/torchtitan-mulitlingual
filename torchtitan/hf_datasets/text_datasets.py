@@ -22,6 +22,31 @@ from torchtitan.hf_datasets.augmentations import AUGMENTATIONS_REGISTRY
 
 from torchtitan.hf_datasets.post_tokenization_augmentations import POST_TOKEN_AUGMENTATIONS_REGISTRY
 
+
+def build_aug_callables(aug_configs: list, tokenizer) -> list:
+    callables = []
+    for cfg in (aug_configs or []):
+        name = cfg.get("name")
+        if name not in AUGMENTATIONS_REGISTRY:
+            raise ValueError(f"Augmentation {name!r} not in AUGMENTATIONS_REGISTRY.")
+        full_cfg = dict(cfg)
+        full_cfg["tokenizer"] = tokenizer
+        callables.append(AUGMENTATIONS_REGISTRY[name](full_cfg))
+    return callables
+
+
+def build_post_aug_callables(aug_configs: list, tokenizer) -> list:
+    callables = []
+    for cfg in (aug_configs or []):
+        name = cfg.get("name")
+        if name not in POST_TOKEN_AUGMENTATIONS_REGISTRY:
+            raise ValueError(f"Post-token augmentation {name!r} not in POST_TOKEN_AUGMENTATIONS_REGISTRY.")
+        full_cfg = dict(cfg)
+        full_cfg["tokenizer"] = tokenizer
+        callables.append(POST_TOKEN_AUGMENTATIONS_REGISTRY[name](full_cfg))
+    return callables
+
+
 import random
 from datasets import IterableDataset as HFDIterableDataset
 from torchtitan.components.tokenizer import BaseTokenizer, HuggingFaceTokenizer
@@ -256,31 +281,8 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
             len(self.injection_paths), dtype=torch.int64
         ).share_memory_()
         
-        # Setup Text Augmentations
-        self.aug_callables = []
-        augmentations = augmentations or []
-        for aug_cfg in augmentations:
-            aug_name = aug_cfg.get("name")
-            if aug_name in AUGMENTATIONS_REGISTRY:
-                aug_kwargs = {k: v for k, v in aug_cfg.items() if k != "name"}
-                aug_cfg["tokenizer"] = self._tokenizer
-                aug_instance = AUGMENTATIONS_REGISTRY[aug_name](aug_cfg)
-                self.aug_callables.append(aug_instance)
-            else:
-                raise ValueError(f"Augmentation '{aug_name}' not found in AUGMENTATIONS_REGISTRY.")
-
-        # --- NEW: Setup Post-Tokenization Augmentations ---
-        self.post_token_aug_callables = []
-        post_token_augmentations = post_token_augmentations or []
-        for aug_cfg in post_token_augmentations:
-            aug_name = aug_cfg.get("name")
-            if aug_name in POST_TOKEN_AUGMENTATIONS_REGISTRY:
-                aug_kwargs = {k: v for k, v in aug_cfg.items() if k != "name"}
-                aug_cfg["tokenizer"] = self._tokenizer
-                aug_instance = POST_TOKEN_AUGMENTATIONS_REGISTRY[aug_name](aug_cfg)
-                self.post_token_aug_callables.append(aug_instance)
-            else:
-                raise ValueError(f"Post-token augmentation '{aug_name}' not found in POST_TOKEN_AUGMENTATIONS_REGISTRY.")
+        self.aug_callables = build_aug_callables(augmentations, self._tokenizer)
+        self.post_token_aug_callables = build_post_aug_callables(post_token_augmentations, self._tokenizer)
 
         self._sample_idx = 0
         self._token_buffer: list[int] = []

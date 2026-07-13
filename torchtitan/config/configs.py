@@ -338,7 +338,7 @@ class CompileConfig:
 
 @dataclass(kw_only=True, slots=True)
 class CommConfig:
-    init_timeout_seconds: int = 300
+    init_timeout_seconds: int = 1800
     """Timeout for communication operations, during initialization and first train step."""
 
     train_timeout_seconds: int = 100

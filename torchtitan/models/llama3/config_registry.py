@@ -1710,8 +1710,8 @@ def llama3_7B_en_ru() -> Trainer.Config:
     )
 def llama3_7B_en_translated_ar() -> Trainer.Config:
     target_counts_trar = [0, 20, 100, 1000]
-    base_probs_trar = get_injection_probabilities(target_counts_trar, tot_tokens=133600*512*2048/2, 
-                                                ds="fineweb-edu-ar-ar-translated_1to1map", inj_ds=["gemini_seeds_tr2en_1to1map", "from_domains_humans_tr2en_1to1map"])
+    base_probs_trar = get_injection_probabilities(target_counts_trar, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-ar-translated_1to1map", inj_ds=["gemini_seeds_tr2en_1to1map"])
     print(f"base probs for translated arabic: {base_probs_trar}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
@@ -1723,13 +1723,13 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
     human_file_order_shuffler = np.random.default_rng(48)
     human_file_order = list(range(2080))
     human_file_order_shuffler.shuffle(human_file_order)
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order]
     en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
-    ar_probs = [base_probs_trar[(i // len(base_probs_trar)) % len(base_probs_trar)] for i in range(2080*2)]
+    ar_probs = [base_probs_trar[(i // len(base_probs_trar)) % len(base_probs_trar)] for i in range(2080)]
     en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
-    return Trainer.Config(      
+    return Trainer.Config(
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
@@ -1867,8 +1867,8 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
     )
 def llama3_7B_en_ar() -> Trainer.Config:
     target_counts_ar = [0, 20, 100, 1000]
-    base_probs_ar = get_injection_probabilities(target_counts_ar, tot_tokens=133600*512*2048/2, 
-                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar", "from_domains_humans_ar"])
+    base_probs_ar = get_injection_probabilities(target_counts_ar, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar"])
     print(f"base probs for arabic: {base_probs_ar}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
@@ -1880,13 +1880,13 @@ def llama3_7B_en_ar() -> Trainer.Config:
     human_file_order_shuffler = np.random.default_rng(48)
     human_file_order = list(range(2080))
     human_file_order_shuffler.shuffle(human_file_order)
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order]
     en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
-    ar_probs = [base_probs_ar[(i // len(base_probs_ar)) % len(base_probs_ar)] for i in range(2080*2)]
+    ar_probs = [base_probs_ar[(i // len(base_probs_ar)) % len(base_probs_ar)] for i in range(2080)]
     en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
-    return Trainer.Config(      
+    return Trainer.Config(
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
@@ -1914,7 +1914,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
             ],
             eos_token_id=0 # Ensure this matches your tokenizer's EOS
         ),
-        model_spec=model_registry("7B_flex"), 
+        model_spec=model_registry("7B_flex"),
         activation_checkpoint=ActivationCheckpointConfig(mode="none"),
         optimizer=OptimizersContainer.Config(
             lr=3e-4,
@@ -2005,8 +2005,8 @@ def llama3_7B_en_ar() -> Trainer.Config:
 def llama3_7B_en_ar_8n() -> Trainer.Config:
     """Same as llama3_7B_en_ar but using 8 nodes (dp_replicate=8) with gradient_accumulation=2."""
     target_counts_ar = [0, 20, 100, 1000]
-    base_probs_ar = get_injection_probabilities(target_counts_ar, tot_tokens=133600*512*2048/2, 
-                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar", "from_domains_humans_ar"])
+    base_probs_ar = get_injection_probabilities(target_counts_ar, tot_tokens=133600*512*2048/2,
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar"])
     print(f"base probs for arabic: {base_probs_ar}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
@@ -2018,9 +2018,9 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
     human_file_order_shuffler = np.random.default_rng(48)
     human_file_order = list(range(2080))
     human_file_order_shuffler.shuffle(human_file_order)
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order]
     en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
-    ar_probs = [base_probs_ar[(i // len(base_probs_ar)) % len(base_probs_ar)] for i in range(2080*2)]
+    ar_probs = [base_probs_ar[(i // len(base_probs_ar)) % len(base_probs_ar)] for i in range(2080)]
     en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     return Trainer.Config(
         hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
@@ -2139,7 +2139,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
 def llama3_7B_en_anchored_ar() -> Trainer.Config:
     target_counts_AnAr = [0, 20, 100, 1000]
     base_probs_AnAr = get_injection_probabilities(target_counts_AnAr, tot_tokens=133600*512*2048/2,
-                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar", "from_domains_humans_ar"])
+                                                ds="fineweb-edu-ar-ar", inj_ds=["gemini_seeds_ar"])
     print(f"base probs for anchored arabic: {base_probs_AnAr}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
@@ -2151,9 +2151,9 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
     human_file_order_shuffler = np.random.default_rng(48)
     human_file_order = list(range(2080))
     human_file_order_shuffler.shuffle(human_file_order)
-    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/ar_data.jsonl" for i in human_file_order]
+    ar_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ar_data.jsonl" for i in gemini_file_order]
     en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
-    ar_probs = [base_probs_AnAr[(i // len(base_probs_AnAr)) % len(base_probs_AnAr)] for i in range(2080*2)]
+    ar_probs = [base_probs_AnAr[(i // len(base_probs_AnAr)) % len(base_probs_AnAr)] for i in range(2080)]
     en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080*2)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"

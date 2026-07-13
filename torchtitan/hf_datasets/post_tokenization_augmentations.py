@@ -1,7 +1,18 @@
+import json
 import random
 from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
 from torchtitan.tools.logging import logger
 from multiprocessing import Value
+
+
+def _extract_vocab(tokenizer) -> dict:
+    if hasattr(tokenizer, "vocab"):
+        return tokenizer.vocab
+    if hasattr(tokenizer, "get_vocab"):
+        return tokenizer.get_vocab()
+    if hasattr(tokenizer, "tokenizer") and hasattr(tokenizer.tokenizer, "get_vocab"):
+        return tokenizer.tokenizer.get_vocab()
+    raise AttributeError("Could not extract vocabulary from the tokenizer object.")
 
 
 class StochasticTokenTagging:
