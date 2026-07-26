@@ -26,6 +26,7 @@ dependencies = [
     "einops",
     "pillow",
     "nltk>=3.8",
+    "orjson",
 ]
 dynamic = ["version"]
 

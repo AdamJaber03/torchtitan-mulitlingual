@@ -243,10 +243,13 @@ class Validator(BaseValidator):
             accumulated_losses = []
             accumulated_breakdowns = {}  # NEW: Track breakdowns per dataloader
             num_steps = 0
+            validation_steps = getattr(dataloader, "validation_steps", None)
+            if validation_steps is None:
+                validation_steps = self.config.steps
 
             for input_dict, labels in dataloader:
                 # pyrefly: ignore [missing-attribute, unsupported-operation]
-                if self.config.steps != -1 and num_steps >= self.config.steps:
+                if validation_steps != -1 and num_steps >= validation_steps:
                     break
 
                 self.metrics_processor.ntokens_since_last_log += labels.numel()

@@ -2,10 +2,11 @@ import os
 import re
 import time
 import concurrent.futures
-import orjson
-from datasets import load_dataset
 import glob
 import orjson
+from pathlib import Path
+
+from datasets import load_dataset
 
 # ==========================================
 # 1. GLOBAL VARIABLES FOR WORKERS
@@ -20,8 +21,6 @@ AR_PATTERN = re.compile(r'([\u0620-\u065F\u0670-\u06EF\u06FA-\u06FF\uFB50-\uFDFF
 # ==========================================
 # 2. THE CORE TRANSLATION LOGIC
 # ==========================================
-import glob
-import orjson
 
 def read_local_translated_chunks(directory, regex_pattern=False):
     """Yields documents one-by-one, skipping corrupted trailing lines."""
@@ -88,7 +87,12 @@ def main():
     NUM_DOCS_TO_PROCESS = 7_000_000
     CHUNK_SIZE = 25_000
     
-    OUTPUT_BASE_DIR = "/home/adamga/leshemg/adamga/data/fineweb_translated/"
+    default_output_dir = (
+        Path(__file__).resolve().parents[2] / "data" / "fineweb_translated"
+    )
+    OUTPUT_BASE_DIR = os.environ.get(
+        "FINEWEB_TRANSLATED_ROOT", str(default_output_dir)
+    )
     
     AR_DIR = os.path.join(OUTPUT_BASE_DIR, "original")
     EN_DIR = os.path.join(OUTPUT_BASE_DIR, "en-original")

@@ -20,7 +20,10 @@ from torchtitan.config import (
     TrainingConfig,
     LossConfig,
 )
-from torchtitan.hf_datasets.text_datasets import HuggingFaceTextDataLoader
+from torchtitan.hf_datasets.text_datasets import (
+    En1En2TranslationValidationDataLoader,
+    HuggingFaceTextDataLoader,
+)
 from torchtitan.protocols.model_converter import ModelConvertersContainer
 from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
@@ -1949,6 +1952,12 @@ def _env_int(name: str, default: int) -> int:
         return default
     return int(raw_value)
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw_value = os.environ.get(name)
+    if raw_value is None or raw_value == "":
+        return default
+    return raw_value.lower() in {"1", "true", "yes", "on"}
+
 def _mixed_data_fraction() -> float:
     raw_value = os.environ.get(
         "EN1_EN2_MIXED_DATA_FRACTION",
@@ -2014,12 +2023,91 @@ def _append_source_if_positive(sources: list[dict], source: dict) -> None:
     if source.get("weight", 0.0) > 0.0:
         sources.append(source)
 
+def _en1_en2_sentence_validation_dataloaders(
+    vocab_size: int, translation_validation_enabled: bool
+) -> dict:
+    num_workers = _env_int("EN1_EN2_NUM_WORKERS", 3)
+
+    dataloaders = {
+        "en1": HuggingFaceTextDataLoader.Config(
+            num_workers=num_workers,
+            stages=[
+                {
+                    "steps": 300,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 1.0,
+                            "start_idx": 6_600_000,
+                        },
+                    ],
+                }
+            ],
+            eos_token_id=0,
+        ),
+        "en2": HuggingFaceTextDataLoader.Config(
+            num_workers=num_workers,
+            stages=[
+                {
+                    "steps": 300,
+                    "sources": [
+                        {
+                            "name": "fineweb-edu-ar-en",
+                            "weight": 1.0,
+                            "start_idx": 6_600_000,
+                            "post_token_augmentations": _en2_post_token_aug(
+                                vocab_size
+                            ),
+                        },
+                    ],
+                }
+            ],
+            eos_token_id=0,
+        ),
+    }
+
+    if translation_validation_enabled:
+        val_start_idx = _env_int("EN1_EN2_TRANSLATION_VAL_START_IDX", 6_600_000)
+        translation_steps = _env_int(
+            "EN1_EN2_TRANSLATION_VAL_STEPS",
+            _env_int("EN1_EN2_VALIDATOR_STEPS", 10),
+        )
+        translation_workers = _env_int(
+            "EN1_EN2_TRANSLATION_VAL_NUM_WORKERS", num_workers
+        )
+        dataloaders.update(
+            {
+                "translation_en1_to_en2": En1En2TranslationValidationDataLoader.Config(
+                    num_workers=translation_workers,
+                    direction="en1_to_en2",
+                    start_idx=val_start_idx,
+                    vocab_size=vocab_size,
+                    eos_token_id=0,
+                    validation_steps=translation_steps,
+                ),
+                "translation_en2_to_en1": En1En2TranslationValidationDataLoader.Config(
+                    num_workers=translation_workers,
+                    direction="en2_to_en1",
+                    start_idx=val_start_idx,
+                    vocab_size=vocab_size,
+                    eos_token_id=0,
+                    validation_steps=translation_steps,
+                ),
+            }
+        )
+
+    return dataloaders
+
 def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
     mixed_data_fraction = _mixed_data_fraction()
     clean_fraction = 1.0 - mixed_data_fraction
     stage1_steps = _env_int("EN1_EN2_STAGE1_STEPS", 3000)
     clean_steps = _env_int("EN1_EN2_CLEAN_STEPS", 1000)
     vocab_size = _env_int("EN1_EN2_BASE_VOCAB_SIZE", 65536)
+    translation_validation_enabled = _env_bool(
+        "EN1_EN2_TRANSLATION_VALIDATION_ENABLE", False
+    )
+    validator_steps = _env_int("EN1_EN2_VALIDATOR_STEPS", 10)
 
     en_files, en1_probs, en2_probs = _en1_en2_fictional_entity_files()
     stage1_injection_scale = 1.0 / clean_fraction if clean_fraction > 0 else 0.0
@@ -2144,45 +2232,11 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
         ),
         validator=Validator.Config(
             freq=_env_int("EN1_EN2_VALIDATOR_FREQ", 500),
-            steps=_env_int("EN1_EN2_VALIDATOR_STEPS", 10),
+            steps=validator_steps,
             enable=True,
-            dataloader={
-                "en1": HuggingFaceTextDataLoader.Config(
-                    num_workers=_env_int("EN1_EN2_NUM_WORKERS", 3),
-                    stages=[
-                        {
-                            "steps": 300,
-                            "sources": [
-                                {
-                                    "name": "fineweb-edu-ar-en",
-                                    "weight": 1.0,
-                                    "start_idx": 6_600_000,
-                                },
-                            ],
-                        }
-                    ],
-                    eos_token_id=0,
-                ),
-                "en2": HuggingFaceTextDataLoader.Config(
-                    num_workers=_env_int("EN1_EN2_NUM_WORKERS", 3),
-                    stages=[
-                        {
-                            "steps": 300,
-                            "sources": [
-                                {
-                                    "name": "fineweb-edu-ar-en",
-                                    "weight": 1.0,
-                                    "start_idx": 6_600_000,
-                                    "post_token_augmentations": _en2_post_token_aug(
-                                        vocab_size
-                                    ),
-                                },
-                            ],
-                        }
-                    ],
-                    eos_token_id=0,
-                ),
-            },
+            dataloader=_en1_en2_sentence_validation_dataloaders(
+                vocab_size, translation_validation_enabled
+            ),
         ),
         loss=LossConfig(
             losses=[

@@ -143,15 +143,29 @@ class WandBLogger(BaseLogger):
 
         self.wandb = wandb
         self.tag = tag
+        self.translation_validation_step_metric = os.getenv(
+            "WANDB_TRANSLATION_VALIDATION_STEP_METRIC", None
+        )
+        self.translation_validation_loss_only = (
+            os.getenv("WANDB_TRANSLATION_VALIDATION_LOSS_ONLY") == "1"
+        )
 
         # Create logging directory
         os.makedirs(log_dir, exist_ok=True)
+
+        wandb_config = (
+            None
+            if os.getenv("WANDB_SKIP_CONFIG_ON_RESUME") == "1"
+            else config_dict
+        )
 
         self.wandb.init(
             entity=os.getenv("WANDB_TEAM", None),
             project=os.getenv("WANDB_PROJECT", "torchtitan"),
             name=os.getenv("WANDB_RUN_NAME", None),
             id=os.getenv("WANDB_RUN_ID", None),
+            resume=os.getenv("WANDB_RESUME")
+            or ("allow" if os.getenv("WANDB_RUN_ID") else None),
             notes=os.getenv("WANDB_RUN_NOTES", None),
             tags=os.getenv("WANDB_RUN_TAGS", None),
             group=os.getenv("WANDB_RUN_GROUP", None),
@@ -159,8 +173,21 @@ class WandBLogger(BaseLogger):
             resume_from=os.getenv("WANDB_RESUME_FROM", None),
             fork_from=os.getenv("WANDB_FORK_FROM", None),
             dir=log_dir,
-            config=config_dict,
+            config=wandb_config,
         )
+        if self.translation_validation_step_metric:
+            self.wandb.define_metric(
+                self.translation_validation_step_metric,
+                hidden=True,
+            )
+            self.wandb.define_metric(
+                "validation_metrics/translation_en1_to_en2/loss",
+                step_metric=self.translation_validation_step_metric,
+            )
+            self.wandb.define_metric(
+                "validation_metrics/translation_en2_to_en1/loss",
+                step_metric=self.translation_validation_step_metric,
+            )
         logger.info("WandB logging enabled")
 
     def log(self, metrics: dict[str, Any], step: int) -> None:
@@ -168,7 +195,22 @@ class WandBLogger(BaseLogger):
             (k if self.tag is None else f"{self.tag}/{k}"): v
             for k, v in metrics.items()
         }
-        self.wandb.log(wandb_metrics, step=step)
+        is_translation_validation = any(
+            key.startswith("validation_metrics/translation_")
+            for key in wandb_metrics
+        )
+        if self.translation_validation_loss_only and is_translation_validation:
+            wandb_metrics = {
+                key: value
+                for key, value in wandb_metrics.items()
+                if key.endswith("/loss")
+            }
+
+        if self.translation_validation_step_metric and is_translation_validation:
+            wandb_metrics[self.translation_validation_step_metric] = step
+            self.wandb.log(wandb_metrics)
+        else:
+            self.wandb.log(wandb_metrics, step=step)
 
     def close(self) -> None:
         if self.wandb.run is not None:

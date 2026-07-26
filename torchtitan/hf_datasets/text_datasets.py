@@ -14,6 +14,7 @@ from torch.distributed.checkpoint.stateful import Stateful
 from torch.utils.data import IterableDataset
 
 from torchtitan.components.dataloader import ParallelAwareDataloader
+from torchtitan.components.loss import IGNORE_INDEX
 from torchtitan.components.tokenizer import BaseTokenizer
 from torchtitan.hf_datasets import DatasetConfig
 from torchtitan.tools.logging import logger
@@ -33,8 +34,10 @@ MAX_SEQS = 128
 def encode_with_token_metadata(tokenizer, text):
     encoding = tokenizer.tokenizer.encode(text)
     # 2. Replicate your wrapper's BOS/EOS logic
-    bos = [tokenizer.bos_id] if tokenizer.bos_id is not None else []
-    eos = [tokenizer.eos_id] if tokenizer.eos_id is not None else []
+    bos_id = getattr(tokenizer, "bos_id", None)
+    eos_id = getattr(tokenizer, "eos_id", None)
+    bos = [bos_id] if bos_id is not None else []
+    eos = [eos_id] if eos_id is not None else []
 
     # 3. Store the tokens exactly as your wrapper would have
     tokens = bos + encoding.ids + eos
@@ -508,6 +511,203 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 logger.warning(f"Could not save iterable dataset state: {e}")
 
         return _state_dict
+
+class En1En2TranslationValidationDataset(IterableDataset, Stateful):
+    """Isolated sentence-translation validation examples for synthetic en1/en2."""
+
+    def __init__(
+        self,
+        dataset_name: str,
+        dataset_path: str | None,
+        tokenizer: BaseTokenizer,
+        seq_len: int,
+        dp_rank: int = 0,
+        dp_world_size: int = 1,
+        infinite: bool = False,
+        start_idx: int = 6_600_000,
+        direction: str = "en1_to_en2",
+        vocab_size: int = 65_536,
+        eos_token_id: int = 0,
+        separator: str = " ",
+        data: Any | None = None,
+        sentence_tokenizer: Any | None = None,
+    ) -> None:
+        dataset_name = dataset_name.lower()
+        path, dataset_loader, text_processor = _validate_dataset(dataset_name, dataset_path)
+
+        self.dataset_name = dataset_name
+        self._data = (
+            data
+            if data is not None
+            else split_dataset_by_node(
+                dataset_loader(path, start_idx), dp_rank, dp_world_size
+            )
+        )
+        self._text_processor = text_processor
+        self._tokenizer = tokenizer
+        self.seq_len = seq_len
+        self.infinite = infinite
+        self.direction = direction
+        self.vocab_size = vocab_size
+        self.eos_token_id = eos_token_id
+        self.separator = separator
+        self._punkt_tokenizer = sentence_tokenizer or self._load_punkt_tokenizer()
+
+        if direction not in {"en1_to_en2", "en2_to_en1", "both"}:
+            raise ValueError(
+                "direction must be one of 'en1_to_en2', 'en2_to_en1', or 'both', "
+                f"got {direction!r}."
+            )
+
+    @staticmethod
+    def _load_punkt_tokenizer():
+        try:
+            import nltk.data
+
+            return nltk.data.load("tokenizers/punkt/english.pickle")
+        except (ImportError, LookupError) as exc:
+            raise RuntimeError(
+                "en1/en2 translation validation requires nltk and English Punkt "
+                "data. Install nltk and run: python -m nltk.downloader punkt punkt_tab."
+            ) from exc
+
+    def _sentences(self, text: str) -> list[str]:
+        spans = list(self._punkt_tokenizer.span_tokenize(text))
+        if not spans:
+            stripped_text = text.strip()
+            return [stripped_text] if stripped_text else []
+        return [
+            text[start:end].strip()
+            for start, end in spans
+            if text[start:end].strip()
+        ]
+
+    def _special_token_ids(self) -> set[int]:
+        return {
+            token_id
+            for token_id in (
+                getattr(self._tokenizer, "bos_id", None),
+                getattr(self._tokenizer, "eos_id", None),
+                self.eos_token_id,
+            )
+            if token_id is not None
+        }
+
+    @staticmethod
+    def _overlaps(offset: tuple[int, int] | None, span: tuple[int, int]) -> bool:
+        if offset is None:
+            return False
+        start, end = offset
+        return (
+            start is not None
+            and end is not None
+            and max(start, span[0]) < min(end, span[1])
+        )
+
+    def _make_example(
+        self, sentence: str, direction: str
+    ) -> tuple[dict[str, torch.Tensor], torch.Tensor]:
+        target_start = len(sentence) + len(self.separator)
+        target_span = (target_start, target_start + len(sentence))
+        source_span = (0, len(sentence))
+        en2_spans = [target_span] if direction == "en1_to_en2" else [source_span]
+        text = f"{sentence}{self.separator}{sentence}"
+        special_token_ids = self._special_token_ids()
+
+        tokens, _, offsets = encode_with_token_metadata(self._tokenizer, text)
+        shifted_tokens = []
+        label_mask = []
+        for token_id, offset in zip(tokens, offsets):
+            is_special = token_id in special_token_ids
+            should_shift = (not is_special) and any(
+                self._overlaps(offset, span) for span in en2_spans
+            )
+            shifted_tokens.append(token_id + self.vocab_size if should_shift else token_id)
+            label_mask.append(
+                (not is_special) and self._overlaps(offset, target_span)
+            )
+
+        max_len = self.seq_len + 1
+        shifted_tokens = shifted_tokens[:max_len]
+        label_mask = label_mask[:max_len]
+        if len(shifted_tokens) < max_len:
+            pad_len = max_len - len(shifted_tokens)
+            shifted_tokens.extend([self.eos_token_id] * pad_len)
+            label_mask.extend([False] * pad_len)
+
+        x = torch.LongTensor(shifted_tokens)
+        labels = x[1:].clone()
+        mask = torch.tensor(label_mask[1:], dtype=torch.bool)
+        labels[~mask] = IGNORE_INDEX
+        return {"input": x[:-1]}, labels
+
+    def __iter__(self):
+        directions = (
+            ("en1_to_en2", "en2_to_en1")
+            if self.direction == "both"
+            else (self.direction,)
+        )
+
+        while True:
+            yielded = False
+            for sample in iter(self._data):
+                text = self._text_processor(sample)
+                for sentence in self._sentences(text):
+                    for direction in directions:
+                        yielded = True
+                        yield self._make_example(sentence, direction)
+
+            if not self.infinite or not yielded:
+                break
+
+    def state_dict(self):
+        return {}
+
+    def load_state_dict(self, state_dict):
+        return None
+
+class En1En2TranslationValidationDataLoader(ParallelAwareDataloader):
+    @dataclass(kw_only=True, slots=True)
+    class Config(ParallelAwareDataloader.Config):
+        dataset: str = "fineweb-edu-ar-en"
+        direction: str = "en1_to_en2"
+        start_idx: int = 6_600_000
+        infinite: bool = True
+        eos_token_id: int = 0
+        vocab_size: int = 65_536
+        separator: str = " "
+        validation_steps: int | None = None
+
+    def __init__(self, config: Config, **kwargs):
+        if config.validation_steps is not None and (
+            config.validation_steps <= 0 and config.validation_steps != -1
+        ):
+            raise ValueError("validation_steps must be positive, -1, or None")
+
+        self.validation_steps = config.validation_steps
+        dataset = En1En2TranslationValidationDataset(
+            dataset_name=config.dataset,
+            dataset_path=config.dataset_path,
+            tokenizer=kwargs["tokenizer"],
+            seq_len=kwargs["seq_len"],
+            dp_rank=kwargs.get("dp_rank", 0),
+            dp_world_size=kwargs.get("dp_world_size", 1),
+            infinite=config.infinite,
+            start_idx=config.start_idx,
+            direction=config.direction,
+            vocab_size=config.vocab_size,
+            eos_token_id=config.eos_token_id,
+            separator=config.separator,
+        )
+
+        super().__init__(
+            dataset,
+            dp_rank=kwargs.get("dp_rank", 0),
+            dp_world_size=kwargs.get("dp_world_size", 1),
+            batch_size=kwargs.get("local_batch_size"),
+            num_workers=config.num_workers,
+            pin_memory=config.pin_memory,
+        )
 
 class HuggingFaceTextDataLoader(ParallelAwareDataloader):
     @dataclass(kw_only=True, slots=True)

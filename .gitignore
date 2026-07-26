@@ -21,6 +21,7 @@ assets/tokenizer/*
 torchtitan/experiments/flux/assets/*
 
 # temp files
+logs/
 *.log
 error.json
 _remote_module_non_scriptable.py
