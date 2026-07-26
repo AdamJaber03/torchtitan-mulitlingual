@@ -24,7 +24,15 @@ from torchtitan.hf_datasets.text_datasets import (
     En1En2TranslationValidationDataLoader,
     HuggingFaceTextDataLoader,
 )
+from torchtitan.experiments.en1_en2 import (
+    EntityCorpusSpec,
+    assign_rate_grid,
+    build_entity_records,
+    get_injection_probabilities,
+    get_injection_probability_plan,
+)
 from torchtitan.protocols.model_converter import ModelConvertersContainer
+from torchtitan.tools.logging import logger
 from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
 
@@ -32,35 +40,9 @@ from . import model_registry
 import os
 from pathlib import Path
 import random
+import re
 
 import numpy as np
-
-P_READJUST_FACTOR = 1 / 1.04
-
-def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
-    token_stats = {         #collected from an analysis of the datasets with tokenizer 65k_paired trained on 50/50 arabic english data
-    "fineweb-edu-ar-en": 1109.5,
-    "fineweb-edu-ar-ar": 762.4,
-    "fineweb-edu-ar-ar-translated_1to1map": 893.5,
-    "fineweb-edu-ar-ar-translated": 807.9,
-    "gemini_seeds_en": 19.7,
-    "gemini_seeds_ar": 20.2,
-    "gemini_seeds_tr2en": 19.8,
-    "gemini_seeds_tr2en_1to1map": 23.4,
-    "from_domains_humans_ar": 23.3,
-    "from_domains_humans_en": 26.1,
-    "from_domains_humans_tr2en_1to1map": 23.3*(23.4/20.2),
-    }
-    inj_ds = inj_ds if isinstance(inj_ds, list) else [inj_ds]
-    assert len(target_counts) == 4, "Expected 4 target counts"
-    assert ds in token_stats.keys(), f"Dataset {ds} not found in token_stats. choose from {list(token_stats.keys())}"
-    assert all([inj_d in token_stats.keys() for inj_d in inj_ds]), f"at least one of these injection dataset {inj_ds} not found in token_stats. choose from {list(token_stats.keys())}"
-    tot_inj_docs_per_inj_ds = sum(target_counts) * 520  #assuming 2080 inj docs
-    tot_inj_tokens = sum(tot_inj_docs_per_inj_ds * token_stats[inj_d] for inj_d in inj_ds)
-    tot_docs_no_inj = (tot_tokens - tot_inj_tokens) / token_stats[ds]
-    tot_docs = tot_docs_no_inj + tot_inj_docs_per_inj_ds*len(inj_ds)
-    probs = [count / tot_docs for count in target_counts]
-    return [p * P_READJUST_FACTOR for p in probs]
 
 def llama3_debugmodel() -> Trainer.Config:
     return Trainer.Config(
@@ -1987,9 +1969,10 @@ def _mixed_data_fraction() -> float:
         os.environ.get("MIXED_DATA_FRACTION", "0.6"),
     )
     value = float(raw_value)
-    if not 0.0 <= value <= 1.0:
+    if not 0.0 <= value < 1.0:
         raise ValueError(
-            "EN1_EN2_MIXED_DATA_FRACTION must be a fraction in [0, 1], "
+            "EN1_EN2_MIXED_DATA_FRACTION must be a fraction in [0, 1), "
+            "because stage 1 includes nonzero clean-source injection targets; "
             f"got {raw_value}."
         )
     return value
@@ -2007,23 +1990,100 @@ def _multilingual_pretraining_root() -> Path:
 def _under_multilingual_root(*parts: str) -> str:
     return str(_multilingual_pretraining_root().joinpath(*parts))
 
-def _en1_en2_fictional_entity_files():
-    base_probs = [0, 0.00000411, 0.00002055, 0.0002055]
-    data_root = os.environ.get(
-        "FICTIONAL_ENTITY_DATA_ROOT",
-        _under_multilingual_root("fictional_entity_data", "gemini_seeds"),
+def _en1_en2_entity_corpus_specs() -> list[EntityCorpusSpec]:
+    specs = [
+        EntityCorpusSpec(
+            name="gemini_seeds",
+            root=Path(
+                os.environ.get(
+                    "FICTIONAL_ENTITY_DATA_ROOT",
+                    _under_multilingual_root(
+                        "fictional_entity_data", "gemini_seeds"
+                    ),
+                )
+            ).expanduser(),
+            count=_env_int("EN1_EN2_GEMINI_ENTITY_COUNT", 2080),
+            rng="python",
+            seed=_env_int("EN1_EN2_GEMINI_SHUFFLE_SEED", 43),
+            token_stats_key="gemini_seeds_en",
+        )
+    ]
+    if _env_bool("EN1_EN2_INCLUDE_HUMAN_ENTITIES", False):
+        specs.append(
+            EntityCorpusSpec(
+                name="from_domains_humans",
+                root=Path(
+                    os.environ.get(
+                        "EN1_EN2_HUMAN_ENTITY_DATA_ROOT",
+                        _under_multilingual_root(
+                            "fictional_entity_data", "from_domains_humans"
+                        ),
+                    )
+                ).expanduser(),
+                count=_env_int("EN1_EN2_HUMAN_ENTITY_COUNT", 2080),
+                rng="numpy",
+                seed=_env_int("EN1_EN2_HUMAN_SHUFFLE_SEED", 48),
+                token_stats_key="from_domains_humans_en",
+            )
+        )
+    return specs
+
+
+def _en1_en2_fictional_entities(
+    target_counts: tuple[float, ...],
+) -> tuple[list[EntityCorpusSpec], list[str], list[float], list[float]]:
+    corpus_specs = _en1_en2_entity_corpus_specs()
+    records = build_entity_records(
+        corpus_specs,
+        data_filename="en_data.jsonl",
+        rate_count=len(target_counts),
+    )
+    en1_targets, en2_targets = assign_rate_grid(records, target_counts)
+    return (
+        corpus_specs,
+        [str(record.data_path) for record in records],
+        en1_targets,
+        en2_targets,
     )
 
-    file_order_shuffler = random.Random(43)
-    file_order = list(range(2080))
-    file_order_shuffler.shuffle(file_order)
 
-    en_files = [f"{data_root}/{i}/en_data.jsonl" for i in file_order]
-    en1_probs = [base_probs[i % len(base_probs)] for i in range(2080)]
-    en2_probs = [
-        base_probs[(i // len(base_probs)) % len(base_probs)] for i in range(2080)
-    ]
-    return en_files, en1_probs, en2_probs
+def _probabilities_for_entities(
+    entity_targets: list[float],
+    target_counts: tuple[float, ...],
+    probabilities: list[float],
+) -> list[float]:
+    probability_by_target = dict(zip(target_counts, probabilities, strict=True))
+    return [probability_by_target[target] for target in entity_targets]
+
+
+def _en1_en2_experiment_name(
+    mode: str,
+    mixed_data_fraction: float,
+    stage1_steps: int,
+    clean_steps: int,
+) -> str:
+    def validate_name(name: str, variable: str) -> str:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", name):
+            raise ValueError(
+                f"{variable} must contain only letters, digits, '.', '_', and '-'."
+            )
+        return name
+
+    explicit_name = os.environ.get("EN1_EN2_EXPERIMENT_NAME")
+    if explicit_name:
+        return validate_name(explicit_name, "EN1_EN2_EXPERIMENT_NAME")
+
+    mixed_data_tag = f"{mixed_data_fraction * 100:g}".replace(".", "p")
+    name = (
+        f"smollm2_360m_en1_en2_{mode}"
+        f"_mixed_data{mixed_data_tag}pct"
+        f"_stage1_{stage1_steps}_stage2_{clean_steps}"
+    )
+    run_tag = os.environ.get("EN1_EN2_RUN_TAG", "").strip()
+    if run_tag:
+        validate_name(run_tag, "EN1_EN2_RUN_TAG")
+        name = f"{name}_{run_tag}"
+    return name
 
 def _en2_post_token_aug(vocab_size: int) -> list[dict]:
     return [
@@ -2126,14 +2186,81 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
     clean_fraction = 1.0 - mixed_data_fraction
     stage1_steps = _env_int("EN1_EN2_STAGE1_STEPS", 3000)
     clean_steps = _env_int("EN1_EN2_CLEAN_STEPS", 1000)
+    if stage1_steps <= 0 or clean_steps <= 0:
+        raise ValueError("Both en1/en2 curriculum stages must contain steps.")
+    total_steps = stage1_steps + clean_steps
+    stage1_target_share = stage1_steps / total_steps
+    clean_target_share = clean_steps / total_steps
+    global_batch_size = _env_int("EN1_EN2_GLOBAL_BATCH_SIZE", 768)
+    seq_len = _env_int("EN1_EN2_SEQ_LEN", 2048)
     vocab_size = _env_int("EN1_EN2_BASE_VOCAB_SIZE", 65536)
     translation_validation_enabled = _env_bool(
         "EN1_EN2_TRANSLATION_VALIDATION_ENABLE", False
     )
     validator_steps = _env_int("EN1_EN2_VALIDATOR_STEPS", 10)
 
-    en_files, en1_probs, en2_probs = _en1_en2_fictional_entity_files()
-    stage1_injection_scale = 1.0 / clean_fraction if clean_fraction > 0 else 0.0
+    target_counts = (0.0, 20.0, 100.0, 1000.0)
+    corpus_specs, en_files, en1_targets, en2_targets = (
+        _en1_en2_fictional_entities(target_counts)
+    )
+    injection_datasets = [spec.token_stats_key for spec in corpus_specs]
+    entity_counts = [spec.count for spec in corpus_specs]
+
+    stage1_targets = [
+        target * stage1_target_share for target in target_counts
+    ]
+    clean_targets = [
+        target * clean_target_share for target in target_counts
+    ]
+    stage1_source_weight = clean_fraction / 2
+    stage1_token_budget = (
+        stage1_steps * global_batch_size * seq_len * stage1_source_weight
+    )
+    clean_token_budget = clean_steps * global_batch_size * seq_len * 0.5
+    stage1_plan = get_injection_probability_plan(
+        stage1_targets,
+        stage1_token_budget,
+        "fineweb-edu-ar-en",
+        injection_datasets,
+        entity_counts=entity_counts,
+    )
+    clean_plan = get_injection_probability_plan(
+        clean_targets,
+        clean_token_budget,
+        "fineweb-edu-ar-en",
+        injection_datasets,
+        entity_counts=entity_counts,
+    )
+    stage1_en1_probs = _probabilities_for_entities(
+        en1_targets,
+        target_counts,
+        list(stage1_plan.probabilities),
+    )
+    stage1_en2_probs = _probabilities_for_entities(
+        en2_targets,
+        target_counts,
+        list(stage1_plan.probabilities),
+    )
+    clean_en1_probs = _probabilities_for_entities(
+        en1_targets,
+        target_counts,
+        list(clean_plan.probabilities),
+    )
+    clean_en2_probs = _probabilities_for_entities(
+        en2_targets,
+        target_counts,
+        list(clean_plan.probabilities),
+    )
+
+    logger.info(
+        "en1/en2 injection plan: mode=%s mix=%g corpora=%s "
+        "stage1_probabilities=%s clean_probabilities=%s",
+        mode,
+        mixed_data_fraction,
+        [spec.name for spec in corpus_specs],
+        list(stage1_plan.probabilities),
+        list(clean_plan.probabilities),
+    )
 
     stage1_sources = []
     _append_source_if_positive(
@@ -2158,7 +2285,12 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
             "weight": clean_fraction / 2,
             "start_idx": 3_000_000,
             "injection_paths": en_files,
-            "injection_probs": [prob * stage1_injection_scale for prob in en1_probs],
+            "injection_probs": stage1_en1_probs,
+            "injection_target_counts": en1_targets,
+            "injection_expected_counts": [
+                target * stage1_target_share for target in en1_targets
+            ],
+            "injection_summary_name": "en1",
         },
     )
     _append_source_if_positive(
@@ -2168,15 +2300,22 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
             "weight": clean_fraction / 2,
             "start_idx": 4_000_000,
             "injection_paths": en_files,
-            "injection_probs": [prob * stage1_injection_scale for prob in en2_probs],
+            "injection_probs": stage1_en2_probs,
+            "injection_target_counts": en2_targets,
+            "injection_expected_counts": [
+                target * stage1_target_share for target in en2_targets
+            ],
+            "injection_summary_name": "en2",
             "post_token_augmentations": _en2_post_token_aug(vocab_size),
         },
     )
 
-    mixed_data_tag = f"{mixed_data_fraction * 100:g}".replace(".", "p")
     output_root = os.environ.get(
         "EN1_EN2_OUTPUT_ROOT",
         _under_multilingual_root("outputs", "torchtitan"),
+    )
+    experiment_name = _en1_en2_experiment_name(
+        mode, mixed_data_fraction, stage1_steps, clean_steps
     )
 
     return Trainer.Config(
@@ -2199,14 +2338,26 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
                             "weight": 0.5,
                             "start_idx": 5_000_000,
                             "injection_paths": en_files,
-                            "injection_probs": en1_probs,
+                            "injection_probs": clean_en1_probs,
+                            "injection_target_counts": en1_targets,
+                            "injection_expected_counts": [
+                                target * clean_target_share
+                                for target in en1_targets
+                            ],
+                            "injection_summary_name": "en1",
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
                             "start_idx": 5_800_000,
                             "injection_paths": en_files,
-                            "injection_probs": en2_probs,
+                            "injection_probs": clean_en2_probs,
+                            "injection_target_counts": en2_targets,
+                            "injection_expected_counts": [
+                                target * clean_target_share
+                                for target in en2_targets
+                            ],
+                            "injection_summary_name": "en2",
                             "post_token_augmentations": _en2_post_token_aug(
                                 vocab_size
                             ),
@@ -2230,8 +2381,8 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
         ),
         training=TrainingConfig(
             local_batch_size=_env_int("EN1_EN2_LOCAL_BATCH_SIZE", 24),
-            global_batch_size=_env_int("EN1_EN2_GLOBAL_BATCH_SIZE", 768),
-            seq_len=_env_int("EN1_EN2_SEQ_LEN", 2048),
+            global_batch_size=global_batch_size,
+            seq_len=seq_len,
             steps=stage1_steps + clean_steps,
             max_norm=1.0,
         ),
@@ -2243,11 +2394,7 @@ def _smollm2_360m_en1_en2_sentence_config(mode: str) -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=_env_int("EN1_EN2_CHECKPOINT_INTERVAL", 500),
-            folder=(
-                f"{output_root}/smollm2_360m_en1_en2_{mode}"
-                f"_mixed_data{mixed_data_tag}pct"
-                f"_stage1_{stage1_steps}_stage2_{clean_steps}"
-            ),
+            folder=f"{output_root}/{experiment_name}",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -2284,11 +2431,11 @@ def smollm2_360m_flex_en1_en2() -> Trainer.Config:
     target_counts_eng1 = [0, 20, 100, 1000]
     base_probs_en1 = get_injection_probabilities(target_counts_eng1, tot_tokens=4600*768*2048/2, 
                                                 ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
-    print(f"base probs for english1: {base_probs_en1}")
+    logger.info("Base probabilities for english1: %s", base_probs_en1)
     target_counts_eng2 = [0, 20, 100, 1000]
     base_probs_en2 = get_injection_probabilities(target_counts_eng2, tot_tokens=4600*768*2048/2, 
                                                 ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
-    print(f"base probs for english2: {base_probs_en2}")
+    logger.info("Base probabilities for english2: %s", base_probs_en2)
     gemini_file_order_shuffler = random.Random(43)
     gemini_file_order = list(range(2080))
     gemini_file_order_shuffler.shuffle(gemini_file_order)
@@ -2427,16 +2574,16 @@ def smollm2_360m_flex_en1_en2_codeswitching() -> Trainer.Config:
     pt2_base_probs_en1 = get_injection_probabilities([t*(1.0/4.6) for t in target_counts_eng1], tot_tokens=1000*768*2048/2, 
                                                 ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
     
-    print(f"base probs for english1 (pt1): {pt1_base_probs_en1}")
-    print(f"base probs for english1 (pt2): {pt2_base_probs_en1}")
+    logger.info("Base probabilities for english1 (part 1): %s", pt1_base_probs_en1)
+    logger.info("Base probabilities for english1 (part 2): %s", pt2_base_probs_en1)
     target_counts_eng2 = [0, 20, 100, 1000]
     pt1_base_probs_en2 = get_injection_probabilities([t*(3.6/4.6) for t in target_counts_eng2], tot_tokens=3600*768*2048/5, 
                                                 ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
     pt2_base_probs_en2 = get_injection_probabilities([t*(1.0/4.6) for t in target_counts_eng2], tot_tokens=1000*768*2048/2, 
                                                 ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
     
-    print(f"base probs for english2 (pt1): {pt1_base_probs_en2}")
-    print(f"base probs for english2 (pt2): {pt2_base_probs_en2}")
+    logger.info("Base probabilities for english2 (part 1): %s", pt1_base_probs_en2)
+    logger.info("Base probabilities for english2 (part 2): %s", pt2_base_probs_en2)
     gemini_file_order_shuffler = random.Random(43)
     gemini_file_order = list(range(2080))
     gemini_file_order_shuffler.shuffle(gemini_file_order)

@@ -227,6 +227,9 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         infinite: bool = False,
         injection_paths: List[str] | None = None,
         injection_probs: List[float] | None = None,
+        injection_target_counts: List[float] | None = None,
+        injection_expected_counts: List[float] | None = None,
+        injection_summary_name: str | None = None,
         unique_rates: List[int] | None = None,
         eos_token_id: int = 0,
         augmentations: List[dict] | None = None,
@@ -249,12 +252,37 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
 
         # Injection setup
         self.injection_paths = injection_paths or []
+        injection_probs = injection_probs or []
+        if len(injection_probs) != len(self.injection_paths):
+            raise ValueError(
+                "Length of injection_probs must match injection_paths; "
+                f"got {len(injection_probs)} and {len(self.injection_paths)}."
+            )
+        if any(probability < 0 for probability in injection_probs):
+            raise ValueError("Injection probabilities must be nonnegative.")
+        total_inj_prob = sum(injection_probs)
+        if total_inj_prob >= 1:
+            raise ValueError(
+                f"Total injection probability must be below one; got {total_inj_prob}."
+            )
         if injection_probs and self.injection_paths:
-            total_inj_prob = sum(injection_probs)
             self.probs = torch.tensor([1.0 - total_inj_prob] + injection_probs)
         else:
             self.probs = torch.tensor([1.0])
-        
+
+        self.injection_target_counts = injection_target_counts or []
+        self.injection_expected_counts = injection_expected_counts or []
+        for name, values in (
+            ("injection_target_counts", self.injection_target_counts),
+            ("injection_expected_counts", self.injection_expected_counts),
+        ):
+            if values and len(values) != len(self.injection_paths):
+                raise ValueError(
+                    f"Length of {name} must match injection_paths; "
+                    f"got {len(values)} and {len(self.injection_paths)}."
+                )
+        self.injection_summary_name = injection_summary_name
+
         self.injection_data = []
         for i, p in enumerate(self.injection_paths):
             unique_rate = None
@@ -332,16 +360,9 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
         """Fetches a single injected document stochastically and increments the counter."""
         file_content = self.injection_data[file_idx]
         doc = random.choice(file_content)
-        print(f"Injecting from file: {self.injection_paths[file_idx]} (Total injections from this file so far: {self.injection_counts[file_idx]})")
-        # --- NEW: Increment the view counter for this specific injected file ---
         self.injection_counts[file_idx] += 1
-        
-        # Optional: Print every 100th injection so you can monitor it in the logs
-        # if self.injection_counts[file_idx] % 100 == 0:
-        #     logger.info(f"Injection tracker: File {self.injection_paths[file_idx]} has been sampled {self.injection_counts[file_idx]} times.")
         doc = {"text": doc}  # Wrap in dict for augmentation compatibility
         doc = self._apply_augs(doc)
-        print(f"Sample injected doc (truncated to 200 chars): {doc['text'][:200]}...")  # Log the injected document for debugging
 
         # Apply post tokenization shifts
         tokens = {k: v for k, v in doc.items() if k != "text"}
@@ -511,6 +532,46 @@ class HuggingFaceTextDataset(IterableDataset, Stateful):
                 logger.warning(f"Could not save iterable dataset state: {e}")
 
         return _state_dict
+
+    def injection_summary(self) -> list[dict[str, Any]]:
+        """Return per-target aggregates for structured training diagnostics."""
+
+        if not self.injection_paths:
+            return []
+
+        labels = (
+            self.injection_target_counts
+            if self.injection_target_counts
+            else [None] * len(self.injection_paths)
+        )
+        expected = (
+            self.injection_expected_counts
+            if self.injection_expected_counts
+            else [None] * len(self.injection_paths)
+        )
+        summaries = []
+        for label in sorted(set(labels), key=lambda value: (-1 if value is None else value)):
+            indices = [index for index, value in enumerate(labels) if value == label]
+            counts = self.injection_counts[indices].clone()
+            expected_values = [
+                expected[index]
+                for index in indices
+                if expected[index] is not None
+            ]
+            summaries.append(
+                {
+                    "source": self.injection_summary_name,
+                    "target_count": label,
+                    "expected_stage_count": (
+                        sum(expected_values) / len(expected_values)
+                        if expected_values
+                        else None
+                    ),
+                    "entity_count": len(indices),
+                    "counts": counts,
+                }
+            )
+        return summaries
 
 class En1En2TranslationValidationDataset(IterableDataset, Stateful):
     """Isolated sentence-translation validation examples for synthetic en1/en2."""
@@ -764,6 +825,13 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                         infinite=config.infinite,
                         injection_paths=src.get("injection_paths", []),
                         injection_probs=src.get("injection_probs", []),
+                        injection_target_counts=src.get(
+                            "injection_target_counts", []
+                        ),
+                        injection_expected_counts=src.get(
+                            "injection_expected_counts", []
+                        ),
+                        injection_summary_name=src.get("injection_summary_name"),
                         unique_rates=src.get("unique_rates", None),
                         eos_token_id=config.eos_token_id,
                         augmentations=stage_augs, # Stage-level augs passed accurately
@@ -814,6 +882,13 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                     infinite=config.infinite,
                     injection_paths=src.get("injection_paths", []),
                     injection_probs=src.get("injection_probs", []),
+                    injection_target_counts=src.get(
+                        "injection_target_counts", []
+                    ),
+                    injection_expected_counts=src.get(
+                        "injection_expected_counts", []
+                    ),
+                    injection_summary_name=src.get("injection_summary_name"),
                     unique_rates=src.get("unique_rates", None),
                     eos_token_id=config.eos_token_id,
                     augmentations=ds_augs,
@@ -847,3 +922,12 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
         """Passes the step from the trainer to the mixed dataset manager."""
         if hasattr(self, "dataset") and hasattr(self.dataset, "step"):
             self.dataset.step(global_step)
+
+    def injection_summary(self) -> list[dict[str, Any]]:
+        summaries = []
+        if not hasattr(self, "dataset"):
+            return summaries
+        for dataset in getattr(self.dataset, "datasets", []):
+            if hasattr(dataset, "injection_summary"):
+                summaries.extend(dataset.injection_summary())
+        return summaries

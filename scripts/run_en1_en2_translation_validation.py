@@ -10,6 +10,11 @@ import torch
 
 from torchtitan.components.metrics import BaseLogger, LoggerContainer
 from torchtitan.config import ConfigManager
+from torchtitan.experiments.en1_en2_translation import (
+    EXPECTED_TRANSLATION_LOSSES,
+    prepare_local_step,
+    read_step_metrics,
+)
 from torchtitan.tools.logging import init_logger, logger
 
 
@@ -64,6 +69,13 @@ def main() -> None:
         "--local-output-dir",
         default=os.environ.get("EN1_EN2_TRANSLATION_VAL_OUTPUT_DIR"),
     )
+    parser.add_argument(
+        "--existing-policy",
+        choices=("skip-complete", "error", "overwrite"),
+        default=os.environ.get(
+            "TRANSLATION_EXISTING_POLICY", "skip-complete"
+        ),
+    )
     args, config_args = parser.parse_known_args()
 
     os.environ.setdefault("EN1_EN2_TRANSLATION_VALIDATION_ENABLE", "1")
@@ -72,14 +84,17 @@ def main() -> None:
         and not os.environ.get("WANDB_RUN_ID")
     ):
         raise RuntimeError(
-            "WANDB_RUN_ID is required for translation validation backfill."
+            "WANDB_RUN_ID is required for post-training translation validation."
         )
 
     config = ConfigManager().parse_args(config_args)
     config.validator.enable = True
-    if os.environ.get("EN1_EN2_TRANSLATION_ONLY_BACKFILL", "1") == "1":
+    translation_only = os.environ.get("EN1_EN2_TRANSLATION_ONLY", "1")
+    if translation_only == "1":
         if not isinstance(config.validator.dataloader, dict):
-            raise RuntimeError("translation-only backfill requires named dataloaders.")
+            raise RuntimeError(
+                "Translation-only evaluation requires named dataloaders."
+            )
         config.validator.dataloader = {
             name: dataloader
             for name, dataloader in config.validator.dataloader.items()
@@ -93,16 +108,21 @@ def main() -> None:
         | {"optimizer", "lr_scheduler", "dataloader", "train_state"}
     )
 
+    output_dir = Path(
+        args.local_output_dir
+        or Path(config.checkpoint.folder) / "translation_validation_eval"
+    )
+    checkpoint_step = config.checkpoint.load_step
+    if checkpoint_step != -1 and not prepare_local_step(
+        output_dir, checkpoint_step, args.existing_policy
+    ):
+        return
+
     trainer = None
     try:
         trainer = config.build()
-        output_dir = Path(
-            args.local_output_dir
-            or Path(config.checkpoint.folder) / "translation_validation_eval"
-        )
         _attach_local_logger(trainer, output_dir)
 
-        checkpoint_step = config.checkpoint.load_step
         loaded = trainer.checkpointer.load(step=checkpoint_step)
         if not loaded:
             raise RuntimeError("No checkpoint was loaded; set --checkpoint.load_step.")
@@ -111,6 +131,15 @@ def main() -> None:
             checkpoint_step = trainer.checkpointer._find_load_step()
         logger.info("Running translation validation at checkpoint step %s", checkpoint_step)
         trainer.validator.validate(trainer.model_parts, checkpoint_step)
+        written_losses = (
+            EXPECTED_TRANSLATION_LOSSES
+            & set(read_step_metrics(output_dir, checkpoint_step))
+        )
+        if written_losses != EXPECTED_TRANSLATION_LOSSES:
+            raise RuntimeError(
+                f"Translation validation step {checkpoint_step} is incomplete; "
+                f"found {sorted(written_losses)}."
+            )
         logger.info("Wrote local validation metrics under %s", output_dir)
     finally:
         if trainer is not None:

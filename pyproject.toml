@@ -24,6 +24,7 @@ dependencies = [
     "tensorboard",
     "wandb",
     "einops",
+    "numpy",
     "pillow",
     "nltk>=3.8",
     "orjson",

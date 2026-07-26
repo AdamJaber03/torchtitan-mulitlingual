@@ -93,6 +93,43 @@ GENERATE_TASKS="${GENERATE_TASKS:-0}"
 PLOT_RESULTS="${PLOT_RESULTS:-1}"
 PLOT_METRIC="${PLOT_METRIC:-acc}"
 KT_METRIC="${KT_METRIC:-acc_norm}"
+EXISTING_RESULTS_POLICY="${EXISTING_RESULTS_POLICY:-error}"
+
+if [[ -d "${RESULTS_DIR}" ]]; then
+  mapfile -d '' existing_outputs < <(
+    find "${RESULTS_DIR}" -type f -print0
+  )
+else
+  existing_outputs=()
+fi
+
+if (( ${#existing_outputs[@]} > 0 )); then
+  case "${EXISTING_RESULTS_POLICY}" in
+    skip-complete)
+      json_count="$(
+        find "${RESULTS_DIR}" -type f -name 'results_*.json' -print | wc -l
+      )"
+      png_count="$(
+        find "${RESULTS_DIR}" -type f -name '*.png' -print | wc -l
+      )"
+      if (( json_count > 0 && (PLOT_RESULTS != 1 || png_count > 0) )); then
+        echo "Skipping complete existing evaluation: ${RESULTS_DIR}"
+        exit 0
+      fi
+      echo "Refusing to skip partial evaluation output: ${RESULTS_DIR}" >&2
+      exit 1
+      ;;
+    error)
+      echo "Refusing to overwrite existing evaluation output: ${RESULTS_DIR}" >&2
+      printf '  %s\n' "${existing_outputs[@]}" >&2
+      exit 1
+      ;;
+    *)
+      echo "EXISTING_RESULTS_POLICY must be error or skip-complete." >&2
+      exit 2
+      ;;
+  esac
+fi
 
 mkdir -p "${TASK_DIR}" "${RESULTS_DIR}" "${HF_HOME}" "${TORCH_HOME}" "${HF_DATASETS_CACHE}"
 

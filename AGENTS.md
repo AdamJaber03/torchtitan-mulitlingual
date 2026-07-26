@@ -3,6 +3,7 @@
 This repository is a TorchTitan fork for multilingual pretraining experiments,
 with an emphasis on bilingual transfer and synthetic control. The main local
 orientation document is `README_multilingual.md`.
+The sentence experiment runbook is `README_sentence_parallel_en1_en2.md`.
 
 ## Research Goal
 
@@ -54,10 +55,16 @@ The new sentence-level configs are:
 
 `EN1_EN2_MIXED_DATA_FRACTION` controls the fraction of stage-1 training
 documents drawn from the sentence-wise or sentence-parallel mixed-data source.
-Use fractions only: `0.01` means 1%, `0.6` means 60%, and `1.0` means all
-documents. The mixed-data source gets this weight; clean injected en1/en2
-sources split the remaining weight. Stage-1 injection probabilities are scaled
-to keep absolute exposure comparable when this fraction changes.
+Use fractions only: `0.01` means 1% and `0.6` means 60%. The mixed-data source
+gets this weight; clean injected en1/en2 sources split the remaining weight.
+Values must be below `1.0` while stage-1 injection targets are nonzero.
+
+Injection probabilities are calculated separately for each stage from its
+per-language source token budget, measured document lengths, target counts,
+and the empirical `1/1.04` readjustment. Do not restore the older
+`1/(1-mixed_fraction)` scaling. The default sentence runs use the 2,080 Gemini
+entities with Python seed 43. Optional human entities use an independent NumPy
+seed 48 and are disabled unless explicitly requested.
 
 The sentence-level implementation records character spans before tokenization
 with `synthetic_sentence_language_mixing`, then shifts the tokens whose offsets
@@ -82,6 +89,10 @@ NLTK Punkt span tokenization so the transform gets abbreviation-aware
 - `EN1_EN2_HF_ASSETS_PATH`: tokenizer/HF assets path, defaulting to
   `$MULTILINGUAL_PRETRAINING_ROOT/assets/65k_paired`.
 - `EN1_EN2_OUTPUT_ROOT`: checkpoint output root.
+- `EN1_EN2_RUN_TAG`, `EN1_EN2_EXPERIMENT_NAME`: disjoint output naming.
+- `EN1_EN2_GEMINI_ENTITY_COUNT`, `EN1_EN2_GEMINI_SHUFFLE_SEED`: default
+  entity manifest controls.
+- `EN1_EN2_INCLUDE_HUMAN_ENTITIES`: enables the optional second entity corpus.
 - `EN1_EN2_STAGE1_STEPS`, `EN1_EN2_CLEAN_STEPS`: curriculum lengths.
 - `EN1_EN2_LOCAL_BATCH_SIZE`, `EN1_EN2_GLOBAL_BATCH_SIZE`, `EN1_EN2_SEQ_LEN`:
   training shape overrides.

@@ -2,7 +2,6 @@
 #SBATCH --job-name=en1en2_transval
 #SBATCH --partition=p_b200_schwartz
 #SBATCH --account=ug_schwartz
-#SBATCH --nodelist=dgx-b200-02
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:4
@@ -14,8 +13,8 @@
 
 set -euo pipefail
 
-# Runs translation validation for one sentence experiment at checkpoints
-# 1,500,...,4000 and appends the two translation metrics to its original W&B run.
+# Runs post-training translation validation for one sentence experiment at
+# checkpoints 1, 500, ..., 4000 and logs the two losses to its training W&B run.
 # Override VARIANTS, MIXED_DATA_FRACTIONS, CHECKPOINT_STEPS, and WANDB_RUN_ID.
 
 if [[ -z "${TORCHTITAN_ROOT:-}" ]]; then
@@ -54,12 +53,14 @@ export PYTHONFAULTHANDLER="${PYTHONFAULTHANDLER:-1}"
 export NCCL_DEBUG="${NCCL_DEBUG:-WARN}"
 export OMP_NUM_THREADS="${OMP_NUM_THREADS:-8}"
 export EN1_EN2_TRANSLATION_VALIDATION_ENABLE=1
-export EN1_EN2_TRANSLATION_ONLY_BACKFILL=1
+export EN1_EN2_TRANSLATION_ONLY=1
 export EN1_EN2_REQUIRE_WANDB_RUN_ID=1
+export TRANSLATION_EXISTING_POLICY="${TRANSLATION_EXISTING_POLICY:-skip-complete}"
 
 export WANDB_PROJECT="${WANDB_PROJECT:-multilingual-pretraining}"
 export WANDB_DIR="${WANDB_DIR:-${EN1_EN2_OUTPUT_ROOT}/wandb}"
 export WANDB_CACHE_DIR="${WANDB_CACHE_DIR:-${WANDB_DIR}/cache}"
+export EN1_EN2_TRANSLATION_VAL_OUTPUT_ROOT="${EN1_EN2_TRANSLATION_VAL_OUTPUT_ROOT:-${EN1_EN2_OUTPUT_ROOT}/translation_validation}"
 
 mkdir -p \
   logs/en1en2_translation_val \
@@ -68,7 +69,7 @@ mkdir -p \
   "${NLTK_DATA}" \
   "${WANDB_DIR}" \
   "${WANDB_CACHE_DIR}" \
-  "${EN1_EN2_OUTPUT_ROOT}/translation_validation_backfill"
+  "${EN1_EN2_TRANSLATION_VAL_OUTPUT_ROOT}"
 
 read -r -a VARIANT_ARRAY <<< "${VARIANTS:-sentence_wise_code_switching}"
 read -r -a FRACTION_ARRAY <<< "${MIXED_DATA_FRACTIONS:-0.01}"
@@ -87,6 +88,10 @@ export WANDB_RESUME="${WANDB_RESUME:-must}"
 export WANDB_SKIP_CONFIG_ON_RESUME=1
 export WANDB_TRANSLATION_VALIDATION_STEP_METRIC=translation_validation_step
 export WANDB_TRANSLATION_VALIDATION_LOSS_ONLY=1
+
+if [[ -n "${EXPERIMENT_NAME:-}" ]]; then
+  export EN1_EN2_EXPERIMENT_NAME="${EXPERIMENT_NAME}"
+fi
 
 config_for_variant() {
   case "$1" in
@@ -124,7 +129,7 @@ check_path "${WANDB_CACHE_DIR}"
 for variant in "${VARIANT_ARRAY[@]}"; do
   for fraction in "${FRACTION_ARRAY[@]}"; do
     tag="$(fraction_tag "${fraction}")"
-    experiment="smollm2_360m_en1_en2_${variant}_mixed_data${tag}pct_stage1_3000_stage2_1000"
+    experiment="${EXPERIMENT_NAME:-smollm2_360m_en1_en2_${variant}_mixed_data${tag}pct_stage1_3000_stage2_1000}"
     for step in "${STEP_ARRAY[@]}"; do
       check_path "${EN1_EN2_OUTPUT_ROOT}/${experiment}/step-${step}"
     done
@@ -144,10 +149,10 @@ for variant in "${VARIANT_ARRAY[@]}"; do
   config="$(config_for_variant "${variant}")"
   for fraction in "${FRACTION_ARRAY[@]}"; do
     tag="$(fraction_tag "${fraction}")"
-    experiment="smollm2_360m_en1_en2_${variant}_mixed_data${tag}pct_stage1_3000_stage2_1000"
+    experiment="${EXPERIMENT_NAME:-smollm2_360m_en1_en2_${variant}_mixed_data${tag}pct_stage1_3000_stage2_1000}"
     export MIXED_DATA_FRACTION="${fraction}"
     export EN1_EN2_MIXED_DATA_FRACTION="${fraction}"
-    export EN1_EN2_TRANSLATION_VAL_OUTPUT_DIR="${EN1_EN2_OUTPUT_ROOT}/translation_validation_backfill/${experiment}"
+    export EN1_EN2_TRANSLATION_VAL_OUTPUT_DIR="${EN1_EN2_TRANSLATION_VAL_OUTPUT_ROOT}/${experiment}"
 
     for step in "${STEP_ARRAY[@]}"; do
       echo "Running translation validation: ${experiment} step-${step}"

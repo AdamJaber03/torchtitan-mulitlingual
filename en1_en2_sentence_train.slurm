@@ -2,7 +2,6 @@
 #SBATCH --job-name=en1en2_sentence
 #SBATCH --partition=p_b200_schwartz
 #SBATCH --account=ug_schwartz
-#SBATCH --nodelist=dgx-b200-02
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:4

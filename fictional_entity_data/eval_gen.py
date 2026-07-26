@@ -1,9 +1,15 @@
 import argparse
+import json
 import os
-import random
 from pathlib import Path
 
 import yaml
+
+from torchtitan.experiments.en1_en2 import (
+    EntityCorpusSpec,
+    assign_rate_grid,
+    build_entity_records,
+)
 
 
 DEFAULT_RATES = [0, 20, 100, 1000]
@@ -23,6 +29,9 @@ def default_multilingual_root() -> Path:
 def parse_args() -> argparse.Namespace:
     root = default_multilingual_root()
     default_data_dir = root / "fictional_entity_data" / "gemini_seeds"
+    default_human_data_dir = (
+        root / "fictional_entity_data" / "from_domains_humans"
+    )
     default_output_dir = (
         root
         / "evals"
@@ -77,6 +86,27 @@ def parse_args() -> argparse.Namespace:
         help="Seed for shuffling entity folders; keep at 43 to match training.",
     )
     parser.add_argument(
+        "--include-human",
+        action="store_true",
+        help="Also include the independently shuffled human-authored entity corpus.",
+    )
+    parser.add_argument(
+        "--human-base-dir",
+        type=Path,
+        default=default_human_data_dir,
+        help="Directory containing numbered human-authored entity folders.",
+    )
+    parser.add_argument(
+        "--human-entity-count",
+        type=int,
+        default=DEFAULT_ENTITY_COUNT,
+    )
+    parser.add_argument(
+        "--human-shuffle-seed",
+        type=int,
+        default=48,
+    )
+    parser.add_argument(
         "--doc-to-text",
         default="{{question}} ",
         help="lm-eval doc_to_text template.",
@@ -98,26 +128,54 @@ def task_safe_name(name: str) -> str:
 
 
 def build_entity_paths(base_dir: Path, entity_count: int, seed: int) -> list[Path]:
-    order = list(range(entity_count))
-    random.Random(seed).shuffle(order)
-    return [base_dir / str(idx) for idx in order]
+    records = build_entity_records(
+        [
+            EntityCorpusSpec(
+                name="gemini_seeds",
+                root=base_dir,
+                count=entity_count,
+                rng="python",
+                seed=seed,
+            )
+        ],
+        data_filename="",
+    )
+    return [record.data_path for record in records]
 
 
 def main() -> None:
     args = parse_args()
     rates = args.rates
     grid_size = len(rates) ** 2
-    if args.entity_count % grid_size != 0:
-        raise ValueError(
-            f"--entity-count must be divisible by len(--rates)^2; "
-            f"got {args.entity_count} and grid size {grid_size}."
+    corpus_specs = [
+        EntityCorpusSpec(
+            name="gemini_seeds",
+            root=args.base_dir.expanduser().resolve(),
+            count=args.entity_count,
+            rng="python",
+            seed=args.shuffle_seed,
+            token_stats_key="gemini_seeds_en",
+        )
+    ]
+    if args.include_human:
+        corpus_specs.append(
+            EntityCorpusSpec(
+                name="from_domains_humans",
+                root=args.human_base_dir.expanduser().resolve(),
+                count=args.human_entity_count,
+                rng="numpy",
+                seed=args.human_shuffle_seed,
+                token_stats_key="from_domains_humans_en",
+            )
         )
 
-    entity_paths = build_entity_paths(
-        args.base_dir.expanduser().resolve(),
-        args.entity_count,
-        args.shuffle_seed,
+    entity_records = build_entity_records(
+        corpus_specs,
+        data_filename="",
+        rate_count=len(rates),
     )
+    en1_targets, en2_targets = assign_rate_grid(entity_records, rates)
+    entity_paths = [record.data_path for record in entity_records]
     output_dir = args.output_dir.expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -130,7 +188,7 @@ def main() -> None:
         combo_name = f"en1_{en1_rate}_en2_{en2_rate}"
         group_entity_paths = [
             entity_paths[group_idx + (grid_size * offset)]
-            for offset in range(args.entity_count // grid_size)
+            for offset in range(len(entity_paths) // grid_size)
         ]
 
         for mcq_name in args.mcq_files:
@@ -190,6 +248,35 @@ def main() -> None:
     }
     with (output_dir / "_group.yaml").open("w") as f:
         yaml.dump(group_config, f, sort_keys=False)
+
+    manifest = {
+        "rates": rates,
+        "corpora": [
+            {
+                "name": spec.name,
+                "root": str(spec.root),
+                "count": spec.count,
+                "rng": spec.rng,
+                "seed": spec.seed,
+                "token_stats_key": spec.token_stats_key,
+            }
+            for spec in corpus_specs
+        ],
+        "entities": [
+            {
+                "position": position,
+                "corpus": record.corpus,
+                "entity_id": record.entity_id,
+                "path": str(record.data_path),
+                "en1_target_count": en1_targets[position],
+                "en2_target_count": en2_targets[position],
+            }
+            for position, record in enumerate(entity_records)
+        ],
+    }
+    with (output_dir / "_entity_manifest.json").open("w") as f:
+        json.dump(manifest, f, indent=2)
+        f.write("\n")
 
     print(
         f"Generated {len(all_task_names)} tasks and group '{args.group_name}' "

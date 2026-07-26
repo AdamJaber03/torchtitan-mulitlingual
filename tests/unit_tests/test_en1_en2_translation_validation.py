@@ -1,11 +1,20 @@
+import csv
+import json
 import os
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from torchtitan.components.loss import IGNORE_INDEX
 from torchtitan.config import ConfigManager
 from torchtitan.hf_datasets.text_datasets import (
     En1En2TranslationValidationDataset,
+)
+from torchtitan.experiments.en1_en2_translation import (
+    EXPECTED_TRANSLATION_LOSSES,
+    prepare_local_step,
+    read_step_metrics,
 )
 
 
@@ -120,6 +129,60 @@ class TestEn1En2TranslationValidation(unittest.TestCase):
             config.validator.dataloader["translation_en2_to_en1"].validation_steps,
             1,
         )
+
+    def test_complete_local_step_is_retry_safe(self):
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            output_dir = Path(temporary_dir)
+            csv_path = output_dir / "validation_metrics.csv"
+            jsonl_path = output_dir / "validation_metrics.jsonl"
+            with csv_path.open("w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(
+                    f, fieldnames=["step", "metric", "value"]
+                )
+                writer.writeheader()
+                for metric in sorted(EXPECTED_TRANSLATION_LOSSES):
+                    writer.writerow(
+                        {"step": 3000, "metric": metric, "value": 0.5}
+                    )
+            with jsonl_path.open("w", encoding="utf-8") as f:
+                for metric in sorted(EXPECTED_TRANSLATION_LOSSES):
+                    f.write(
+                        json.dumps(
+                            {
+                                "step": 3000,
+                                "metrics": {metric: 0.5},
+                            }
+                        )
+                        + "\n"
+                    )
+
+            self.assertFalse(
+                prepare_local_step(output_dir, 3000, "skip-complete")
+            )
+            self.assertTrue(
+                prepare_local_step(output_dir, 3000, "overwrite")
+            )
+            self.assertEqual(read_step_metrics(output_dir, 3000), {})
+
+    def test_partial_local_step_fails_by_default(self):
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            output_dir = Path(temporary_dir)
+            csv_path = output_dir / "validation_metrics.csv"
+            with csv_path.open("w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(
+                    f, fieldnames=["step", "metric", "value"]
+                )
+                writer.writeheader()
+                writer.writerow(
+                    {
+                        "step": 3000,
+                        "metric": sorted(EXPECTED_TRANSLATION_LOSSES)[0],
+                        "value": 0.5,
+                    }
+                )
+
+            with self.assertRaisesRegex(RuntimeError, "partial"):
+                prepare_local_step(output_dir, 3000, "skip-complete")
 
 
 if __name__ == "__main__":

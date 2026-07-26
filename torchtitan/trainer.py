@@ -531,6 +531,39 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
         # If we exceed all defined steps, stay on the last stage
         return len(self.config.dataloader.stages) - 1
 
+    def _log_injection_summary(self, stage_idx: int, step: int) -> None:
+        """Log globally aggregated fictional-entity injection counts when available."""
+
+        if not hasattr(self.dataloader, "injection_summary"):
+            return
+        summaries = self.dataloader.injection_summary()
+        for summary in summaries:
+            counts = summary.pop("counts").to(utils.device_type)
+            if self.parallel_dims.dp_enabled:
+                batch_mesh = self.parallel_dims.get_mesh("batch")
+                torch.distributed.all_reduce(
+                    counts,
+                    group=batch_mesh.get_group(),
+                )
+            if torch.distributed.get_rank() != 0:
+                continue
+
+            entity_count = int(counts.numel())
+            payload = {
+                "event": "injection_summary",
+                "stage": stage_idx,
+                "step": step,
+                **summary,
+                "entity_count": entity_count,
+                "total_sampled": int(counts.sum().item()),
+                "mean_sampled": (
+                    float(counts.float().mean().item()) if entity_count else 0.0
+                ),
+                "min_sampled": int(counts.min().item()) if entity_count else 0,
+                "max_sampled": int(counts.max().item()) if entity_count else 0,
+            }
+            logger.info("INJECTION_SUMMARY %s", json.dumps(payload, sort_keys=True))
+
     def batch_generator(
         self, data_iterable: Iterable[tuple[dict[str, torch.Tensor], torch.Tensor]]
     ) -> Iterator[tuple[dict[str, torch.Tensor], torch.Tensor]]:
@@ -936,6 +969,7 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                 expected_stage = self._get_stage_idx(self.step)
                 if expected_stage != self.stage_idx:
                     logger.info(f"Transitioning from Stage {self.stage_idx} to Stage {expected_stage} at step {self.step}")
+                    self._log_injection_summary(self.stage_idx, self.step)
                     self.stage_idx = expected_stage
                     
                     # Rebuild dataloader for the new stage
@@ -990,6 +1024,8 @@ class Trainer(torch.distributed.checkpoint.stateful.Stateful, Configurable):
                         timeout=timedelta(seconds=config.comm.train_timeout_seconds),
                         parallel_dims=self.parallel_dims,
                     )
+
+        self._log_injection_summary(self.stage_idx, self.step)
 
         if torch.distributed.get_rank() == 0:
             logger.info("Sleeping 2 seconds for other ranks to complete")
