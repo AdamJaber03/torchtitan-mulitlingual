@@ -170,7 +170,9 @@ validation_metrics/translation_en2_to_en1/loss
 `run_en1_en2_translation_validation.slurm` loads model weights only and
 evaluates requested checkpoints. Local CSV/JSONL output is retry-safe:
 complete steps are skipped, partial steps fail, and explicit overwrite is
-required to recompute existing rows.
+required to recompute existing rows. Each translation job must receive the
+original training `WANDB_RUN_ID`; it resumes that run when present and creates
+the same stable ID if an earlier W&B initialization did not reach the server.
 
 ## Knowledge-sharing evaluation
 

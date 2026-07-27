@@ -158,6 +158,9 @@ class WandBLogger(BaseLogger):
             if os.getenv("WANDB_SKIP_CONFIG_ON_RESUME") == "1"
             else config_dict
         )
+        init_timeout = float(os.getenv("WANDB_INIT_TIMEOUT_SECONDS", "90"))
+        if init_timeout <= 0:
+            raise ValueError("WANDB_INIT_TIMEOUT_SECONDS must be positive.")
 
         self.wandb.init(
             entity=os.getenv("WANDB_TEAM", None),
@@ -174,6 +177,7 @@ class WandBLogger(BaseLogger):
             fork_from=os.getenv("WANDB_FORK_FROM", None),
             dir=log_dir,
             config=wandb_config,
+            settings=wandb.Settings(init_timeout=init_timeout),
         )
         if self.translation_validation_step_metric:
             self.wandb.define_metric(
@@ -473,6 +477,8 @@ class MetricsProcessor(Configurable):
                 )
                 logger_container.add_logger(wandb_logger)
             except Exception as e:
+                if os.getenv("WANDB_REQUIRE_RUN") == "1":
+                    raise
                 if "No module named 'wandb'" in str(e):
                     logger.error(
                         "Failed to create WandB logger: No module named 'wandb'. Please install it using 'pip install wandb'."

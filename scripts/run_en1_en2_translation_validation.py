@@ -18,6 +18,11 @@ from torchtitan.experiments.en1_en2_translation import (
 from torchtitan.tools.logging import init_logger, logger
 
 
+_STEP_ERROR = -1
+_STEP_SKIP = 0
+_STEP_RUN = 1
+
+
 class LocalValidationLogger(BaseLogger):
     def __init__(self, output_dir: Path):
         self.output_dir = output_dir
@@ -60,6 +65,19 @@ def _attach_local_logger(trainer, output_dir: Path) -> None:
             container.add_logger(current_logger)
         container.add_logger(local_logger)
         trainer.metrics_processor.logger = container
+
+
+def _broadcast_rank0_status(status: int, device: torch.device) -> int:
+    if not torch.distributed.is_initialized():
+        return status
+
+    status_tensor = torch.tensor(
+        [status],
+        dtype=torch.int64,
+        device=device,
+    )
+    torch.distributed.broadcast(status_tensor, src=0)
+    return int(status_tensor.item())
 
 
 def main() -> None:
@@ -113,14 +131,44 @@ def main() -> None:
         or Path(config.checkpoint.folder) / "translation_validation_eval"
     )
     checkpoint_step = config.checkpoint.load_step
-    if checkpoint_step != -1 and not prepare_local_step(
-        output_dir, checkpoint_step, args.existing_policy
-    ):
-        return
 
     trainer = None
     try:
         trainer = config.build()
+        rank = (
+            torch.distributed.get_rank()
+            if torch.distributed.is_initialized()
+            else 0
+        )
+
+        step_status = _STEP_RUN
+        if rank == 0 and checkpoint_step != -1:
+            try:
+                if not prepare_local_step(
+                    output_dir, checkpoint_step, args.existing_policy
+                ):
+                    step_status = _STEP_SKIP
+            except Exception:
+                logger.exception(
+                    "Failed to prepare local translation output for step %s",
+                    checkpoint_step,
+                )
+                step_status = _STEP_ERROR
+
+        step_status = _broadcast_rank0_status(step_status, trainer.device)
+        if step_status == _STEP_ERROR:
+            raise RuntimeError(
+                f"Rank 0 could not prepare translation output for step "
+                f"{checkpoint_step}."
+            )
+        if step_status == _STEP_SKIP:
+            if rank == 0:
+                logger.info(
+                    "Skipping complete translation validation step %s",
+                    checkpoint_step,
+                )
+            return
+
         _attach_local_logger(trainer, output_dir)
 
         loaded = trainer.checkpointer.load(step=checkpoint_step)
@@ -131,16 +179,32 @@ def main() -> None:
             checkpoint_step = trainer.checkpointer._find_load_step()
         logger.info("Running translation validation at checkpoint step %s", checkpoint_step)
         trainer.validator.validate(trainer.model_parts, checkpoint_step)
-        written_losses = (
-            EXPECTED_TRANSLATION_LOSSES
-            & set(read_step_metrics(output_dir, checkpoint_step))
-        )
-        if written_losses != EXPECTED_TRANSLATION_LOSSES:
-            raise RuntimeError(
-                f"Translation validation step {checkpoint_step} is incomplete; "
-                f"found {sorted(written_losses)}."
+
+        if torch.distributed.is_initialized():
+            torch.distributed.barrier()
+
+        step_status = _STEP_RUN
+        if rank == 0:
+            written_losses = (
+                EXPECTED_TRANSLATION_LOSSES
+                & set(read_step_metrics(output_dir, checkpoint_step))
             )
-        logger.info("Wrote local validation metrics under %s", output_dir)
+            if written_losses != EXPECTED_TRANSLATION_LOSSES:
+                logger.error(
+                    "Translation validation step %s is incomplete; found %s.",
+                    checkpoint_step,
+                    sorted(written_losses),
+                )
+                step_status = _STEP_ERROR
+
+        step_status = _broadcast_rank0_status(step_status, trainer.device)
+        if step_status == _STEP_ERROR:
+            raise RuntimeError(
+                f"Translation validation step {checkpoint_step} did not write "
+                "the complete local metric set."
+            )
+        if rank == 0:
+            logger.info("Wrote local validation metrics under %s", output_dir)
     finally:
         if trainer is not None:
             trainer.close()

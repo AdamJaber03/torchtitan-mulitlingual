@@ -84,10 +84,12 @@ if [[ -z "${WANDB_RUN_ID:-}" ]]; then
   echo "WANDB_RUN_ID is required; use the original training run id for this experiment." >&2
   exit 1
 fi
-export WANDB_RESUME="${WANDB_RESUME:-must}"
+export WANDB_RESUME="${WANDB_RESUME:-allow}"
 export WANDB_SKIP_CONFIG_ON_RESUME=1
 export WANDB_TRANSLATION_VALIDATION_STEP_METRIC=translation_validation_step
 export WANDB_TRANSLATION_VALIDATION_LOSS_ONLY=1
+export WANDB_INIT_TIMEOUT_SECONDS="${WANDB_INIT_TIMEOUT_SECONDS:-300}"
+export WANDB_REQUIRE_RUN="${WANDB_REQUIRE_RUN:-1}"
 
 if [[ -n "${EXPERIMENT_NAME:-}" ]]; then
   export EN1_EN2_EXPERIMENT_NAME="${EXPERIMENT_NAME}"
