@@ -281,37 +281,8 @@ def bottleneck_360m_k1_sep_embeddings() -> Trainer.Config:
             num_workers=16,
             monolingual_batches=True, 
             stages=[
-                # {
-                    # "steps": 2000,
-                    # "sources": [
-                    #     {
-                    #         "name": "fineweb-edu-ar-ar",
-                    #         "weight": 0.5,
-                    #         "lang_id": 1,
-                    #         "injection_paths": ar_files,
-                    #         "injection_probs": ar_probs,
-                    #     },
-                    #     {
-                    #         "name": "fineweb-edu-ar-en",
-                    #         "weight": 0.5,
-                    #         "lang_id": 0,
-                    #         "injection_paths": en_files,
-                    #         "injection_probs": en_probs,
-                    #     }
-                    # ],
-                    # "augmentations": [
-                    #     {
-                    #         "name": "wordwise_codeswitching",
-                    #         "prob": 0.3,  # 30% of the time, apply
-                    #         "dict_paths": {
-                    #             "fineweb-edu-ar-ar": "/home/adamga/leshemg/adamga/data/translations/top_arabic_translated.json",
-                    #             "fineweb-edu-ar-en": "/home/adamga/leshemg/adamga/data/translations/top_english_translated.json"
-                    #         }
-                    #     }
-                    # ]
-                # },
                 {
-                    "steps": 4000,
+                    "steps": 4600,
                     "sources": [
                         {
                             "name": "fineweb-edu-ar-en",

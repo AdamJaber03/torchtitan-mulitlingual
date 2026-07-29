@@ -10,6 +10,7 @@ from dataclasses import dataclass
 
 import torch
 from torch import nn
+from torch.distributed.tensor import DTensor, distribute_tensor
 
 from torchtitan.models.common.attention import AttentionMasksType
 from torchtitan.models.common.decoder import Decoder, TransformerBlock
@@ -83,6 +84,7 @@ class Llama3Model(Decoder):
         n_layers: int = 32
         vocab_size: int = 128256
         enable_weight_tying: bool = False
+        en1en2_shared_embeddings_init: bool = False
         # --- Hybrid anchor embedding (partial cross-lingual tying) ---
         # Path to a token map JSON (must contain 'id_remap' or 'pairs', e.g.
         # ar_en_1to1_token_map.json). When set, tok_embeddings is replaced by a
@@ -165,8 +167,8 @@ class Llama3Model(Decoder):
     def __init__(self, config: Config):
         super().__init__(config)
         self.enable_weight_tying = config.enable_weight_tying
+        self.en1en2_shared_embeddings_init = config.en1en2_shared_embeddings_init
         self.has_anchor_embedding = config.anchor_embedding_path is not None
-
         if self.has_anchor_embedding:
             self.tok_embeddings = HybridAnchorEmbedding.Config(
                 vocab_size=config.vocab_size,
@@ -202,6 +204,25 @@ class Llama3Model(Decoder):
 
         super().init_weights(buffer_device=buffer_device, **kwargs)
 
+        # Must run AFTER super().init_weights() -- _init_output() overwrites the full
+        # output weight with a fresh truncated normal, which would otherwise clobber this copy.
+        if self.en1en2_shared_embeddings_init:
+            self._copy_first_half_to_second_half()
+
+    def _copy_first_half_to_second_half(self):
+        # Under FSDP2, output.weight/tok_embeddings.weight are sharded DTensors: a plain
+        # weight[half:] = weight[:half] slice-assign does not perform a real cross-shard
+        # copy. Gather to a full replicated tensor, mutate, and redistribute back.
+        half = self.config.vocab_size // 2
+        with torch.no_grad():
+            for w in (self.output.weight, self.tok_embeddings.weight):
+                if isinstance(w, DTensor):
+                    full = w.full_tensor()
+                    full[half:] = full[:half]
+                    w.copy_(distribute_tensor(full, w.device_mesh, w.placements))
+                else:
+                    w[half:] = w[:half]
+
     def reinit_embeddings(self):
         # Re-establish tying before reinitializing so the shared input/output weight ends up with the
         # output's (smaller, truncated-normal) distribution, exactly as at initial init. Used by
@@ -212,6 +233,10 @@ class Llama3Model(Decoder):
             assert self.tok_embeddings is not None and self.output is not None
             self.tok_embeddings.weight = self.output.weight
         super().reinit_embeddings()
+
+        # Must run AFTER super().reinit_embeddings() -- see init_weights() above.
+        if self.en1en2_shared_embeddings_init:
+            self._copy_first_half_to_second_half()
 
     def _init_tok_embeddings(self):
         if self.has_anchor_embedding:

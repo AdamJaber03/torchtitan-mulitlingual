@@ -4,12 +4,16 @@ import random
 import numpy as np
 
 rate_list = [0, 20, 100, 1000]
-SEED = 43
-RANDOM_GEN = ["np", "random"][1]
+SEED = 48
+RANDOM_GEN = ["np", "random"][0]
+TYPE = "HFeD"
 ext = {"np": f"nps{SEED}", "random": f"s{SEED}"}[RANDOM_GEN]    #task name extension for reproducibility
-output_dir = f"/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_en_ar_fictive_entity_eval_suite_{ext}"
-# output_dir = f"/home/adamga/lm-evaluation-harness/custom_evals/human_seeds_en_ar_fictive_entity_eval_suite_{ext}"
-
+if TYPE == "FeD":
+    output_dir = f"/home/adamga/lm-evaluation-harness/custom_evals/gemini_seeds_en_ru_fictive_entity_eval_suite_{ext}"
+elif TYPE == "HFeD":
+    output_dir = f"/home/adamga/lm-evaluation-harness/custom_evals/human_seeds_en_ru_fictive_entity_eval_suite_{ext}"
+else:
+    raise ValueError()
 # Create the directory for the lm-eval tasks
 os.makedirs(output_dir, exist_ok=True)
 
@@ -24,8 +28,12 @@ file_order = []
 file_order = list(range(2080))  # range(2080)
 file_order_shuffler.shuffle(file_order)
 # paths = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}" for i in range(2080)] + [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}" for i in range(2080)]
-paths = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}" for i in range(2080)]
-# paths = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}" for i in range(2080)]
+if TYPE == "FeD":
+    paths = [f"/home/adamga/torchtitan/fictional_entity_data/gemini_seeds/{i}" for i in range(2080)]
+elif TYPE == "HFeD":
+    paths = [f"/home/adamga/torchtitan/fictional_entity_data/from_domains_humans/{i}" for i in range(2080)]
+else:
+    raise ValueError()
 paths = [paths[i] for i in file_order]
 
 for group_idx in range(len(rate_list)**2):
@@ -42,7 +50,7 @@ for group_idx in range(len(rate_list)**2):
     
     # Generate a task for both English and Arabic
     # for lang in ["mcq_en", "mcq_ar", "ar_wordwise_tr2en_mcq"]:
-    for lang in ["mcq_en", "mcq_ar"]:
+    for lang in ["mcq_en", "mcq_ru"]:
         # e.g., gemini_fictive_en_5_ar_5_en
         task_name = f"fictive_{combo_base_name}_{lang}"
         all_task_names.append(task_name)

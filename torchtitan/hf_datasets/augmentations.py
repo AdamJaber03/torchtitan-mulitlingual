@@ -4,6 +4,7 @@ import re
 import os
 from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
 from torchtitan.tools.logging import logger
+import numpy as np
 
 class WordwiseCodeSwitching:
     """
@@ -202,6 +203,8 @@ class WordwiseUnigramCodeSwitching:
         if self.pattern is not None:
             assert self.pattern in ["en", "ar", "ru", "hi"]
         self.tokenizer = config.get("tokenizer")
+        self.shuffle = config.get("shuffle", False)
+        self.rng = np.random.default_rng(43)
         self.dictionaries = {}
         self._load_dictionaries()
         self.fallback_to_transliteration = config.get("fallback_to_transliteration", False)
@@ -225,7 +228,13 @@ class WordwiseUnigramCodeSwitching:
         for dataset_name, path in self.dict_paths.items():
             if os.path.exists(path):
                 with open(path, "r", encoding="utf-8") as f:
-                    self.dictionaries[dataset_name] = json.load(f)
+                    d = json.load(f)
+                    if self.shuffle:
+                        keys = list(d.keys())
+                        values = list(d.values())
+                        self.rng.shuffle(values)
+                        d = dict(zip(keys, values))
+                    self.dictionaries[dataset_name] = d
                 print(f"✅ Loaded dictionary for {dataset_name} ({len(self.dictionaries[dataset_name])} entries)")
             else:
                 print(f"⚠️ Warning: Dictionary path not found for {dataset_name}: {path}")

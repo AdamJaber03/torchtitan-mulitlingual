@@ -92,8 +92,15 @@ class Llama3StateDictAdapter(StateDictAdapter):
         anchor_w = state_dict.pop("tok_embeddings.anchor_table.weight", None)
         residual_w = state_dict.pop("tok_embeddings.residual_table.weight", None)
         anchor_group_id = state_dict.pop("tok_embeddings.anchor_group_id", None)
-        if anchor_w is not None:
-            full_emb = torch.cat([anchor_w[anchor_group_id], residual_w], dim=-1)
+        if anchor_w is not None or residual_w is not None:
+            # One or both sub-tables may be absent at the tying extremes: shared_dim_fraction==1.0
+            # drops the residual table (full tying), ==0.0 drops the anchor table (no tying).
+            parts = []
+            if anchor_w is not None:
+                parts.append(anchor_w[anchor_group_id])
+            if residual_w is not None:
+                parts.append(residual_w)
+            full_emb = parts[0] if len(parts) == 1 else torch.cat(parts, dim=-1)
             hf_state_dict["model.embed_tokens.weight"] = full_emb
             # Tied case: TiedAnchorOutput holds tok_embeddings as a submodule, so the SAME
             # params are also reachable (and present in this state_dict) under

@@ -50,27 +50,40 @@ class HybridAnchorEmbedding(Module):
     def __init__(self, config: Config):
         super().__init__()
         self.config = config
-        assert 0.0 < config.shared_dim_fraction < 1.0, (
-            "shared_dim_fraction must be in (0, 1) -- use a plain nn.Embedding for 0.0, and the "
-            "data-level SharedAnchorRemap (full id-remap tying) for 1.0."
+        assert 0.0 <= config.shared_dim_fraction <= 1.0, (
+            "shared_dim_fraction must be in [0, 1]: 0.0 = fully independent per-token embeddings "
+            "(no shared anchor subspace), 1.0 = fully tied (no independent residual subspace)."
         )
         self.dim_anchor = round(config.dim * config.shared_dim_fraction)
         self.dim_residual = config.dim - self.dim_anchor
-        assert self.dim_anchor > 0 and self.dim_residual > 0
+        # The two extremes are supported as ablation endpoints by DROPPING the degenerate
+        # (zero-width) table rather than creating a 0-dim nn.Embedding -- a 0-numel parameter is a
+        # fragile / untested case under FSDP sharding. has_anchor False (fraction 0.0) -> this is
+        # just a plain per-token embedding (no tying); has_residual False (fraction 1.0) -> matched
+        # pairs share their ENTIRE embedding row (full tying, like the data-level SharedAnchorRemap
+        # but at the parameter level).
+        self.has_anchor = self.dim_anchor > 0
+        self.has_residual = self.dim_residual > 0
 
-        self._group_id_list, num_groups = self._compute_group_id_list(
-            config.anchor_map_path, config.vocab_size
-        )
-        # Persistent buffer: saved/restored by DCP + HF round trip. Registered here with a
-        # placeholder value only -- real values get filled in by init_weights() (see there for
-        # why: this module is constructed under a meta device context, same as the rest of the
-        # model, and to_empty(device=init_device) discards whatever a meta-time value held).
-        self.register_buffer(
-            "anchor_group_id", torch.zeros(config.vocab_size, dtype=torch.long), persistent=True
-        )
+        if self.has_anchor:
+            self._group_id_list, num_groups = self._compute_group_id_list(
+                config.anchor_map_path, config.vocab_size
+            )
+            # Persistent buffer: saved/restored by DCP + HF round trip. Registered here with a
+            # placeholder value only -- real values get filled in by init_weights() (see there for
+            # why: this module is constructed under a meta device context, same as the rest of the
+            # model, and to_empty(device=init_device) discards whatever a meta-time value held).
+            self.register_buffer(
+                "anchor_group_id", torch.zeros(config.vocab_size, dtype=torch.long), persistent=True
+            )
+            self.anchor_table = nn.Embedding(num_groups, self.dim_anchor)
+        else:
+            self._group_id_list, num_groups = None, 0
+            self.anchor_table = None
 
-        self.anchor_table = nn.Embedding(num_groups, self.dim_anchor)
-        self.residual_table = nn.Embedding(config.vocab_size, self.dim_residual)
+        self.residual_table = (
+            nn.Embedding(config.vocab_size, self.dim_residual) if self.has_residual else None
+        )
 
         logger.info(
             f"HybridAnchorEmbedding: vocab_size={config.vocab_size}, dim={config.dim} -> "
@@ -94,10 +107,26 @@ class HybridAnchorEmbedding(Module):
         {V+i: i for i in range(V)} -- i.e. every second-half token V+i is tied to its first-half
         twin i. Used by the tagged-hybrid-anchor setup (translate AR->EN, then tag AR-origin tokens
         into the second vocab half), where the pairing is purely arithmetic and needs no data file.
+
+        An optional third field "identity_shift:<V>:<token_fraction>" ties only the first
+        `token_fraction` of the token pairs: {V+i: i for i in range(round(V*token_fraction))}. The
+        remaining tagged tokens (and their untagged counterparts) stay UNTIED -- each gets its own
+        independent group. token_fraction is the fraction of tokens that are anchored at all, which
+        is orthogonal to shared_dim_fraction (the fraction of the embedding *dim* shared within an
+        anchored pair). ":1.0" (or omitting it) == the plain full-tie form. E.g. with V=65536,
+        ":0.5" ties V+i -> i only for i in [0, 32768); ids [32768, 65536) and [V+32768, 2V) are
+        independent.
         """
         if map_path.startswith("identity_shift:"):
-            V = int(map_path.split(":", 1)[1])
-            id_remap = {V + i: i for i in range(V)}
+            # "identity_shift:<V>" or "identity_shift:<V>:<token_fraction>"
+            fields = map_path.split(":")
+            V = int(fields[1])
+            token_fraction = float(fields[2]) if len(fields) > 2 else 1.0
+            assert 0.0 <= token_fraction <= 1.0, (
+                f"identity_shift token_fraction must be in [0, 1], got {token_fraction}"
+            )
+            num_tied = round(V * token_fraction)
+            id_remap = {V + i: i for i in range(num_tied)}
         else:
             with open(map_path) as f:
                 data = json.load(f)
@@ -128,10 +157,12 @@ class HybridAnchorEmbedding(Module):
         return group_id, num_groups
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
-        anchor_ids = self.anchor_group_id[tokens]
-        return torch.cat(
-            [self.anchor_table(anchor_ids), self.residual_table(tokens)], dim=-1
-        )
+        parts = []
+        if self.has_anchor:
+            parts.append(self.anchor_table(self.anchor_group_id[tokens]))
+        if self.has_residual:
+            parts.append(self.residual_table(tokens))
+        return parts[0] if len(parts) == 1 else torch.cat(parts, dim=-1)
 
     def init_weights(self, *, final_out_std: float | None = None, **kwargs) -> None:
         """final_out_std: set this when the embedding is ALSO serving as the tied LM head (via
@@ -145,9 +176,10 @@ class HybridAnchorEmbedding(Module):
         _init_tok_embeddings() (std=1) runs first and _init_output() OVERWRITES the same aliased
         .weight tensor with the small std afterward. TiedAnchorOutput has no independent weight
         for _init_output() to overwrite, so that correction has to happen here instead."""
+        tables = [t for t in (self.anchor_table, self.residual_table) if t is not None]
         if final_out_std is not None:
             cutoff_factor = 3
-            for table in (self.anchor_table, self.residual_table):
+            for table in tables:
                 trunc_normal_(
                     table.weight,
                     mean=0.0,
@@ -156,16 +188,18 @@ class HybridAnchorEmbedding(Module):
                     b=cutoff_factor * final_out_std,
                 )
         else:
-            nn.init.normal_(self.anchor_table.weight)
-            nn.init.normal_(self.residual_table.weight)
+            for table in tables:
+                nn.init.normal_(table.weight)
         # anchor_group_id is a deterministic function of the map file + vocab_size, but its
         # meta-time value (from __init__) gets discarded by to_empty(device=init_device) before
         # this runs -- so refill it here from the cached Python list, on the now-real device.
-        self.anchor_group_id.copy_(
-            torch.tensor(
-                self._group_id_list, dtype=torch.long, device=self.anchor_group_id.device
+        # (Only present when there is an anchor subspace; fraction 0.0 has no anchor_group_id.)
+        if self.has_anchor:
+            self.anchor_group_id.copy_(
+                torch.tensor(
+                    self._group_id_list, dtype=torch.long, device=self.anchor_group_id.device
+                )
             )
-        )
 
     def materialize_full_matrix(self) -> torch.Tensor:
         """Build the full (vocab_size, dim) matrix for HF export / the tied-output forward.
@@ -179,14 +213,18 @@ class HybridAnchorEmbedding(Module):
         .full_tensor() first all-gathers each DTensor into an ordinary, fully-materialized local
         tensor (exactly the "materialize the full matrix" semantics this function is named for),
         after which plain-Tensor indexing is unambiguous and safe."""
-        anchor_weight = self.anchor_table.weight
-        residual_weight = self.residual_table.weight
-        if isinstance(anchor_weight, DTensor):
-            anchor_weight = anchor_weight.full_tensor()
-        if isinstance(residual_weight, DTensor):
-            residual_weight = residual_weight.full_tensor()
-        full_anchor = anchor_weight[self.anchor_group_id]  # [V, D_anchor]
-        return torch.cat([full_anchor, residual_weight], dim=-1)  # [V, D]
+        parts = []
+        if self.has_anchor:
+            anchor_weight = self.anchor_table.weight
+            if isinstance(anchor_weight, DTensor):
+                anchor_weight = anchor_weight.full_tensor()
+            parts.append(anchor_weight[self.anchor_group_id])  # [V, D_anchor]
+        if self.has_residual:
+            residual_weight = self.residual_table.weight
+            if isinstance(residual_weight, DTensor):
+                residual_weight = residual_weight.full_tensor()
+            parts.append(residual_weight)  # [V, D_residual]
+        return parts[0] if len(parts) == 1 else torch.cat(parts, dim=-1)  # [V, D]
 
 
 class TiedAnchorOutput(nn.Module):

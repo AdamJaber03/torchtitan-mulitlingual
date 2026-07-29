@@ -1,5 +1,6 @@
 import json
 import random
+import numpy as np
 from torchtitan.hf_datasets.value_schedualers import SCHEDUALER_REGISTRY
 from torchtitan.tools.logging import logger
 from multiprocessing import Value
@@ -360,9 +361,54 @@ class SharedAnchorRemap:
         return tokens_in
 
 
+class RandomVocabPermutation:
+    """
+    Applies a fixed random permutation of the vocabulary, generated once from a
+    seed, to every tokenized sequence. Each token id is replaced by
+    permutation[token_id], where `permutation` is a random bijection of
+    range(vocab_size) computed at init time.
+    """
+
+    def __init__(self, config: dict):
+        self.name = config.get("name", "random_vocab_permutation")
+        self.idx = config.get("idx", None)
+        self.vocab_size = config.get("vocab_size")
+        if self.vocab_size is None:
+            raise ValueError(f"[{self.name}] config must include 'vocab_size'")
+        self.seed = config.get("seed", 43)
+
+        # Special tokens (BOS, EOS, PAD, ...) are left untouched by the permutation.
+        self.special_tokens = set(config.get("special_tokens", []))
+
+        rng = np.random.default_rng(self.seed)
+        self.permutation = rng.permutation(self.vocab_size).tolist()
+
+        logger.info(f"Initializing {self.name} augmentation with vocab_size={self.vocab_size}, seed={self.seed}...")
+
+    def __call__(self, tokens_in: dict | list[dict], dataset_name: str = None) -> list:
+        if not tokens_in:
+            return tokens_in
+        if self.idx is not None:
+            tokens = tokens_in[self.idx]["tokens"]
+        else:
+            tokens = tokens_in["tokens"]
+
+        permuted_tokens = [
+            token_id if token_id in self.special_tokens else self.permutation[token_id]
+            for token_id in tokens
+        ]
+
+        if self.idx is not None:
+            tokens_in[self.idx]["tokens"] = permuted_tokens
+            return tokens_in
+        tokens_in["tokens"] = permuted_tokens
+        return tokens_in
+
+
 POST_TOKEN_AUGMENTATIONS_REGISTRY = {
     "stochastic_token_tagging": StochasticTokenTagging,
     "stochastic_word_tagging": StochasticWordTokenTagging,
     "token_prefix": TokenPrefix,
     "shared_anchor_remap": SharedAnchorRemap,
+    "random_vocab_permutation": RandomVocabPermutation,
 }

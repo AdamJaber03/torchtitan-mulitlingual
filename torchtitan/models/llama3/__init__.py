@@ -416,6 +416,7 @@ llama3_configs = {
         vocab_size=65536,
         enable_weight_tying=True,
         enable_contrastive_alignment=True,
+        contrastive_head_type="identity",
         contrastive_proj_dim=512,
         contrastive_target_layer=4,
         keep_len=2304,  # ~ (2/3)*3072 + ~12% headroom; see the new training config (seq_len=3072)
@@ -446,6 +447,68 @@ llama3_configs = {
         n_layers=32,
         vocab_size=65536*2,    #*2 if tagging # User override (Standard is 49152)
         enable_weight_tying=True,
+        enable_contrastive_alignment=True,
+        contrastive_proj_dim=512,
+        contrastive_target_layer=4,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
+        layer=Llama3TransformerBlock.Config(
+            feed_forward=FeedForward.Config(
+                hidden_dim=compute_ffn_hidden_dim(
+                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
+                )
+            ),
+            attention=GQAttention.Config(
+                n_heads=15,
+                n_kv_heads=5,         # 3:1 GQA Ratio
+                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
+                attn_mask_type="block_causal",
+                rope_backend="complex",
+            ),
+        ),
+        rope=RoPE.Config(
+            dim=960 // 15,        # Head dim = 64
+            max_seq_len=2048,
+            theta=10000,         # SmolLM2 standard theta
+            backend="complex",
+            scaling="llama",
+        ),
+    ),
+    "smollm2_360m_contrastive_2xvocab_sameinit": Llama3Model.Config(
+        dim=960,
+        n_layers=32,
+        vocab_size=65536*2,    #*2 if tagging # User override (Standard is 49152)
+        enable_weight_tying=True,
+        en1en2_shared_embeddings_init=True,
+        enable_contrastive_alignment=True,
+        contrastive_proj_dim=512,
+        contrastive_target_layer=4,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
+        layer=Llama3TransformerBlock.Config(
+            feed_forward=FeedForward.Config(
+                hidden_dim=compute_ffn_hidden_dim(
+                    960, multiple_of=256  # Omitting multiplier defaults to standard 8/3 -> 2560
+                )
+            ),
+            attention=GQAttention.Config(
+                n_heads=15,
+                n_kv_heads=5,         # 3:1 GQA Ratio
+                attn_backend="flex",  # Fast optimized kernel for packed variable seq_len inputs
+                attn_mask_type="block_causal",
+                rope_backend="complex",
+            ),
+        ),
+        rope=RoPE.Config(
+            dim=960 // 15,        # Head dim = 64
+            max_seq_len=2048,
+            theta=10000,         # SmolLM2 standard theta
+            backend="complex",
+            scaling="llama",
+        ),
+    ),
+    "smollm2_360m_contrastive_2xvocab_id": Llama3Model.Config(
+        dim=960,
+        n_layers=32,
+        vocab_size=65536*2,    #*2 if tagging # User override (Standard is 49152)
+        enable_weight_tying=True,
+        contrastive_head_type="identity",
         enable_contrastive_alignment=True,
         contrastive_proj_dim=512,
         contrastive_target_layer=4,  # Apply contrastive alignment at this layer index (0-based) -1 is embeddings, 0 is first layer, etc.
@@ -833,8 +896,31 @@ llama3_configs["smollm2_360m_hybrid_anchor"] = _dc.replace(
 llama3_configs["smollm2_360m_tagged_hybrid_anchor"] = _dc.replace(
     llama3_configs["smollm2_360m_2xvocab"],
     anchor_embedding_path="identity_shift:65536",
-    anchor_shared_dim_fraction=0.5,
+    anchor_shared_dim_fraction=0.999,
+    enable_weight_tying=True,  # weight tying is incompatible with the identity_shift anchor map
 )
+llama3_configs["smollm2_360m_tagged_hybrid_anchor_0.99"] = _dc.replace(
+    llama3_configs["smollm2_360m_2xvocab"],
+    anchor_embedding_path="identity_shift:65536",
+    anchor_shared_dim_fraction=0.99,
+    enable_weight_tying=True,  # weight tying is incompatible with the identity_shift anchor map
+)
+
+# "Full-tie fraction-of-tokens" variants: near-fully tie (anchor_shared_dim_fraction=0.999, i.e.
+# nearly the ENTIRE embedding dim is shared within an anchored pair, leaving a 1-dim independent
+# sliver) but only for the first `token_fraction` of the token pairs -- via the
+# "identity_shift:65536:<token_fraction>" map. The remaining tagged tokens
+# (and their untagged counterparts) stay fully independent. token_fraction is orthogonal to
+# shared_dim_fraction: it picks WHICH pairs anchor, not how much of the dim they share. p08/p16/p32/p64
+# tie 8/16/32/64% of tokens. Pair with the matching smollm2_360m_flex_en1_en2_hybrid_anchor_fulltie_p*
+# Trainer configs in config_registry.py.
+for _tie_pct in (8, 16, 32, 64):
+    llama3_configs[f"smollm2_360m_tagged_hybrid_anchor_fulltie_p{_tie_pct:02d}"] = _dc.replace(
+        llama3_configs["smollm2_360m_2xvocab"],
+        anchor_embedding_path=f"identity_shift:65536:{_tie_pct / 100}",
+        anchor_shared_dim_fraction=0.999,  # near-full tie: keeps a 1-dim independent sliver per pair
+        enable_weight_tying=True,
+    )
 
 
 def model_registry(flavor: str) -> ModelSpec:
