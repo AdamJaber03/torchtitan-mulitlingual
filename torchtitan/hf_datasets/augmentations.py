@@ -176,8 +176,8 @@ import json
 import re
 import random
 from multiprocessing import Value
-from unidecode import unidecode
 from code_switching_tools.buckwalter_transliteration import arabic_to_buckwalter
+from code_switching_tools.gost_transliteration import russian_to_gost
 
 
 class WordwiseUnigramCodeSwitching:
@@ -275,8 +275,8 @@ class WordwiseUnigramCodeSwitching:
                         if self.fallback_to_transliteration:
                             if pattern == self.ar_pattern:
                                 return arabic_to_buckwalter(word)
-                            elif pattern == self.ru_pattern:    #TODO: find a russian 1to1 transliteration method
-                                return unidecode(word)
+                            elif pattern == self.ru_pattern:
+                                return russian_to_gost(word)
                     return word
                 
                 # Search and replace words within the current token
