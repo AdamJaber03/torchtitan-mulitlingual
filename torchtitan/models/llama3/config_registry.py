@@ -65,7 +65,7 @@ def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
     probs = [count / tot_docs for count in target_counts]
     return [p * P_READJUST_FACTOR[ds.split("-")[-1]] for p in probs]
 
-RU_P_READJUST_FACTOR = {"en": 1 / 1.01, "ru": 1 / 1.03, "translated_1to1map": 1.0 / 1.01}
+RU_P_READJUST_FACTOR = {"en": 1.0, "ru": 1.0, "translated_1to1map": 1.0}
 
 
 def get_injection_probabilities_ru(target_counts, tot_tokens, ds, inj_ds) -> list:
@@ -99,7 +99,6 @@ def get_injection_probabilities_ru(target_counts, tot_tokens, ds, inj_ds) -> lis
     "gemini_seeds_en": 21.1,
     "gemini_seeds_ru": 20.6,
     "gemini_seeds_ru_translated_1to1map": 23.9,
-    "from_domains_humans_en": 27.7,
     }
     inj_ds = inj_ds if isinstance(inj_ds, list) else [inj_ds]
     assert len(target_counts) == 4, "Expected 4 target counts"
@@ -1469,18 +1468,15 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
     print(f"base probs for translated russian: {base_probs_ru}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities_ru(target_counts_en, tot_tokens=133600*512*2048/2,
-                                               ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+                                               ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en"])
     print(f"base probs for english: {base_probs_en}")
     gemini_file_order_shuffler = random.Random(43)
     gemini_file_order = list(range(2080))
     gemini_file_order_shuffler.shuffle(gemini_file_order)
-    human_file_order_shuffler = np.random.default_rng(48)
-    human_file_order = list(range(2080))
-    human_file_order_shuffler.shuffle(human_file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order]
     ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in gemini_file_order]
     ru_probs = [base_probs_ru[i % len(base_probs_ru)] for i in range(2080)]
-    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(4160)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
@@ -1494,7 +1490,6 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
                             "injection_paths": en_files,
                             "injection_probs": en_probs,
                         },
@@ -1626,7 +1621,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
     print(f"base probs for russian: {base_probs_ru}")
     target_counts_en = [0, 20, 100, 1000]
     base_probs_en = get_injection_probabilities_ru(target_counts_en, tot_tokens=133600*512*2048/2,
-                                               ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
+                                               ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en"])
     print(f"base probs for english: {base_probs_en}")
     gemini_file_order_shuffler = random.Random(43)
     gemini_file_order = list(range(2080))
@@ -1634,10 +1629,10 @@ def llama3_7B_en_ru() -> Trainer.Config:
     human_file_order_shuffler = np.random.default_rng(48)
     human_file_order = list(range(2080))
     human_file_order_shuffler.shuffle(human_file_order)
-    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order] + [f"{_PROJECT_ROOT}/fictional_entity_data/from_domains_humans/{i}/en_data.jsonl" for i in human_file_order]
+    en_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/en_data.jsonl" for i in gemini_file_order]
     ru_files = [f"{_PROJECT_ROOT}/fictional_entity_data/gemini_seeds/{i}/ru_data.jsonl" for i in gemini_file_order]
     ru_probs = [base_probs_ru[i % len(base_probs_ru)] for i in range(2080)]
-    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(4160)]
+    en_probs = [base_probs_en[i % len(base_probs_en)] for i in range(2080)]
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
@@ -1657,7 +1652,6 @@ def llama3_7B_en_ru() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
                             "injection_paths": en_files,
                             "injection_probs": en_probs,
                         },

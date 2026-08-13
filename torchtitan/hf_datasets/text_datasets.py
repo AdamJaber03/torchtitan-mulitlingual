@@ -572,7 +572,7 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                         eos_token_id=config.eos_token_id,
                         augmentations=stage_augs, # Stage-level augs passed accurately
                         post_token_augmentations=stage_post_augs, # Pass down the post token augs
-                        start_idx=(src.get("start_idx", 0) // (config.num_workers * dp_world_size)),
+                        start_idx=(src.get("start_idx", 0),
                         lang_id=src.get("lang_id", None),
                         enable_contrastive_mask=src.get("enable_contrastive_mask", False),
                         contrastive_len_threshold=src.get("contrastive_len_threshold", 256),
@@ -623,7 +623,7 @@ class HuggingFaceTextDataLoader(ParallelAwareDataloader):
                     eos_token_id=config.eos_token_id,
                     augmentations=ds_augs,
                     post_token_augmentations=ds_post_token_augmentations, # Pass down the post token augs
-                    start_idx=(src.get("start_idx", 0) // (config.num_workers * dp_world_size)),
+                    start_idx=(src.get("start_idx", 0),
                     lang_id=src.get("lang_id", None),
                     enable_contrastive_mask=src.get("enable_contrastive_mask", False),
                     contrastive_len_threshold=src.get("contrastive_len_threshold", 256),
