@@ -87,14 +87,19 @@ def get_injection_probabilities_ru(target_counts, tot_tokens, ds, inj_ds) -> lis
     There is no Russian from_domains_humans family (those seed dirs carry no ru_data.jsonl),
     so Russian injections come from gemini_seeds only -- pass a single-element inj_ds.
     """
-    token_stats = {     # tokenizer: tests/assets/65k_en1.0_ru1.0, 20k docs/source
-    "fineweb-edu-ar-en": 1041.2,
-    "fineweb2-hq-ru": 1007.0,
-    "fineweb2-hq-ru-translated_1to1map": 1240.5,
-    "gemini_seeds_en": 20.8,
+    token_stats = {     # tokenizer: tests/assets/65k_en1.0_ru1.0
+    # fineweb rows: systematic 1-in-100 stride within each of 221 (ru) / 205 (en) chunks
+    # spread across the corpus. Document length is non-stationary both across chunks
+    # (per-chunk means 766-1485) and within them (chunk heads are the long end), so a
+    # head-of-stream sample reads these low. 95% CI +-26 (ru) / +-23 (en).
+    "fineweb-edu-ar-en": 1071.4,
+    "fineweb2-hq-ru": 1083.7,
+    "fineweb2-hq-ru-translated_1to1map": 1334.4,
+    # injection rows: every document in the source, so no sampling error
+    "gemini_seeds_en": 21.1,
     "gemini_seeds_ru": 20.6,
-    "gemini_seeds_ru_translated_1to1map": 24.3,
-    "from_domains_humans_en": 27.8,
+    "gemini_seeds_ru_translated_1to1map": 23.9,
+    "from_domains_humans_en": 27.7,
     }
     inj_ds = inj_ds if isinstance(inj_ds, list) else [inj_ds]
     assert len(target_counts) == 4, "Expected 4 target counts"

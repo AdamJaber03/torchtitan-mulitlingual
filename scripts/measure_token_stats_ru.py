@@ -9,8 +9,7 @@ present:
     python scripts/measure_token_stats_ru.py --docs 2000      # quick pass
     python scripts/measure_token_stats_ru.py --only fineweb2-hq-ru gemini_seeds_ru
 
-Three properties make the output comparable to what training actually sees, and
-all three were wrong in the first en-ru attempt:
+Four properties make the output comparable to what training actually sees:
 
 * the tokenizer is tests/assets/65k_en1.0_ru1.0, the en/ru vocab the models are
   trained and released with -- not the en/ar 65k_paired vocab;
@@ -19,7 +18,17 @@ all three were wrong in the first en-ru attempt:
 * the translated_1to1map rows apply the real training-time augmentation
   (WordwiseUnigramCodeSwitching, prob=1.0, GOST fallback) to the original
   Russian, rather than reading the precomputed translated_1to1map directory,
-  because the augmentation is what the dataloader feeds the model.
+  because the augmentation is what the dataloader feeds the model;
+* the fineweb rows are sampled on a systematic grid over the chunk files rather
+  than off the head of the stream. Document length in these corpora is
+  non-stationary across chunks (per-chunk means span 766-1485) and within them
+  (the first documents of a chunk are the long ones), and the dataloader's
+  20k-document shuffle buffer never leaves the head of a 1105-chunk corpus, so a
+  streamed sample reads these rows low no matter how many documents it draws.
+  Pass --head-sample to reproduce that biased figure for comparison.
+
+Run --shard/--n-shards to split the fineweb rows across jobs; the shard means are
+independent replicates, so their spread is the standard error of the pooled value.
 
 Paste the printed block into get_injection_probabilities_ru.
 """
@@ -57,6 +66,35 @@ def stream_hf(dataset_name, limit, start_idx=0):
         if i >= limit:
             return
         yield cfg.sample_processor(sample)
+
+
+CHUNKED_CORPORA = {
+    # stat key -> (directory of chunk_NNNN.jsonl files, number of chunks)
+    "fineweb-edu-ar-en": ("data/fineweb_translated/en-original", 613),
+    "fineweb2-hq-ru": ("data/fineweb2_hq/rus_Cyrl/original", 1105),
+}
+
+
+def stream_chunked(stat_key, chunk_step, stride, shard=0, n_shards=1):
+    """Yield documents on a systematic grid: every chunk_step-th chunk, every stride-th document.
+
+    Chunks are dealt out to shards round-robin, so each shard is itself a spread
+    sample of the whole corpus rather than a contiguous slice of it.
+    """
+    subdir, n_chunks = CHUNKED_CORPORA[stat_key]
+    root = os.path.join(PROJECT_ROOT, subdir)
+    chunks = [c for i, c in enumerate(range(1, n_chunks + 1, chunk_step)) if i % n_shards == shard]
+    for chunk in chunks:
+        path = os.path.join(root, f"chunk_{chunk:04d}.jsonl")
+        if not os.path.exists(path):
+            continue
+        with open(path, encoding="utf-8") as f:
+            for i, line in enumerate(f):
+                if i % stride:
+                    continue
+                text = json.loads(line).get("text") or ""
+                if text.strip():
+                    yield text
 
 
 def stream_jsonl_dirs(subdir, filename, limit):
@@ -115,7 +153,22 @@ def main():
     parser.add_argument("--start-idx", type=int, default=0,
                         help="skip this many streamed docs first; the committed table used 0")
     parser.add_argument("--only", nargs="*", default=None, help="subset of stat keys to measure")
+    parser.add_argument("--head-sample", action="store_true",
+                        help="draw the fineweb rows off the head of the stream instead of the "
+                             "systematic grid; reproduces the biased figure, do not commit it")
+    parser.add_argument("--chunk-step", type=int, default=5,
+                        help="sample every Nth chunk file of the fineweb corpora")
+    parser.add_argument("--stride", type=int, default=100,
+                        help="sample every Nth document within each sampled chunk")
+    parser.add_argument("--shard", type=int, default=0, help="this shard's index")
+    parser.add_argument("--n-shards", type=int, default=1, help="total number of shards")
     args = parser.parse_args()
+
+    def fineweb(stat_key):
+        """The document stream for a fineweb row, spread over the corpus unless --head-sample."""
+        if args.head_sample:
+            return stream_hf(stat_key, args.docs, args.start_idx)
+        return stream_chunked(stat_key, args.chunk_step, args.stride, args.shard, args.n_shards)
 
     tokenizer = HuggingFaceTokenizer.Config().build(tokenizer_path=TOKENIZER_PATH)
     assert tokenizer.bos_id is None, "table assumes no BOS is prepended per document"
@@ -124,11 +177,11 @@ def main():
 
     sources = {
         "fineweb-edu-ar-en": lambda: measure(
-            "fineweb-edu-ar-en", stream_hf("fineweb-edu-ar-en", args.docs, args.start_idx), tokenizer),
+            "fineweb-edu-ar-en", fineweb("fineweb-edu-ar-en"), tokenizer),
         "fineweb2-hq-ru": lambda: measure(
-            "fineweb2-hq-ru", stream_hf("fineweb2-hq-ru", args.docs, args.start_idx), tokenizer),
+            "fineweb2-hq-ru", fineweb("fineweb2-hq-ru"), tokenizer),
         "fineweb2-hq-ru-translated_1to1map": lambda: measure(
-            "fineweb2-hq-ru-translated_1to1map", stream_hf("fineweb2-hq-ru", args.docs, args.start_idx),
+            "fineweb2-hq-ru-translated_1to1map", fineweb("fineweb2-hq-ru"),
             tokenizer, augment=ru_aug),
         "gemini_seeds_en": lambda: measure(
             "gemini_seeds_en", stream_jsonl_dirs("gemini_seeds", "en_data.jsonl", args.docs), tokenizer),
@@ -146,7 +199,10 @@ def main():
     unknown = [key for key in selected if key not in sources]
     assert not unknown, f"unknown stat keys {unknown}; choose from {list(sources)}"
 
-    print(f"=== tokenizer {TOKENIZER_PATH}, {args.docs} docs/source ===\n")
+    sampling = (f"head of stream, {args.docs} docs" if args.head_sample
+                else f"every {args.chunk_step}th chunk, every {args.stride}th doc, "
+                     f"shard {args.shard}/{args.n_shards}")
+    print(f"=== tokenizer {TOKENIZER_PATH} | fineweb rows: {sampling} ===\n")
     results = {}
     for key in selected:
         print(f"{key} ...", flush=True)
