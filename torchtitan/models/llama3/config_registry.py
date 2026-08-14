@@ -1570,7 +1570,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 30_000_000,
+                                    "start_idx": 100_000,
                                 },
                             ],
                         }
@@ -1586,7 +1586,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb2-hq-ru",
                                     "weight": 1.0,
-                                    "start_idx": 54_700_000,
+                                    "start_idx": 100_000,
                                     "augmentations": [
                                         {
                                             "name": "wordwise_unigram_codeswitching",
@@ -1716,7 +1716,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 30_000_000,
+                                    "start_idx": 100_000,
                                 },
                             ],
                         }
@@ -1732,7 +1732,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb2-hq-ru",
                                     "weight": 1.0,
-                                    "start_idx": 54_700_000,
+                                    "start_idx": 100_000,
                                 },
                             ],
                         }
