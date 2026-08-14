@@ -71,10 +71,10 @@ RU_P_READJUST_FACTOR = {"en": 1.0, "ru": 1.0, "translated_1to1map": 1.0}
 def get_injection_probabilities_ru(target_counts, tot_tokens, ds, inj_ds) -> list:
     """Russian counterpart of get_injection_probabilities.
 
-    Means measured by scripts/measure_token_stats_ru.py on 20k docs per source with the
+    Means measured by scripts/measure_token_stats_ru.py with the
     en/ru tokenizer (tests/assets/65k_en1.0_ru1.0), +1 for the EOS the dataloader appends
     per document. These are NOT interchangeable with the 65k_paired (en/ar) numbers: the
-    same English corpus measures 1041.2 tokens/doc here vs 1109.5 there, and Russian
+    same English corpus measures 1071.4 tokens/doc here vs 1109.5 there, and Russian
     fragments differently again, so reusing the en/ar table would push the realized
     0/20/100/1000 exposure counts off target -- and exposure rate is the independent
     variable of the whole knowledge-transfer experiment.
@@ -1152,7 +1152,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 15_100_000,
                             "injection_paths": en_files,
                             "injection_probs": en2_probs,
                             "post_token_augmentations": [
@@ -1223,7 +1223,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1239,7 +1239,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                     "post_token_augmentations": [
                                         {
                                             "name": "stochastic_word_tagging",
@@ -1314,14 +1314,14 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.2,
-                            "start_idx": 72_000_000,
+                            "start_idx": 13_600_000,
                             "injection_paths": en_files,
                             "injection_probs": pt1_en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.2,
-                            "start_idx": 96_000_000,
+                            "start_idx": 18_100_000,
                             "injection_paths": en_files,
                             "injection_probs": pt1_en2_probs,
                             "post_token_augmentations": [
@@ -1342,14 +1342,14 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 120_000_000,
+                            "start_idx": 22_700_000,
                             "injection_paths": en_files,
                             "injection_probs": pt2_en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 140_000_000,
+                            "start_idx": 26_500_000,
                             "injection_paths": en_files,
                             "injection_probs": pt2_en2_probs,
                             "post_token_augmentations": [
@@ -1420,7 +1420,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1436,7 +1436,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                     "post_token_augmentations": [
                                         {
                                             "name": "stochastic_word_tagging",
@@ -1570,7 +1570,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1586,7 +1586,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb2-hq-ru",
                                     "weight": 1.0,
-                                    "start_idx": 45_000_000,
+                                    "start_idx": 54_700_000,
                                     "augmentations": [
                                         {
                                             "name": "wordwise_unigram_codeswitching",
@@ -1716,7 +1716,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1732,7 +1732,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb2-hq-ru",
                                     "weight": 1.0,
-                                    "start_idx": 45_000_000,
+                                    "start_idx": 54_700_000,
                                 },
                             ],
                         }
@@ -1788,7 +1788,7 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                             "augmentations": [
@@ -1863,7 +1863,7 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1879,7 +1879,7 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                     "augmentations": [
                                         {
                                             "name": "wordwise_unigram_codeswitching",
@@ -1945,7 +1945,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                         },
@@ -2010,7 +2010,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -2026,7 +2026,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                 },
                             ],
                         }
@@ -2081,7 +2081,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                         },
@@ -2144,7 +2144,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -2160,7 +2160,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                 },
                             ],
                         }
@@ -2216,7 +2216,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                             "post_token_augmentations": [
@@ -2287,7 +2287,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -2303,7 +2303,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                     "post_token_augmentations": [
                                         {
                                             "name": "shared_anchor_remap",
