@@ -19,6 +19,7 @@ from .attention import (
 )
 from .decoder import Decoder, TransformerBlock
 from .feed_forward import compute_ffn_hidden_dim, FeedForward
+from .hybrid_anchor_embedding import HybridAnchorEmbedding, TiedAnchorOutput
 from .moe import MoE
 from .rope import (
     apply_rotary_emb_complex,
@@ -39,9 +40,11 @@ __all__ = [
     "get_fixed_block_mask_mod",
     "get_sliding_window_mask_mod",
     "GQAttention",
+    "HybridAnchorEmbedding",
     "MoE",
     "RoPE",
     "ScaledDotProductAttentionWrapper",
+    "TiedAnchorOutput",
     "TransformerBlock",
     "VarlenAttentionWrapper",
     "VarlenMetadata",

@@ -8,6 +8,8 @@ import logging
 import re
 from typing import Any
 
+import torch
+
 logger = logging.getLogger()
 
 from torchtitan.protocols.state_dict_adapter import StateDictAdapter
@@ -78,6 +80,45 @@ class Llama3StateDictAdapter(StateDictAdapter):
         dim = self.model_config.dim
         head_dim = dim // n_heads
         hf_state_dict = {}
+
+        # --- HybridAnchorEmbedding: materialize the dense (vocab_size, dim) matrix that
+        # to_hf_map's "tok_embeddings.weight" entry would otherwise expect. The live module has
+        # no such key -- its params live under tok_embeddings.anchor_table.weight /
+        # tok_embeddings.residual_table.weight (plus the anchor_group_id buffer) -- so the normal
+        # per-key loop below would KeyError on `to_hf_map[key]`. Pop them out and emit the
+        # equivalent dense matrix under the regular HF key instead; the rest of the pipeline
+        # (including downstream vocab-slicing) then works unchanged on a normal dense matrix.
+        state_dict = dict(state_dict)  # shallow copy -- don't mutate the caller's dict
+        anchor_w = state_dict.pop("tok_embeddings.anchor_table.weight", None)
+        residual_w = state_dict.pop("tok_embeddings.residual_table.weight", None)
+        anchor_group_id = state_dict.pop("tok_embeddings.anchor_group_id", None)
+        # TiedAnchorOutput's optional scalar softmax temperature. HF has no equivalent field,
+        # so fold exp(log_scale) into the exported lm_head weight below -- otherwise inference
+        # through transformers would silently run at a different temperature than training.
+        # Must be popped either way: the per-key loop ends in an unguarded `to_hf_map[key]`.
+        logit_scale = state_dict.pop("output.log_logit_scale", None)
+        if anchor_w is not None or residual_w is not None:
+            # One or both sub-tables may be absent at the tying extremes: shared_dim_fraction==1.0
+            # drops the residual table (full tying), ==0.0 drops the anchor table (no tying).
+            parts = []
+            if anchor_w is not None:
+                parts.append(anchor_w[anchor_group_id])
+            if residual_w is not None:
+                parts.append(residual_w)
+            full_emb = parts[0] if len(parts) == 1 else torch.cat(parts, dim=-1)
+            hf_state_dict["model.embed_tokens.weight"] = full_emb
+            # Tied case: TiedAnchorOutput holds tok_embeddings as a submodule, so the SAME
+            # params are also reachable (and present in this state_dict) under
+            # output.tok_embeddings.*. Discard that duplicate path and instead emit lm_head.weight
+            # as an independent clone of the materialized matrix.
+            state_dict.pop("output.tok_embeddings.anchor_table.weight", None)
+            state_dict.pop("output.tok_embeddings.residual_table.weight", None)
+            state_dict.pop("output.tok_embeddings.anchor_group_id", None)
+            if self.model_config.enable_weight_tying:
+                head = full_emb.clone()
+                if logit_scale is not None:
+                    head = head * logit_scale.float().exp().to(head.dtype)
+                hf_state_dict["lm_head.weight"] = head
 
         for key, value in state_dict.items():
             if "contrastive_proj" in key:

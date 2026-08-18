@@ -10,6 +10,7 @@ from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.tensor import DTensor
 from torch.distributed.tensor.placement_types import _StridedShard, Replicate, Shard
 
+from torchtitan.models.common.hybrid_anchor_embedding import HybridAnchorEmbedding
 from torchtitan.protocols.model import BaseModel
 from torchtitan.protocols.state_dict_adapter import StateDictAdapter
 
@@ -410,7 +411,7 @@ def get_dense_model_nparams_and_flops(
     nparams_embedding = sum(
         sum(p.numel() for p in m.parameters())
         for m in model.children()
-        if isinstance(m, nn.Embedding)
+        if isinstance(m, (nn.Embedding, HybridAnchorEmbedding))
     )
 
     # Reasoning behind the factor of 6 for the self-attention part of the formula:

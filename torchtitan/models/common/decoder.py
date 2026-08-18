@@ -117,23 +117,13 @@ class Decoder(BaseModel):
             rope = self.config.rope.build()
             rope.init_weights(buffer_device=buffer_device)
             self.freqs_cis = rope.cache
-        if self.tok_embeddings is not None:
-            nn.init.normal_(self.tok_embeddings.weight)
+        self._init_tok_embeddings()
         for layer in self.layers.values():
             # pyrefly: ignore [not-callable]
             layer.init_weights(buffer_device=buffer_device)
         if self.norm is not None:
             self.norm.reset_parameters()
-        final_out_std = self.config.dim**-0.5
-        cutoff_factor = 3
-        if self.output is not None:
-            trunc_normal_(
-                self.output.weight,
-                mean=0.0,
-                std=final_out_std,
-                a=-cutoff_factor * final_out_std,
-                b=cutoff_factor * final_out_std,
-            )
+        self._init_output()
         # --- NEW: Initialize MLP weights ---
         if self.enable_contrastive and self.contrastive_proj is not None:
             buffer_device = kwargs.get("buffer_device") or self.freqs_cis.device
@@ -148,6 +138,30 @@ class Decoder(BaseModel):
                     )
                     if mod.bias is not None:
                         nn.init.zeros_(mod.bias)
+
+    def _init_tok_embeddings(self):
+        """Initialize the token (input) embeddings.
+
+        Split out of ``init_weights`` (and called from its original position, so the RNG draw
+        order is unchanged) purely so subclasses can override it. Llama3Model does, because a
+        HybridAnchorEmbedding has no single ``.weight`` to initialize.
+        """
+        if self.tok_embeddings is not None:
+            nn.init.normal_(self.tok_embeddings.weight)
+
+    def _init_output(self):
+        """Initialize the output projection. Split out for the same reason as
+        ``_init_tok_embeddings`` above, and likewise called from its original position."""
+        if self.output is not None:
+            final_out_std = self.config.dim**-0.5
+            cutoff_factor = 3
+            trunc_normal_(
+                self.output.weight,
+                mean=0.0,
+                std=final_out_std,
+                a=-cutoff_factor * final_out_std,
+                b=cutoff_factor * final_out_std,
+            )
 
     def forward(
         self,
