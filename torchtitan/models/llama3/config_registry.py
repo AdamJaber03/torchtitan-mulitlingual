@@ -35,18 +35,19 @@ import random
 # Works regardless of the machine or working directory the job runs from.
 _PROJECT_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 
-P_READJUST_FACTOR = {"en": 1/1.04, "ar": 1/1.04, "translated_1to1map": 1.0, "ru": 1/1.04}
+P_READJUST_FACTOR = {"en": 1/1.04, "ar": 1/1.04, "translated_1to1map": 1.0}
 
 def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
+    """Arabic/English injection probabilities. Russian runs must use
+    get_injection_probabilities_ru -- the two tokenizers fragment the same corpus
+    differently, so the tables are not interchangeable."""
     token_stats = {         #collected from an analysis of the datasets with tokenizer 65k_paired trained on 50/50 arabic english data
     "fineweb-edu-ar-en": 1109.5,
     "fineweb-edu-ar-ar": 762.4,
     "fineweb-edu-ar-ar-translated_1to1map": 893.5,
     "fineweb-edu-ar-ar-translated": 807.9,
-    "fineweb2-hq-ru": 3103.236,
     "gemini_seeds_en": 19.7,
     "gemini_seeds_ar": 20.2,
-    "gemini_seeds_ru": 57.693,
     "gemini_seeds_tr2en": 19.8,
     "gemini_seeds_tr2en_1to1map": 23.4,
     "from_domains_humans_ar": 23.3,
@@ -63,6 +64,55 @@ def get_injection_probabilities(target_counts, tot_tokens, ds, inj_ds) -> list:
     tot_docs = tot_docs_no_inj + tot_inj_docs_per_inj_ds*len(inj_ds)
     probs = [count / tot_docs for count in target_counts]
     return [p * P_READJUST_FACTOR[ds.split("-")[-1]] for p in probs]
+
+RU_P_READJUST_FACTOR = {"en": 1.0, "ru": 1.0, "translated_1to1map": 1.0}
+
+
+def get_injection_probabilities_ru(target_counts, tot_tokens, ds, inj_ds) -> list:
+    """Russian counterpart of get_injection_probabilities.
+
+    Means measured by scripts/measure_token_stats_ru.py with the
+    en/ru tokenizer (tests/assets/65k_en1.0_ru1.0), +1 for the EOS the dataloader appends
+    per document. These are NOT interchangeable with the 65k_paired (en/ar) numbers: the
+    same English corpus measures 1071.4 tokens/doc here vs 1109.5 there, and Russian
+    fragments differently again, so reusing the en/ar table would push the realized
+    0/20/100/1000 exposure counts off target -- and exposure rate is the independent
+    variable of the whole knowledge-transfer experiment.
+
+    The TrRu rows are the output of the real training-time augmentation
+    (wordwise_unigram_codeswitching, prob=1.0, GOST fallback) applied to the original
+    Russian, which is what the dataloader actually feeds the model -- not the precomputed
+    fineweb2_hq/rus_Cyrl/translated_1to1map directory.
+
+    There is no Russian from_domains_humans family (those seed dirs carry no ru_data.jsonl),
+    so Russian injections come from gemini_seeds only -- pass a single-element inj_ds.
+    English injections use both gemini_seeds_en and from_domains_humans_en, as the Arabic
+    runs did.
+    """
+    token_stats = {     # tokenizer: tests/assets/65k_en1.0_ru1.0
+    # fineweb rows: systematic 1-in-100 stride within each of 221 (ru) / 205 (en) chunks
+    # spread across the corpus. Document length is non-stationary both across chunks
+    # (per-chunk means 766-1485) and within them (chunk heads are the long end), so a
+    # head-of-stream sample reads these low. 95% CI +-26 (ru) / +-23 (en).
+    "fineweb-edu-ar-en": 1071.4,
+    "fineweb2-hq-ru": 1083.7,
+    "fineweb2-hq-ru-translated_1to1map": 1334.4,
+    # injection rows: every document in the source, so no sampling error
+    "gemini_seeds_en": 21.1,
+    "gemini_seeds_ru": 20.6,
+    "gemini_seeds_ru_translated_1to1map": 23.9,
+    "from_domains_humans_en": 27.7,
+    }
+    inj_ds = inj_ds if isinstance(inj_ds, list) else [inj_ds]
+    assert len(target_counts) == 4, "Expected 4 target counts"
+    assert ds in token_stats.keys(), f"Dataset {ds} not found in token_stats. choose from {list(token_stats.keys())}"
+    assert all([inj_d in token_stats.keys() for inj_d in inj_ds]), f"at least one of these injection dataset {inj_ds} not found in token_stats. choose from {list(token_stats.keys())}"
+    tot_inj_docs_per_inj_ds = sum(target_counts) * 520  # 2080 injection dirs / 4 rate groups
+    tot_inj_tokens = sum(tot_inj_docs_per_inj_ds * token_stats[inj_d] for inj_d in inj_ds)
+    tot_docs_no_inj = (tot_tokens - tot_inj_tokens) / token_stats[ds]
+    tot_docs = tot_docs_no_inj + tot_inj_docs_per_inj_ds*len(inj_ds)
+    probs = [count / tot_docs for count in target_counts]
+    return [p * RU_P_READJUST_FACTOR[ds.split("-")[-1]] for p in probs]
 
 def llama3_debugmodel() -> Trainer.Config:
     return Trainer.Config(
@@ -1105,7 +1155,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 15_100_000,
                             "injection_paths": en_files,
                             "injection_probs": en2_probs,
                             "post_token_augmentations": [
@@ -1176,7 +1226,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1192,7 +1242,7 @@ def llama3_7B_en1_en2() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                     "post_token_augmentations": [
                                         {
                                             "name": "stochastic_word_tagging",
@@ -1267,14 +1317,14 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.2,
-                            "start_idx": 72_000_000,
+                            "start_idx": 13_600_000,
                             "injection_paths": en_files,
                             "injection_probs": pt1_en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.2,
-                            "start_idx": 96_000_000,
+                            "start_idx": 18_100_000,
                             "injection_paths": en_files,
                             "injection_probs": pt1_en2_probs,
                             "post_token_augmentations": [
@@ -1295,14 +1345,14 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 120_000_000,
+                            "start_idx": 22_700_000,
                             "injection_paths": en_files,
                             "injection_probs": pt2_en1_probs,
                         },
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 140_000_000,
+                            "start_idx": 26_500_000,
                             "injection_paths": en_files,
                             "injection_probs": pt2_en2_probs,
                             "post_token_augmentations": [
@@ -1373,7 +1423,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1389,7 +1439,7 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                     "post_token_augmentations": [
                                         {
                                             "name": "stochastic_word_tagging",
@@ -1416,11 +1466,11 @@ def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
     )
 def llama3_7B_en_translated_ru() -> Trainer.Config:
     target_counts_ru = [0, 20, 100, 1000]
-    base_probs_ru = get_injection_probabilities(target_counts_ru, tot_tokens=133600*512*2048/2,
-                                               ds="fineweb2-hq-ru", inj_ds=["gemini_seeds_ru"])
+    base_probs_ru = get_injection_probabilities_ru(target_counts_ru, tot_tokens=133600*512*2048/2,
+                                               ds="fineweb2-hq-ru-translated_1to1map", inj_ds=["gemini_seeds_ru_translated_1to1map"])
     print(f"base probs for translated russian: {base_probs_ru}")
     target_counts_en = [0, 20, 100, 1000]
-    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+    base_probs_en = get_injection_probabilities_ru(target_counts_en, tot_tokens=133600*512*2048/2,
                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
     print(f"base probs for english: {base_probs_en}")
     gemini_file_order_shuffler = random.Random(43)
@@ -1436,7 +1486,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
-        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_en1.0_ru1.0",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1446,7 +1496,6 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
                             "injection_paths": en_files,
                             "injection_probs": en_probs,
                         },
@@ -1504,7 +1553,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder=".outputs/llama3_7B_test5_en_translated_ru_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            folder=".outputs/llama3_7B_test5_en_translated_ru_v3_ru_tokenizer_injection_0_20_100_1000_20800entities_seq2048",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1527,14 +1576,14 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 100_000,
                                 },
                             ],
                         }
                     ],
                     eos_token_id=0 # Ensure this matches your tokenizer's EOS
                 ),
-                "ar": HuggingFaceTextDataLoader.Config(
+                "ru": HuggingFaceTextDataLoader.Config(
                     num_workers=3,
                     stages=[
                         {
@@ -1543,7 +1592,7 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb2-hq-ru",
                                     "weight": 1.0,
-                                    "start_idx": 45_000_000,
+                                    "start_idx": 100_000,
                                     "augmentations": [
                                         {
                                             "name": "wordwise_unigram_codeswitching",
@@ -1573,11 +1622,11 @@ def llama3_7B_en_translated_ru() -> Trainer.Config:
     )
 def llama3_7B_en_ru() -> Trainer.Config:
     target_counts_ru = [0, 20, 100, 1000]
-    base_probs_ru = get_injection_probabilities(target_counts_ru, tot_tokens=133600*512*2048/2,
+    base_probs_ru = get_injection_probabilities_ru(target_counts_ru, tot_tokens=133600*512*2048/2,
                                                ds="fineweb2-hq-ru", inj_ds=["gemini_seeds_ru"])
     print(f"base probs for russian: {base_probs_ru}")
     target_counts_en = [0, 20, 100, 1000]
-    base_probs_en = get_injection_probabilities(target_counts_en, tot_tokens=133600*512*2048/2,
+    base_probs_en = get_injection_probabilities_ru(target_counts_en, tot_tokens=133600*512*2048/2,
                                                ds="fineweb-edu-ar-en", inj_ds=["gemini_seeds_en", "from_domains_humans_en"])
     print(f"base probs for english: {base_probs_en}")
     gemini_file_order_shuffler = random.Random(43)
@@ -1593,7 +1642,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
     nnodes = int(os.environ.get("NNODES", 16))
     assert 16 % nnodes == 0, f"NNODES={nnodes} must evenly divide 16"
     return Trainer.Config(      
-        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_paired",
+        hf_assets_path=f"{_PROJECT_ROOT}/tests/assets/65k_en1.0_ru1.0",
         dataloader=HuggingFaceTextDataLoader.Config(
             num_workers=3,
             stages=[
@@ -1609,7 +1658,6 @@ def llama3_7B_en_ru() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-en",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
                             "injection_paths": en_files,
                             "injection_probs": en_probs,
                         },
@@ -1651,7 +1699,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
         ),
         checkpoint=CheckpointManager.Config(
             interval=500,
-            folder=".outputs/llama3_7B_test4_en_ru_stage1_34k_clean_injection_0_20_100_1000_20800entities_seq2048",
+            folder=".outputs/llama3_7B_test4_en_ru_v3_ru_tokenizer_injection_0_20_100_1000_20800entities_seq2048",
             enable=True,
             enable_first_step_checkpoint=True,
             last_save_in_hf=False,
@@ -1674,7 +1722,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 100_000,
                                 },
                             ],
                         }
@@ -1690,7 +1738,7 @@ def llama3_7B_en_ru() -> Trainer.Config:
                                 {
                                     "name": "fineweb2-hq-ru",
                                     "weight": 1.0,
-                                    "start_idx": 45_000_000,
+                                    "start_idx": 100_000,
                                 },
                             ],
                         }
@@ -1746,7 +1794,7 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                             "augmentations": [
@@ -1821,7 +1869,7 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1837,7 +1885,7 @@ def llama3_7B_en_translated_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                     "augmentations": [
                                         {
                                             "name": "wordwise_unigram_codeswitching",
@@ -1903,7 +1951,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                         },
@@ -1968,7 +2016,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -1984,7 +2032,7 @@ def llama3_7B_en_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                 },
                             ],
                         }
@@ -2039,7 +2087,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                         },
@@ -2102,7 +2150,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -2118,7 +2166,7 @@ def llama3_7B_en_ar_8n() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                 },
                             ],
                         }
@@ -2174,7 +2222,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                         {
                             "name": "fineweb-edu-ar-ar",
                             "weight": 0.5,
-                            "start_idx": 80_000_000,
+                            "start_idx": 13_000_000,
                             "injection_paths": ar_files,
                             "injection_probs": ar_probs,
                             "post_token_augmentations": [
@@ -2245,7 +2293,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-en",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 30_000_000,
                                 },
                             ],
                         }
@@ -2261,7 +2309,7 @@ def llama3_7B_en_anchored_ar() -> Trainer.Config:
                                 {
                                     "name": "fineweb-edu-ar-ar",
                                     "weight": 1.0,
-                                    "start_idx": 162_000_000,
+                                    "start_idx": 25_800_000,
                                     "post_token_augmentations": [
                                         {
                                             "name": "shared_anchor_remap",
