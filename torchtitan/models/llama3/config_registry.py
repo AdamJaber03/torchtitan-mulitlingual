@@ -21,7 +21,16 @@ from torchtitan.config import (
     LossConfig,
 )
 from torchtitan.hf_datasets.text_datasets import HuggingFaceTextDataLoader
-from torchtitan.hf_datasets.instruction_datasets import AyaSFTDataLoader
+
+try:
+    from torchtitan.hf_datasets.instruction_datasets import AyaSFTDataLoader
+except ImportError:
+    # torchtitan/hf_datasets/instruction_datasets.py is not present in this tree. Importing it
+    # unconditionally at module scope made the ENTIRE llama3 config registry unimportable --
+    # config/manager.py imports this whole module to resolve --config, so every llama3 config
+    # died, not just the Aya SFT ones. Degrade to a None sentinel so the other configs keep
+    # working; the llama3_7B_aya_sft* functions below then fail only if actually invoked.
+    AyaSFTDataLoader = None
 from torchtitan.protocols.model_converter import ModelConvertersContainer
 from torchtitan.tools.profiling import ProfilingConfig
 from torchtitan.trainer import Trainer
