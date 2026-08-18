@@ -1276,6 +1276,30 @@ def llama3_7B_en1_en2() -> Trainer.Config:
             ]
         )
     )
+def llama3_7B_en1_en2_hybrid_anchor() -> Trainer.Config:
+    """llama3_7B_en1_en2 with a partially-tied (hybrid anchor) input embedding.
+
+    Identical to the baseline in every respect -- same data, tagging, schedule, parallelism and
+    batch size -- except that tok_embeddings becomes a HybridAnchorEmbedding: each tagged token
+    65536+i shares 4092 of its 4096 embedding dims with its untagged twin i, leaving a 4-dim
+    independent sliver. That makes this a one-variable ablation against llama3_7B_en1_en2.
+
+    Derived by mutation rather than copied so the two configs cannot drift apart; the only edits
+    are the model flavor and the checkpoint folder.
+
+    The LM head is NOT tied (7B_flex_2xvocab does not enable weight tying), so the anchoring is
+    input-side only and the head keeps 131072 independent rows. Note the anchored input embedding
+    has 268.7M params vs the baseline's 536.9M -- fewer parameters is inherent to the tying, not a
+    misconfiguration.
+    """
+    config = llama3_7B_en1_en2()
+    config.model_spec = model_registry("7B_flex_tagged_hybrid_anchor")
+    # Fresh folder: this must never resume from the non-anchor baseline's checkpoints, whose
+    # tok_embeddings.weight has no counterpart in the anchor model's state dict.
+    config.checkpoint.folder = ".outputs/llama3_7B_test1_en1_en2_hybrid_anchor_2xvocab_stage1_133.6k_clean_injection_0_20_100_1000_20800entities_seq2048"
+    return config
+
+
 def llama3_7B_en1_en2_codeswitching() -> Trainer.Config:
     target_counts_en2 = [0, 20, 100, 1000]
     pt1_base_probs_en2 = get_injection_probabilities([t*(1100/1336) for t in target_counts_en2], tot_tokens=100_000*512*2048/5,

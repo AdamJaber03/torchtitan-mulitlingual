@@ -379,6 +379,33 @@ llama3_configs = {
     ),
 }
 
+import dataclasses as _dc
+
+# Tagged hybrid-anchor variant of "7B_flex_2xvocab" -- the doubled vocab is split into an
+# EN-origin first half [0, 65536) and a "tagged" second half [65536, 131072). Each second-half
+# token 65536+i is partially tied (shared anchor subspace) to its first-half twin i via the
+# synthetic "identity_shift:65536" anchor map, so no data file is needed. Pair with a training
+# config that tags one stream into the second half via stochastic_word_tagging with
+# vocab_size=65536 -- see llama3_7B_en1_en2_hybrid_anchor in config_registry.py.
+#
+# enable_weight_tying is deliberately LEFT AT 7B_flex_2xvocab's False, unlike the smollm2_360m
+# tagged-anchor flavors which tie. Only the INPUT embedding is anchored here; the LM head stays a
+# stock nn.Linear. That keeps this a one-variable change against the llama3_7B_en1_en2 baseline,
+# and avoids TiedAnchorOutput rebuilding a [131072, 4096] matrix every microbatch.
+#
+# At dim=4096 and fraction 0.999 the split is anchor_dim=4092 / residual_dim=4, i.e. a 4-dim
+# independent sliver per token (the 360m runs at dim=960 get a 1-dim sliver). Use 4095/4096
+# (~0.99976) instead if an exactly-1-dim sliver is wanted.
+#
+# Registered here (not only wired into the Trainer config) so flavor-name resolvers -- e.g.
+# scripts/checkpoint_conversion/convert_to_hf.py's model_registry(model_flavor) -- rebuild the
+# exact architecture instead of the stock 2xvocab (non-anchor) model.
+llama3_configs["7B_flex_tagged_hybrid_anchor"] = _dc.replace(
+    llama3_configs["7B_flex_2xvocab"],
+    anchor_embedding_path="identity_shift:65536",
+    anchor_shared_dim_fraction=0.999,
+)
+
 
 def model_registry(flavor: str) -> ModelSpec:
     return ModelSpec(
